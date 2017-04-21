@@ -107,9 +107,6 @@ class DocstringPython(object):
 
             output_str += block_str
 
-        formatter = str_format.NumberifyFormatter()
-        output_str = formatter.format(output_str)
-
         return output_str
 
 

@@ -123,44 +123,44 @@ class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
-    # def test_build_docstring_multi_args(self):
-    #     '''Build docstrings for functions with more than one positional arg.'''
-    #     some_function = \
-    #         '''\
-    #         def some_function(some_arg, another_arg):
-    #             {curs}
-    #             pass
-    #         '''.format(curs=self.cursor.pointer)
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+    def test_build_docstring_multi_args(self):
+        '''Build docstrings for functions with more than one positional arg.'''
+        some_function = \
+            '''\
+            def some_function(some_arg, another_arg):
+                {curs}
+                pass
+            '''.format(curs=self.cursor.pointer)
+        expected_output = \
+            '''\
+            {1}.
 
-    #         Args:
-    #             some_arg ({2}): {3}.
-    #             another_arg ({4}): {5}.
+            Args:
+                some_arg ({2}): {3}.
+                another_arg ({4}): {5}.
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-    # def test_build_docstring_default_arg(self):
-    #     '''Create a docstring that has default arg info.'''
-    #     some_function = \
-    #         '''\
-    #         def some_function(some_arg=8):
-    #             {curs}
-    #             pass
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+    def test_build_docstring_default_arg(self):
+        '''Create a docstring that has default arg info.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=8):
+                {curs}
+                pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-    #         Args:
-    #             some_arg ({int}): {2}.
+            Args:
+                some_arg ({2:int}): {3}.
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
     # def test_build_docstring_default_arg_custom(self):
     #     '''Build a docstring that has a default arg that is not built in.'''

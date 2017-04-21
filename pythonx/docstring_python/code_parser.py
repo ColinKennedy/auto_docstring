@@ -106,7 +106,7 @@ class ParserPython(object):
                 return 'method'
             elif isinstance(row_type, ast.Expr):
                 return 'class_properties'
-        return context_types.get(row_type, '')
+        return context_types.get(type(row_type), '')
 
     def get_info(self, node, node_type=''):
         class ExitVisitor(ast.NodeVisitor):
@@ -152,15 +152,15 @@ class ParserPython(object):
         args_len = len(node.args.args)
         for index, arg in enumerate(node.args.args):
             try:
-                arg_type = node.args.defaults[-1 * index]
-                arg_type = getattr(arg_type, arg_type._fields[0])
+                type_ = node.args.defaults[-1 * index]
+                type_ = get_type_as_str(type(getattr(type_, type_._fields[0])))
             except IndexError:
-                arg_type = ''
+                type_ = ''
 
             args.append(
                 {
                     'name': arg.id,
-                    'type': arg_type,
+                    'type': type_,
                     'message': ''
                 })
 
