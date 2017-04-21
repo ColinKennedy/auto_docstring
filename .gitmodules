@@ -1,0 +1,3 @@
+[submodule "core"]
+	path = pythonx/docstring_python/core
+	url = https://github.com/ColinKennedy/core.git

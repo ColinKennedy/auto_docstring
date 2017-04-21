@@ -17,6 +17,9 @@ class MultiTypeBlock(object):
         self.label = label
         self.block_info = []
 
+    def is_empty(self):
+        return not self.block_info
+
     def add_block_object_raw(self, info):
         '''Add the information directly into the object instance's data.
 
@@ -74,13 +77,14 @@ class MultiTypeBlock(object):
             output_str += ': '
 
             info_message = info_dict.get('message', '')
-            output_str += '{' + info_message + '}'
+            output_str += '{' + info_message + '}.'
 
             is_last = self.block_info.index(info_dict) == \
                 len(self.block_info) - 1
 
             if not is_last:
                 output_str += '\n'
+
         return output_str
 
 
@@ -92,7 +96,14 @@ class InlineTypeBlock(MultiTypeBlock):
         super(InlineTypeBlock, self).draw(method=method)
         output_str = str(self.label) + ':\n'
         types = [block.get('type') for block in self.block_info]
-        types[0] = '    ' + types[0]
+        try:
+            types[0] = '    ' + types[0]
+        except IndexError:
+            # This shouldn't ever happen because, ideally, if this method has
+            # information in its block, it should have some idea of its type
+            #
+            types = []
+
         output_str += ' or '.join(types) + ':'
         output_str += ' {}'
 

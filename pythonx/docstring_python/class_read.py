@@ -110,61 +110,68 @@ def create_auto_docstring(code, row, language, style):
 def test():
     '''Get a test class object.'''
     cursor_marker_text = 'X'
+    # example_file = \
+    #     """\
+    #     class SomeClasWithInfo(object):
+
+    #         '''Some inner docstring.'''
+
+    #         def __init__(self, asdfasdf):
+    #             '''A method with info inside of it.
+
+    #             Args:
+    #                 asdfasdf (asdsd): asdfasdfsds adf. asdsfd
+
+    #             '''
+    #             super(SomeClasWithInfo, self).__init__()
+
+    #         @classmethod
+    #         def inner_method(cls, something, another, tt=8, lastly='asdfsf'):
+    #             '''Some info.
+
+    #             Args:
+    #                 something (asdfasdfasdf): asdfasdfsfd.
+    #                 another (asdfasdf): asdfasdfj
+
+    #             '''
+    #             {POSITION}
+    #             self.something = ('asdfasdf, 8')
+    #             raise ValueError("Thing 'here'")
+    #             raise NotImplementedError('Something with a really long string that '
+    #                                       'spans multiple lines.')
+    #             if self.something:
+    #                 return 'asdf'
+    #             return True
+    #             yield 'something'
+
+
+    #     class AnotherThing(SomeClasWithInfo):
+
+    #         '''Whatever.'''
+
+    #         def __init__(self, ttt):
+    #             '''asfdasdf.'''
+    #             super(AnotherThing, self).__init__(ttt)
+
+    #         def asdfasfd(self):
+    #             '''asdfasd.'''
+    #             pass
+
+
+    #     def some_asdfasdf(self):
+    #         '''.
+
+    #         Args:
+    #              ()
+
+    #         '''
+    #         pass
+    #     """.format(POSITION=cursor_marker_text)
+
     example_file = \
         """\
-        class SomeClasWithInfo(object):
-
-            '''Some inner docstring.'''
-
-            def __init__(self, asdfasdf):
-                '''A method with info inside of it.
-
-                Args:
-                    asdfasdf (asdsd): asdfasdfsds adf. asdsfd
-
-                '''
-                super(SomeClasWithInfo, self).__init__()
-
-            @classmethod
-            def inner_method(cls, something, another, tt=8, lastly='asdfsf'):
-                '''Some info.
-
-                Args:
-                    something (asdfasdfasdf): asdfasdfsfd.
-                    another (asdfasdf): asdfasdfj
-
-                '''
-                {POSITION}
-                self.something = ('asdfasdf, 8')
-                raise ValueError("Thing 'here'")
-                raise NotImplementedError('Something with a really long string that '
-                                          'spans multiple lines.')
-                if self.something:
-                    return 'asdf'
-                return True
-                yield 'something'
-
-
-        class AnotherThing(SomeClasWithInfo):
-
-            '''Whatever.'''
-
-            def __init__(self, ttt):
-                '''asfdasdf.'''
-                super(AnotherThing, self).__init__(ttt)
-
-            def asdfasfd(self):
-                '''asdfasd.'''
-                pass
-
-
-        def some_asdfasdf(self):
-            '''.
-
-            Args:
-                 ()
-
-            '''
+        def some_function(some_arg):
+            {POSITION}
             pass
         """.format(POSITION=cursor_marker_text)
     example_file = textwrap.dedent(example_file)

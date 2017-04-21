@@ -93,7 +93,7 @@ class CommonFunctionTestCase(common.CommonTestCase):
         '''
         docs = self.get_docstring(input_text)
         expected_output = textwrap.dedent(expected_output)
-        self.assertEqual(docs.get_docstring(), expected_output)
+        self.assertEqual(docs, expected_output)
 
 
 class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):

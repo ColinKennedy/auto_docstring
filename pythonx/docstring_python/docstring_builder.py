@@ -5,6 +5,23 @@
 
 # IMPORT STANDARD LIBRARIES
 import os
+import re
+
+# IMPORT LOCAL LIBRARIES
+# TODO : Make this relative
+from core.formatting import str_format
+
+
+class PassThroughDict(object):
+
+    '''.'''
+
+    def __init__(self):
+        '''.'''
+        super(PassThroughDict, self).__init__()
+
+    def __getitem__(self, key):
+        return key
 
 
 class DocstringPython(object):
@@ -68,14 +85,42 @@ class DocstringPython(object):
             final_blocks.append(block_object)
 
         # Display each block's docstring information
-        output_str = ''
+        output_str = '{1}.\n\n'
+        offset_value = 1
+        number_formatter = str_format.NumberifyWordFormatter()
         for block in final_blocks:
-            output_str += block.draw('formatted')
+            if block.is_empty():
+                continue
+
+            block_str = block.draw('formatted')
             is_last_element = final_blocks.index(block) == len(final_blocks) - 1
             if not is_last_element:
-                output_str += '\n\n'
+                block_str += '\n\n'
+
+            offset_value = get_offset_value(output_str)
+
+            # Add numbers wherever needed
+            block_str = number_formatter.format(block_str, dict())
+
+            formatter = str_format.OffsetFormatter(offset=offset_value + 1)
+            block_str = formatter.format(block_str, PassThroughDict())
+
+            output_str += block_str
+
+        formatter = str_format.NumberifyFormatter()
+        output_str = formatter.format(output_str)
 
         return output_str
+
+
+def get_offset_value(input_str):
+    match = re.search('{(\d+)}', input_str)
+    if not match:
+        return 0
+
+    if match:
+        return max((int(num) for num in match.groups()))
+
 
 
 if __name__ == '__main__':

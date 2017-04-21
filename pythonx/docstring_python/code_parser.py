@@ -35,6 +35,9 @@ class CollectorPython(object):
         tree = ast.parse(code)
         previous_node = None
         for node in ast.walk(tree):
+            if not isinstance(node, (ast.ClassDef, ast.FunctionDef)):
+                continue
+
             try:
                 line_number = node.lineno
             except AttributeError:
@@ -44,8 +47,8 @@ class CollectorPython(object):
                     if previous_node is None:
                         return node
                     return previous_node
-                previous_node = node
-            #     previous_node = node
+            previous_node = node
+        return previous_node
 
 
 class ParserPython(object):
@@ -206,6 +209,10 @@ class ParserPython(object):
             row = self.row
 
         previous_node = None
+
+        if isinstance(self.collector, ast.FunctionDef):
+            return self.collector
+
         body = self.collector.body
         for node in body:
             if node.lineno > row:
