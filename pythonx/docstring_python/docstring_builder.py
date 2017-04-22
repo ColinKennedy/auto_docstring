@@ -87,25 +87,24 @@ class DocstringPython(object):
         # Display each block's docstring information
         output_str = '{1}.\n\n'
         offset_value = 1
-        number_formatter = str_format.NumberifyWordFormatter()
-        for block in final_blocks:
+        for index, block in enumerate(final_blocks):
+            number_formatter = str_format.NumberifyWordFormatter()
             if block.is_empty():
                 continue
 
             block_str = block.draw('formatted')
-            is_last_element = final_blocks.index(block) == len(final_blocks) - 1
-            if not is_last_element:
-                block_str += '\n\n'
+            is_last_element = index == len(final_blocks) - 1
+            # Separate new blocks
+            block_str += '\n\n'
 
             offset_value = get_offset_value(output_str)
 
             # Add numbers wherever needed
-            block_str = number_formatter.format(block_str, dict())
-
-            formatter = str_format.OffsetFormatter(offset=offset_value + 1)
-            block_str = formatter.format(block_str, PassThroughDict())
-
             output_str += block_str
+            output_str = number_formatter.format(output_str, dict())
+            # formatter = str_format.OffsetFormatter(offset=offset_value + 1)
+            # block_str = formatter.format(block_str, PassThroughDict())
+
 
         return output_str
 

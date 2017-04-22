@@ -9,6 +9,7 @@ import ast
 NODE_TYPES = \
     {
         ast.Str: 'str',
+        ast.List: 'list',
     }
 
 
@@ -153,7 +154,11 @@ class ParserPython(object):
         for index, arg in enumerate(node.args.args):
             try:
                 type_ = node.args.defaults[-1 * index]
-                type_ = get_type_as_str(type(getattr(type_, type_._fields[0])))
+                if isinstance(type_, ast.Call):
+                    type_ = '<{module}.{attr}>'.format(
+                        module=type_.func.value.id, attr=type_.func.attr)
+                else:
+                    type_ = get_type_as_str(type(getattr(type_, type_._fields[0])))
             except IndexError:
                 type_ = ''
 

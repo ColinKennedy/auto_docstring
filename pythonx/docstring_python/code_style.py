@@ -95,7 +95,13 @@ class InlineTypeBlock(MultiTypeBlock):
     def draw(self, method):
         super(InlineTypeBlock, self).draw(method=method)
         output_str = str(self.label) + ':\n'
-        types = [block.get('type') for block in self.block_info]
+        types_ = [block.get('type') for block in self.block_info]
+
+        types = []
+        for type_ in types_:
+            if type_ not in types:
+                types.append(type_)
+
         try:
             types[0] = '    ' + types[0]
         except IndexError:
@@ -105,7 +111,7 @@ class InlineTypeBlock(MultiTypeBlock):
             types = []
 
         output_str += ' or '.join(types) + ':'
-        output_str += ' {}'
+        output_str += ' {}.'
 
         return output_str
 
