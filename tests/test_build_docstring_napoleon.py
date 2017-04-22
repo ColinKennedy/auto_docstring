@@ -919,6 +919,24 @@ class FunctionDocstringPositionTestCase(CommonFunctionTestCase, unittest.TestCas
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
+    def test_end_function_in_file(self):
+        some_function = self.functions.format(top='', mid='', bottom='{curs}')
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                third_function_arg ({2}): {3}.
+                top ({4:str}, optional): {5}.
+
+            Yields:
+                str: {6}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+
 
 class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
     def test_no_raise(self):

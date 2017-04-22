@@ -59,51 +59,7 @@ class CollectorPython(object):
                     break
             walked_nodes.append(node)
 
-        # # If the last node we reached was a class or function, then that means
-        # # that the cursor position was likely inside of the node before that.
-        # # To protect against this case, we check for this and return the second
-        # # to last class if the last node is a class
-        # #
-        # highest_parent_node = walked_nodes[-1]
-        # highest_parent_node_type = type(highest_parent_node)
-        # if isinstance(highest_parent_node, (ast.ClassDef, ast.FunctionDef)):
-        #     try:
-        #         print(walked_nodes)
-        #         highest_parent_node = \
-        #             [node for node in walked_nodes[:-2]
-        #              if isinstance(node, highest_parent_node_type)][0]
-        #     except IndexError:
-        #         pass
-        # return highest_parent_node
-
-        # If the last node we reached was a class, then that means that the
-        # cursor position was likely actually a function within the previous
-        # class. To protect ourselves, we check for this and return the second
-        # to last class if the last node is a class
-        #
-        highest_level_parent_node = walked_nodes[-1]
-        print(highest_level_parent_node.name)
-        if isinstance(highest_level_parent_node, ast.ClassDef):
-            try:
-                highest_level_parent_node = walked_nodes[-2]
-            except AttributeError:
-                pass
-        return highest_level_parent_node
-
-        # # If the last node we reached was a class, then that means that the
-        # # cursor position was likely actually a function within the previous
-        # # class. To protect ourselves, we check for this and return the second
-        # # to last class if the last node is a class
-        # #
-        # highest_level_parent_node = walked_nodes[-1]
-        # try:
-        #     if not isinstance(highest_level_parent_node, ast.FunctionDef):
-        #         highest_level_parent_node = \
-        #             [node for node in walked_nodes[:-1]
-        #             if isinstance(node, (ast.ClassDef, ast.FunctionDef))][-1]
-        # except IndexError:
-        #     pass
-        # return highest_level_parent_node
+        return walked_nodes[-1]
 
 
 class ParserPython(object):
@@ -236,6 +192,7 @@ class ParserPython(object):
                 pass
 
         visitor = ExitVisitor()
+        print('NODE', node.name)
         visitor.visit(node)
         raises = visitor.raises
         returns = visitor.returns
