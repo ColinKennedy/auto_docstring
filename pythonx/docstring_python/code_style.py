@@ -97,8 +97,6 @@ class MultiTypeBlock(object):
 class MultiNoTypeBlock(MultiTypeBlock):
     def __init__(self, label):
         super(MultiNoTypeBlock, self).__init__(label=label)
-        self.label = label
-        self.block_info = []
 
     def get_type(self, info):
         return ''
@@ -113,21 +111,24 @@ class InlineTypeBlock(MultiTypeBlock):
         output_str = str(self.label) + ':\n'
         types_ = [block.get('type') for block in self.block_info]
 
-        types = []
+        item_types = []
         for type_ in types_:
-            if type_ not in types:
-                types.append(type_)
+            if type_ not in item_types:
+                item_types.append(type_)
 
         try:
-            types[0] = '    ' + types[0]
+            item_types[0] = '    ' + item_types[0]
         except IndexError:
             # This shouldn't ever happen because, ideally, if this method has
             # information in its block, it should have some idea of its type
             #
-            types = []
+            item_types = []
 
-        output_str += ' or '.join(types) + ':'
-        output_str += ' {}.'
+        if item_types:
+            output_str += ' or '.join(item_types) + ':'
+            output_str += ' {}.'
+        else:
+            output_str += '    '
 
         return output_str
 

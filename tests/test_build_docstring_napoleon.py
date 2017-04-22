@@ -930,6 +930,31 @@ class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
+    def test_multi_raise_and_return(self):
+        some_function = \
+            '''\
+            def some_function():
+                {curs}
+                if some_condition:
+                    raise ValueError('TTTT')
+                    raise TypeError('ZZZ')
+                return True
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Raises:
+                ValueError: {2:TTTT}.
+                TypeError: {3:ZZZ}.
+
+            Returns:
+                bool: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
 
 # class BuildClassDocstringTestCase(unittest.TestCase):
 

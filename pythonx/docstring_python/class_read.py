@@ -59,21 +59,7 @@ def get_code_block_from_lines(lines):
         return lines
 
 
-def create_auto_docstring(code, row, language, style):
-    '''Build a docstring, automatically, for some code.
-
-    Args:
-        code (str): The code to create an automatic docstring of.
-        row (int): The cursor's position, relative to the code.
-        language (str): The language to assume that the code is.
-                        This argument will be used to get a parser class
-                        in order to parse the code.
-        style (str): The style to draw the docstring in. Suggestion: 'google'.
-
-    Returns:
-        str: The automatic docstring generated.
-
-    '''
+def get_builder(code, row, language, style):
     language = language.lower()
     style = style.lower()
 
@@ -103,8 +89,33 @@ def create_auto_docstring(code, row, language, style):
         raise ValueError('Language: "{lang}" has no builder. Language options '
                          'were, "{opt}".'.format(lang=language,
                                                  opt=sorted(BUILDERS.keys())))
-    builder = builder(parser=parsed_code, style=style_object)
-    return builder.create_docstring()
+    return builder(parser=parsed_code, style=style_object)
+
+
+def create_auto_docstring(code, row, language, style, blocks='*'):
+    # '''Build a docstring, automatically, for some code.
+
+    # Args:
+    #     code (str): The code to create an automatic docstring of.
+    #     row (int): The cursor's position, relative to the code.
+    #     language (str): The language to assume that the code is.
+    #                     This argument will be used to get a parser class
+    #                     in order to parse the code.
+    #     style (str): The style to draw the docstring in. Suggestion: 'google'.
+
+    # Returns:
+    #     str: The automatic docstring generated.
+
+    # '''
+    builder = get_builder(
+        code=code, row=row, language=language, style=style)
+    return builder.create_docstring(blocks)
+
+
+def create_auto_docstring_block(code, row, language, style, block):
+    builder = get_builder(
+        code=code, row=row, language=language, style=style)
+    return builder.create_docstring_block(block)
 
 
 def test():

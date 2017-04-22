@@ -8,8 +8,11 @@ import ast
 
 NODE_TYPES = \
     {
-        ast.Str: 'str',
+        ast.BoolOp: 'bool',
         ast.List: 'list',
+        ast.Num: 'float',
+        ast.Str: 'str',
+        ast.Tuple: 'tuple'
     }
 
 
@@ -55,6 +58,23 @@ class CollectorPython(object):
             else:
                 if line_number > row:
                     break
+
+        # # If the last node we reached was a class or function, then that means
+        # # that the cursor position was likely inside of the node before that.
+        # # To protect against this case, we check for this and return the second
+        # # to last class if the last node is a class
+        # #
+        # highest_parent_node = walked_nodes[-1]
+        # highest_parent_node_type = type(highest_parent_node)
+        # if isinstance(highest_parent_node, (ast.ClassDef, ast.FunctionDef)):
+        #     try:
+        #         print(walked_nodes)
+        #         highest_parent_node = \
+        #             [node for node in walked_nodes[:-2]
+        #              if isinstance(node, highest_parent_node_type)][0]
+        #     except IndexError:
+        #         pass
+        # return highest_parent_node
 
         # If the last node we reached was a class, then that means that the
         # cursor position was likely actually a function within the previous
@@ -253,6 +273,9 @@ class ParserPython(object):
 def get_ast_type(node):
     if isinstance(node, ast.Name):
         return get_type_as_str(type(eval(node.id)))
+    if isinstance(node, ast.Call):
+        return '<{func}.{attr}>'.format(func=node.func.value.id,
+                                        attr=node.func.attr)
 
     return NODE_TYPES[node.__class__]
 

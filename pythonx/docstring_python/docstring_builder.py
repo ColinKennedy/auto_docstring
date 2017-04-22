@@ -13,11 +13,7 @@ from core.formatting import str_format
 
 
 class PassThroughDict(object):
-
-    '''.'''
-
     def __init__(self):
-        '''.'''
         super(PassThroughDict, self).__init__()
 
     def __getitem__(self, key):
@@ -64,17 +60,39 @@ class DocstringPython(object):
                                                 opt=cls.valid_display_orders))
         return display_orders
 
-    def create_docstring(self):
-        '''str: Draw an automatic Python docstring.'''
+    def create_docstring_block(self, block):
+        blocks = self.get_row_blocks()
+        block_object = self.style.get_block(block)
+        if block_object is None:
+            raise ValueError(
+                'Block: "{0}" was not a valid block. Options were, "{1}".'
+                ''.format(block, sorted(self.style.block_types.keys())))
+
+        block_object = block_object(block)
+        for arg_info in blocks.get(block, []):
+            block_object.add_block_object_raw(arg_info)
+
+        auto_block_docstring = block_object.draw('formatted')
+        number_formatter = str_format.NumberifyWordFormatter()
+        return number_formatter.format(auto_block_docstring)
+
+    def get_row_blocks(self):
         context = self.parser.get_context()
         row_info = self.parser.get_info(self.parser.get_row_type(),
                                         node_type=context)
-        blocks = row_info.get('blocks')
+        return row_info.get('blocks')
+
+    def create_docstring(self, allowed_blocks='*'):
+        '''Draw an automatic Python docstring.'''
+        blocks = self.get_row_blocks()
+
+        if allowed_blocks == '*':
+            allowed_blocks = self.get_block_order()
 
         # Build blocks that will represent our docstrings
         final_blocks = []
         for block in [block for block in self.get_block_order()
-                      if block in blocks]:
+                      if block in blocks and block in allowed_blocks]:
             block_object = self.style.get_block(block)
             if block_object is None:
                 continue
