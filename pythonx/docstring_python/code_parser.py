@@ -43,21 +43,21 @@ class CollectorPython(object):
                 continue
 
             if isinstance(node, ast.FunctionDef):
-                for nodes in walked_nodes:
-                    for node_ in ast.walk(node):
+                for walk_node in walked_nodes:
+                    for node_ in ast.walk(walk_node):
                         if isinstance(node_, ast.FunctionDef) and node == node_:
-                            node.parent = node_
+                            node.parent = walk_node
                             break
 
-            walked_nodes.append(node)
-
             try:
-                line_number = node.lineno
+                # row is base 0 but line number is base 1 so offset by 1
+                line_number = node.lineno - 1
             except AttributeError:
                 pass
             else:
                 if line_number > row:
                     break
+            walked_nodes.append(node)
 
         # # If the last node we reached was a class or function, then that means
         # # that the cursor position was likely inside of the node before that.
@@ -80,14 +80,30 @@ class CollectorPython(object):
         # cursor position was likely actually a function within the previous
         # class. To protect ourselves, we check for this and return the second
         # to last class if the last node is a class
-        # 333
+        #
         highest_level_parent_node = walked_nodes[-1]
+        print(highest_level_parent_node.name)
         if isinstance(highest_level_parent_node, ast.ClassDef):
             try:
                 highest_level_parent_node = walked_nodes[-2]
             except AttributeError:
                 pass
         return highest_level_parent_node
+
+        # # If the last node we reached was a class, then that means that the
+        # # cursor position was likely actually a function within the previous
+        # # class. To protect ourselves, we check for this and return the second
+        # # to last class if the last node is a class
+        # #
+        # highest_level_parent_node = walked_nodes[-1]
+        # try:
+        #     if not isinstance(highest_level_parent_node, ast.FunctionDef):
+        #         highest_level_parent_node = \
+        #             [node for node in walked_nodes[:-1]
+        #             if isinstance(node, (ast.ClassDef, ast.FunctionDef))][-1]
+        # except IndexError:
+        #     pass
+        # return highest_level_parent_node
 
 
 class ParserPython(object):
@@ -127,14 +143,20 @@ class ParserPython(object):
                 ast.FunctionDef: 'function',
                 ast.Module: 'module',
             }
-
         try:
             parent = self.collector.parent
             has_parent = True
         except AttributeError:
             has_parent = False
 
-        if has_parent or isinstance(self.collector, ast.ClassDef):
+        parent = None
+        try:
+            parent = self.collector.parent
+        except AttributeError:
+            pass
+
+        if isinstance(self.collector, ast.ClassDef) or \
+                (parent and isinstance(parent, ast.ClassDef)):
             if isinstance(row_type, ast.FunctionDef):
                 decorator_names = [dec.id for dec in row_type.decorator_list]
                 if 'classmethod' in decorator_names:
@@ -190,15 +212,16 @@ class ParserPython(object):
         args_len = len(node.args.args)
         for index, arg in enumerate(node.args.args):
             try:
-                default_index = index - args_len
-                type_ = node.args.defaults[default_index]
+                type_ = node.args.defaults[index - args_len]
+            except IndexError:
+                type_ = ''
+            else:
                 if isinstance(type_, ast.Call):
                     type_ = '<{module}.{attr}>'.format(
                         module=type_.func.value.id, attr=type_.func.attr)
                 else:
-                    type_ = get_type_as_str(type(getattr(type_, type_._fields[0])))
-            except IndexError:
-                type_ = ''
+                    type_ = get_type_as_str(
+                        type(getattr(type_, type_._fields[0])))
 
             args.append(
                 {
@@ -206,7 +229,6 @@ class ParserPython(object):
                     'type': type_,
                     'message': ''
                 })
-
         if node_type in ['method', 'classmethod']:
             try:
                 args = args[1:]
@@ -254,7 +276,7 @@ class ParserPython(object):
         previous_node = None
 
         if isinstance(self.collector, ast.FunctionDef):
-            return self.collector
+            previous_node = self.collector
 
         body = self.collector.body
         for node in body:
@@ -277,7 +299,16 @@ def get_ast_type(node):
         return '<{func}.{attr}>'.format(func=node.func.value.id,
                                         attr=node.func.attr)
 
-    return NODE_TYPES[node.__class__]
+    return NODE_TYPES.get(node.__class__, '{unknown}')
+
+
+def get_top_most_parent(node, parent=None):
+    try:
+        parent = node.parent
+    except AttributeError:
+        return node
+    else:
+        return get_top_most_parent(node, parent=parent)
 
 
 def get_type_as_str(object_type):

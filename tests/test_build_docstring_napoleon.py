@@ -100,9 +100,9 @@ class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
 
     '''Create docstrings for a napoleon-style function.'''
 
-    def test_build_docstring_no_args(self):
-        '''Make a docstring that is just a summary line.'''
-        pass
+    # def test_build_docstring_no_args(self):
+    #     '''Make a docstring that is just a summary line.'''
+    #     pass
 
     def test_build_docstring_one_arg(self):
         '''Make a function docstring that has one positional arg.'''
@@ -310,36 +310,55 @@ class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
-    # # def test_nested_function_returns(self):
-    # #     '''Do not pick up return lines from a nested function.'''
-    # #     some_function = \
-    # #         '''\
-    # #         def a_parent_wrapped_func(yyy='asfd'):
-    # #             {curs}
-    # #             def some_function(some_arg=collections.OrderedDict()):
-    # #                 if something:
-    # #                     yield True
-    # #                 yield []
-    # #             return True
+    def test_nested_function_docstring(self):
+        some_function = \
+            '''\
+            def an_outer_function(*args, **kwargs):
+                def inner_function(some_arg=collections.OrderedDict()):
+                    {curs}
+                    if something:
+                        yield True
+                    yield []
 
-    # #         '''.format(curs=self.cursor.pointer)
-    # #     some_function = textwrap.dedent(some_function)
-    # #     some_function = some_function.split('\n')
-    # #     row, _ = self.cursor.get_position(some_function)
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-    # #     docs = docstring.get_docstring(lines=some_function, row=row)
-    # #     expected_output = \
-# # '''{1}.
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
 
-# # Args:
-    # # yyy ({str}): {2}.
+            Yields:
+                bool or list: {4}.
 
-# # Yields:
-    # # bool: {3}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-# # '''
-    # #     expected_output = textwrap.dedent(expected_output)
-    # #     self.assertEqual(docs.get_docstring(), expected_output)
+    def test_nested_function_parent_function(self):
+        some_function = \
+            '''\
+            def a_parent_wrapped_func(yyy='asfd'):
+                {curs}
+                def some_function(some_arg=collections.OrderedDict()):
+                    if something:
+                        yield True
+                    yield []
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                yyy ({2:str}, optional): {3}.
+
+            Yields:
+                bool or list: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
     # def test_build_return_docstring_implicit(self):
     #     '''Create a docstring where one or more bare return is used.'''
@@ -352,64 +371,6 @@ class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
     # def test_build_docstring_multiline_args(self):
     #     '''Build a function docstring from a definition that is 2+ lines.'''
     #     pass
-
-    # # def test_nested_function_definition(self):
-    # #     '''Create a function docstring, even if inside another function.'''
-    # #     # some_function = \
-    # #     #     '''\
-    # #     #     def some_wrapped_function():
-    # #     #         def some_function(ttt_arg=collections.OrderedDict()):
-    # #     #             {curs}
-    # #     #             if something:
-    # #     #                 yield True
-    # #     #             yield []
-
-    # #     #     '''.format(curs=self.cursor.pointer)
-    # #     # some_function = textwrap.dedent(some_function)
-    # #     # some_function = some_function.split('\n')
-    # #     # row, _ = self.cursor.get_position(some_function)
-
-    # #     # docs = docstring.get_docstring(lines=some_function, row=row)
-    # #     # expected_output = \
-# # # '''{1}.
-
-# # # Args:
-    # # # some_arg ({<collections.OrderedDict>}): {2}.
-
-# # # Yields: # # # # bool or list: {3}.
-
-# # # '''
-    # #     # expected_output = textwrap.dedent(expected_output)
-    # #     # self.assertEqual(docs.get_docstring(), expected_output)
-
-    # #     some_function = \
-    # #         '''\
-    # #         def some_wrapped_function():
-    # #             def some_function(ttt_arg=collections.OrderedDict()):
-    # #                 {curs}
-    # #                 if something:
-    # #                     yield True
-    # #                 yield []
-
-    # #         '''.format(curs=self.cursor.pointer)
-    # #     some_function = textwrap.dedent(some_function)
-    # #     some_function = some_function.split('\n')
-    # #     row, _ = self.cursor.get_position(some_function)
-
-    # #     funcblock = docstring.get_docstring_raw_info(
-    # #         lines=some_function, row=row) #     # #     print('adsfasfd', funcblock.get_parameters())
-
-    # #     docs = docstring.get_docstring(lines=some_function, row=row)
-    # #     expected_output = \
-# # '''{1}.
-
-# # Args:
-    # # some_arg ({<collections.OrderedDict>}): {2}.
-
-# # Yields:
-    # # bool or list: {3}.
-
-# # '''
 
 
 class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
@@ -438,7 +399,7 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
 
     def test_build_docstring_one_arg_0001(self):
         some_function = \
-            """
+            """\
             class asdfsdf(object):
 
                 '''.'''
@@ -803,6 +764,32 @@ if __name__ == '__main__':
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
+    def test_nested_class_instancemethod(self):
+        some_function = \
+            '''\
+            class InnerClass(object):
+                class JazzyBoy(object):
+                    def some_function(self, some_arg=collections.OrderedDict()):
+                        {curs}
+                        if something:
+                            yield True
+                        yield []
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            Yields:
+                bool or list: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
     # def test_method_attribute(self):
     #     '''Add attribute(s) to a method if it is defined out of __init__.'''
     #     some_function = \
@@ -879,6 +866,60 @@ if __name__ == '__main__':
     #                                        expected_output=expected_output)
 
 
+class FunctionDocstringPositionTestCase(CommonFunctionTestCase, unittest.TestCase):
+
+    def setUp(self):
+        super(FunctionDocstringPositionTestCase, self).setUp()
+        self.functions = \
+            '''
+            def a_1st_function(something):
+                {top}
+                pass
+
+
+            def a_2nd_function(second_function_arg, argzilla=119):
+                {mid}
+                if a_thing:
+                    return ''
+                return True
+
+
+            def a_3rd_function(third_function_arg, top='right'):
+                {bottom}
+                yield 'both'
+            '''
+
+    def test_top_function_in_file(self):
+        some_function = self.functions.format(top='{curs}', mid='', bottom='')
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                something ({2}): {3}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_middle_function_in_file(self):
+        some_function = self.functions.format(top='', mid='{curs}', bottom='')
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                second_function_arg ({2}): {3}.
+                argzilla ({4:int}, optional): {5}.
+
+            Returns:
+                str or bool: {6}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+
 class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
     def test_no_raise(self):
         some_function = \
@@ -938,6 +979,7 @@ class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
                 if some_condition:
                     raise ValueError('TTTT')
                     raise TypeError('ZZZ')
+
                 return True
             '''
         expected_output = \
@@ -981,4 +1023,5 @@ class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
 
 # if __name__ == '__main__':
     # print(__doc__)
+
 
