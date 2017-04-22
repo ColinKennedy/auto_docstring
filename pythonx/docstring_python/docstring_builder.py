@@ -85,7 +85,11 @@ class DocstringPython(object):
             final_blocks.append(block_object)
 
         # Display each block's docstring information
+
         output_str = '{1}.\n\n'
+        if not [block for block in final_blocks if not block.is_empty()]:
+            output_str = '{1}.'
+
         offset_value = 1
         for index, block in enumerate(final_blocks):
             number_formatter = str_format.NumberifyWordFormatter()
@@ -102,9 +106,6 @@ class DocstringPython(object):
             # Add numbers wherever needed
             output_str += block_str
             output_str = number_formatter.format(output_str, dict())
-            # formatter = str_format.OffsetFormatter(offset=offset_value + 1)
-            # block_str = formatter.format(block_str, PassThroughDict())
-
 
         return output_str
 

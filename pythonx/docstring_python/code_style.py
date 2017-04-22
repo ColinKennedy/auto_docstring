@@ -71,8 +71,8 @@ class MultiTypeBlock(object):
         for info_dict in self.block_info:
             output_str += '{indent}{name}'.format(indent='    ',
                                                   name=info_dict.get('name'))
-            block_type = info_dict.get('type', '')
-            output_str += ' ({' + str(block_type) + '})'
+            info_type = self.get_type(info_dict)
+            output_str += info_type
 
             output_str += ': '
 
@@ -86,6 +86,22 @@ class MultiTypeBlock(object):
                 output_str += '\n'
 
         return output_str
+
+    def get_type(self, info):
+            block_type = info.get('type', '')
+            if block_type:
+                return ' ({' + str(block_type) + '}, optional)'
+            return ' ({})'
+
+
+class MultiNoTypeBlock(MultiTypeBlock):
+    def __init__(self, label):
+        super(MultiNoTypeBlock, self).__init__(label=label)
+        self.label = label
+        self.block_info = []
+
+    def get_type(self, info):
+        return ''
 
 
 class InlineTypeBlock(MultiTypeBlock):
@@ -122,7 +138,7 @@ class GoogleStylePython(object):
         {
             'Args': MultiTypeBlock,
             'Attributes': MultiTypeBlock,
-            'Raises': MultiTypeBlock,
+            'Raises': MultiNoTypeBlock,
             'Returns': InlineTypeBlock,
             'Yields': InlineTypeBlock,
         }

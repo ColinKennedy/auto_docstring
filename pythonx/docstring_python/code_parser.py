@@ -34,10 +34,19 @@ class CollectorPython(object):
 
         '''
         tree = ast.parse(code)
-        previous_node = None
+        walked_nodes = []
         for node in ast.walk(tree):
             if not isinstance(node, (ast.ClassDef, ast.FunctionDef)):
                 continue
+
+            if isinstance(node, ast.FunctionDef):
+                for nodes in walked_nodes:
+                    for node_ in ast.walk(node):
+                        if isinstance(node_, ast.FunctionDef) and node == node_:
+                            node.parent = node_
+                            break
+
+            walked_nodes.append(node)
 
             try:
                 line_number = node.lineno
@@ -45,11 +54,20 @@ class CollectorPython(object):
                 pass
             else:
                 if line_number > row:
-                    if previous_node is None:
-                        return node
-                    return previous_node
-            previous_node = node
-        return previous_node
+                    break
+
+        # If the last node we reached was a class, then that means that the
+        # cursor position was likely actually a function within the previous
+        # class. To protect ourselves, we check for this and return the second
+        # to last class if the last node is a class
+        # 333
+        highest_level_parent_node = walked_nodes[-1]
+        if isinstance(highest_level_parent_node, ast.ClassDef):
+            try:
+                highest_level_parent_node = walked_nodes[-2]
+            except AttributeError:
+                pass
+        return highest_level_parent_node
 
 
 class ParserPython(object):
@@ -61,13 +79,7 @@ class ParserPython(object):
     '''
 
     def __init__(self, collector, row):
-        '''Initialize the object with a collector, to query data from.
-
-        Args:
-            collector (CollectorPython):
-                The collector to get parsed Python data from.
-
-        '''
+        '''Initialize the object with a collector, to query data from.'''
         super(ParserPython, self).__init__()
         self.collector = collector
         self.row = row
@@ -79,14 +91,13 @@ class ParserPython(object):
         actually a classmethod, this function will return 'classmethod'.
 
         Args:
-            row (:obj:`int`, optional): The row number to check the context of.
-                                        If no row is given, it will default to
+            row (:obj:`int`, optional): The row number to check the context of.  If no row is given, it will default to
                                         the row stored within the parser.
 
         Returns:
             str: The closest description for the current row.
 
-        '''
+            '''
         if row is None:
             row = self.row
 
@@ -97,7 +108,13 @@ class ParserPython(object):
                 ast.Module: 'module',
             }
 
-        if isinstance(self.collector, ast.ClassDef):
+        try:
+            parent = self.collector.parent
+            has_parent = True
+        except AttributeError:
+            has_parent = False
+
+        if has_parent or isinstance(self.collector, ast.ClassDef):
             if isinstance(row_type, ast.FunctionDef):
                 decorator_names = [dec.id for dec in row_type.decorator_list]
                 if 'classmethod' in decorator_names:
@@ -153,7 +170,8 @@ class ParserPython(object):
         args_len = len(node.args.args)
         for index, arg in enumerate(node.args.args):
             try:
-                type_ = node.args.defaults[-1 * index]
+                default_index = index - args_len
+                type_ = node.args.defaults[default_index]
                 if isinstance(type_, ast.Call):
                     type_ = '<{module}.{attr}>'.format(
                         module=type_.func.value.id, attr=type_.func.attr)

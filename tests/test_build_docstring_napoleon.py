@@ -96,299 +96,320 @@ class CommonFunctionTestCase(common.CommonTestCase):
         self.assertEqual(docs, expected_output)
 
 
-# class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
+class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
 
-#     '''Create docstrings for a napoleon-style function.'''
+    '''Create docstrings for a napoleon-style function.'''
 
-#     def test_build_docstring_no_args(self):
-#         '''Make a docstring that is just a summary line.'''
-#         pass
+    def test_build_docstring_no_args(self):
+        '''Make a docstring that is just a summary line.'''
+        pass
 
-#     def test_build_docstring_one_arg(self):
-#         '''Make a function docstring that has one positional arg.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg):
-#                 {curs}
-#                 pass
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+    def test_build_docstring_one_arg(self):
+        '''Make a function docstring that has one positional arg.'''
+        some_function = \
+            '''\
+            def some_function(some_arg):
+                {curs}
+                pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 some_arg ({2}): {3}.
+            Args:
+                some_arg ({2}): {3}.
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#     def test_build_docstring_multi_args(self):
-#         '''Build docstrings for functions with more than one positional arg.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg, another_arg):
-#                 {curs}
-#                 pass
-#             '''.format(curs=self.cursor.pointer)
-#         expected_output = \
-#             '''\
-#             {1}.
+    def test_build_docstring_multi_args(self):
+        '''Build docstrings for functions with more than one positional arg.'''
+        some_function = \
+            '''\
+            def some_function(some_arg, another_arg):
+                {curs}
+                pass
+            '''.format(curs=self.cursor.pointer)
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 some_arg ({2}): {3}.
-#                 another_arg ({4}): {5}.
+            Args:
+                some_arg ({2}): {3}.
+                another_arg ({4}): {5}.
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#     def test_build_docstring_default_arg(self):
-#         '''Create a docstring that has default arg info.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg=8):
-#                 {curs}
-#                 pass
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+    def test_build_docstring_default_arg(self):
+        '''Create a docstring that has default arg info.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=8):
+                {curs}
+                pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 some_arg ({2:int}): {3}.
+            Args:
+                some_arg ({2:int}, optional): {3}.
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#     def test_build_docstring_default_arg_custom(self):
-#         '''Build a docstring that has a default arg that is not built in.'''
-#         some_function = \
-#             '''\
-#             def some_function(collect=collections.OrderedDict()):
-#                 {curs}
-#                 pass
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+    def test_build_docstring_arg_and_default_arg(self):
+        '''Make a docstring that has one positional arg and an optional arg.'''
+        some_function = \
+            '''\
+            def some_function(something, another=8):
+                {curs}
+                return True
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 collect ({2:<collections.OrderedDict>}): {3}.
+            Args:
+                something ({2}): {3}.
+                another ({4:int}, optional): {5}.
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+            Returns:
+                bool: {6}.
 
-#     # def test_build_docstring_default_arg_statement(self):
-#     #     '''Make a function docstring that prefers a built-in statement.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#     #     For example, if the default arg is a bool or NoneType, the format of
-#     #     the default text is 'Default is X'.
+    def test_build_docstring_default_arg_custom(self):
+        '''Build a docstring that has a default arg that is not built in.'''
+        some_function = \
+            '''\
+            def some_function(collect=collections.OrderedDict()):
+                {curs}
+                pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#     #     '''
-#     #     pass
+            Args:
+                collect ({2:<collections.OrderedDict>}, optional): {3}.
 
-#     def test_build_return_docstring(self):
-#         '''Make a docstring to describe a function that has a return value.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg=collections.OrderedDict()):
-#                 {curs}
-#                 return True
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#             Args:
-#                 some_arg ({2:<collections.OrderedDict>}): {3}.
+    # def test_build_docstring_default_arg_statement(self):
+    #     '''Make a function docstring that prefers a built-in statement.
 
-#             Returns:
-#                 bool: {4}.
+    #     For example, if the default arg is a bool or NoneType, the format of
+    #     the default text is 'Default is X'.
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+    #     '''
+    #     pass
 
-#     def test_build_multi_return_single_type(self):
-#         '''Build a docstring that has one return type but multiple returns.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg=collections.OrderedDict()):
-#                 {curs}
-#                 if something:
-#                     return True
-#                 return False
+    def test_build_return_docstring(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=collections.OrderedDict()):
+                {curs}
+                return True
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
 
-#             Args:
-#                 some_arg ({2:<collections.OrderedDict>}): {3}.
+            Returns:
+                bool: {4}.
 
-#             Returns:
-#                 bool: {4}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+    def test_build_multi_return_single_type(self):
+        '''Build a docstring that has one return type but multiple returns.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=collections.OrderedDict()):
+                {curs}
+                if something:
+                    return True
+                return False
 
-#     def test_build_multi_return_docstring(self):
-#         '''Make a docstring to describe a function that has a return value.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg=collections.OrderedDict()):
-#                 {curs}
-#                 if something:
-#                     return True
-#                 return ''
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
 
-#             Args:
-#                 some_arg ({2:<collections.OrderedDict>}): {3}.
+            Returns:
+                bool: {4}.
 
-#             Returns:
-#                 bool or str: {4}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+    def test_build_multi_return_docstring(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=collections.OrderedDict()):
+                {curs}
+                if something:
+                    return True
+                return ''
 
-#     def test_build_multi_yield_docstring(self):
-#         '''Make a docstring to describe a function that has a yield value.'''
-#         some_function = \
-#             '''\
-#             def some_function(some_arg=collections.OrderedDict()):
-#                 {curs}
-#                 if something:
-#                     yield True
-#                 yield []
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#             '''
-#         expected_output = \
-#             '''\
-#             {1}.
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
 
-#             Args:
-#                 some_arg ({2:<collections.OrderedDict>}): {3}.
+            Returns:
+                bool or str: {4}.
 
-#             Yields:
-#                 bool or list: {4}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-#             '''
-#         self.compare_docstring_with_output(input_text=some_function,
-#                                            expected_output=expected_output)
+    def test_build_multi_yield_docstring(self):
+        '''Make a docstring to describe a function that has a yield value.'''
+        some_function = \
+            '''\
+            def some_function(some_arg=collections.OrderedDict()):
+                {curs}
+                if something:
+                    yield True
+                yield []
 
-#     # # def test_nested_function_returns(self):
-#     # #     '''Do not pick up return lines from a nested function.'''
-#     # #     some_function = \
-#     # #         '''\
-#     # #         def a_parent_wrapped_func(yyy='asfd'):
-#     # #             {curs}
-#     # #             def some_function(some_arg=collections.OrderedDict()):
-#     # #                 if something:
-#     # #                     yield True
-#     # #                 yield []
-#     # #             return True
+            '''
+        expected_output = \
+            '''\
+            {1}.
 
-#     # #         '''.format(curs=self.cursor.pointer)
-#     # #     some_function = textwrap.dedent(some_function)
-#     # #     some_function = some_function.split('\n')
-#     # #     row, _ = self.cursor.get_position(some_function)
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
 
-#     # #     docs = docstring.get_docstring(lines=some_function, row=row)
-#     # #     expected_output = \
+            Yields:
+                bool or list: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    # # def test_nested_function_returns(self):
+    # #     '''Do not pick up return lines from a nested function.'''
+    # #     some_function = \
+    # #         '''\
+    # #         def a_parent_wrapped_func(yyy='asfd'):
+    # #             {curs}
+    # #             def some_function(some_arg=collections.OrderedDict()):
+    # #                 if something:
+    # #                     yield True
+    # #                 yield []
+    # #             return True
+
+    # #         '''.format(curs=self.cursor.pointer)
+    # #     some_function = textwrap.dedent(some_function)
+    # #     some_function = some_function.split('\n')
+    # #     row, _ = self.cursor.get_position(some_function)
+
+    # #     docs = docstring.get_docstring(lines=some_function, row=row)
+    # #     expected_output = \
+# # '''{1}.
+
+# # Args:
+    # # yyy ({str}): {2}.
+
+# # Yields:
+    # # bool: {3}.
+
+# # '''
+    # #     expected_output = textwrap.dedent(expected_output)
+    # #     self.assertEqual(docs.get_docstring(), expected_output)
+
+    # def test_build_return_docstring_implicit(self):
+    #     '''Create a docstring where one or more bare return is used.'''
+    #     pass
+
+    # def test_build_yield_docstring_implicit(self):
+    #     '''Create a docstring where one or more bare yield is used.'''
+    #     pass
+
+    # def test_build_docstring_multiline_args(self):
+    #     '''Build a function docstring from a definition that is 2+ lines.'''
+    #     pass
+
+    # # def test_nested_function_definition(self):
+    # #     '''Create a function docstring, even if inside another function.'''
+    # #     # some_function = \
+    # #     #     '''\
+    # #     #     def some_wrapped_function():
+    # #     #         def some_function(ttt_arg=collections.OrderedDict()):
+    # #     #             {curs}
+    # #     #             if something:
+    # #     #                 yield True
+    # #     #             yield []
+
+    # #     #     '''.format(curs=self.cursor.pointer)
+    # #     # some_function = textwrap.dedent(some_function)
+    # #     # some_function = some_function.split('\n')
+    # #     # row, _ = self.cursor.get_position(some_function)
+
+    # #     # docs = docstring.get_docstring(lines=some_function, row=row)
+    # #     # expected_output = \
 # # # '''{1}.
 
 # # # Args:
-#     # # yyy ({str}): {2}.
+    # # # some_arg ({<collections.OrderedDict>}): {2}.
 
-# # # Yields:
-#     # # bool: {3}.
-
-# # # '''
-#     # #     expected_output = textwrap.dedent(expected_output)
-#     # #     self.assertEqual(docs.get_docstring(), expected_output)
-
-#     # def test_build_return_docstring_implicit(self):
-#     #     '''Create a docstring where one or more bare return is used.'''
-#     #     pass
-
-#     # def test_build_yield_docstring_implicit(self):
-#     #     '''Create a docstring where one or more bare yield is used.'''
-#     #     pass
-
-#     # def test_build_docstring_multiline_args(self):
-#     #     '''Build a function docstring from a definition that is 2+ lines.'''
-#     #     pass
-
-#     # # def test_nested_function_definition(self):
-#     # #     '''Create a function docstring, even if inside another function.'''
-#     # #     # some_function = \
-#     # #     #     '''\
-#     # #     #     def some_wrapped_function():
-#     # #     #         def some_function(ttt_arg=collections.OrderedDict()):
-#     # #     #             {curs}
-#     # #     #             if something:
-#     # #     #                 yield True
-#     # #     #             yield []
-
-#     # #     #     '''.format(curs=self.cursor.pointer)
-#     # #     # some_function = textwrap.dedent(some_function)
-#     # #     # some_function = some_function.split('\n')
-#     # #     # row, _ = self.cursor.get_position(some_function)
-
-#     # #     # docs = docstring.get_docstring(lines=some_function, row=row)
-#     # #     # expected_output = \
-# # # # '''{1}.
-
-# # # # Args:
-#     # # # some_arg ({<collections.OrderedDict>}): {2}.
-
-# # # # Yields:
-#     # # # bool or list: {3}.
-
-# # # # '''
-#     # #     # expected_output = textwrap.dedent(expected_output)
-#     # #     # self.assertEqual(docs.get_docstring(), expected_output)
-
-#     # #     some_function = \
-#     # #         '''\
-#     # #         def some_wrapped_function():
-#     # #             def some_function(ttt_arg=collections.OrderedDict()):
-#     # #                 {curs}
-#     # #                 if something:
-#     # #                     yield True
-#     # #                 yield []
-
-#     # #         '''.format(curs=self.cursor.pointer)
-#     # #     some_function = textwrap.dedent(some_function)
-#     # #     some_function = some_function.split('\n')
-#     # #     row, _ = self.cursor.get_position(some_function)
-
-#     # #     funcblock = docstring.get_docstring_raw_info(
-#     # #         lines=some_function, row=row)
-#     # #     print('adsfasfd', funcblock.get_parameters())
-
-#     # #     docs = docstring.get_docstring(lines=some_function, row=row)
-#     # #     expected_output = \
-# # # '''{1}.
-
-# # # Args:
-#     # # some_arg ({<collections.OrderedDict>}): {2}.
-
-# # # Yields:
-#     # # bool or list: {3}.
+# # # Yields: # # # # bool or list: {3}.
 
 # # # '''
+    # #     # expected_output = textwrap.dedent(expected_output)
+    # #     # self.assertEqual(docs.get_docstring(), expected_output)
+
+    # #     some_function = \
+    # #         '''\
+    # #         def some_wrapped_function():
+    # #             def some_function(ttt_arg=collections.OrderedDict()):
+    # #                 {curs}
+    # #                 if something:
+    # #                     yield True
+    # #                 yield []
+
+    # #         '''.format(curs=self.cursor.pointer)
+    # #     some_function = textwrap.dedent(some_function)
+    # #     some_function = some_function.split('\n')
+    # #     row, _ = self.cursor.get_position(some_function)
+
+    # #     funcblock = docstring.get_docstring_raw_info(
+    # #         lines=some_function, row=row) #     # #     print('adsfasfd', funcblock.get_parameters())
+
+    # #     docs = docstring.get_docstring(lines=some_function, row=row)
+    # #     expected_output = \
+# # '''{1}.
+
+# # Args:
+    # # some_arg ({<collections.OrderedDict>}): {2}.
+
+# # Yields:
+    # # bool or list: {3}.
+
+# # '''
 
 
 class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
@@ -412,171 +433,375 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
                 some_arg ({2}): {3}.
 
             '''
-
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
-    # def test_build_docstring_multi_args(self):
-    #     '''Build docstrings for functions with more than one positional arg.'''
-    #     some_function = \
-    #         '''\
-    #         class AnotherClass(object):
-    #             def some_another_function(self, some_arg, another_arg):
-    #                 {curs}
-    #                 pass
-    #         '''.format(curs=self.cursor.pointer)
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+    def test_build_docstring_one_arg_0001(self):
+        some_function = \
+            """
+            class asdfsdf(object):
 
-    #         Args:
-    #             some_arg ({2}): {3}.
-    #             another_arg ({4}): {5}.
+                '''.'''
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+                def __init__(self):
+                    '''asdfsfdsfdsdfasfdsd.'''
+                    super(asdfsdf, self).__init__()
 
-    # def test_build_docstring_default_arg(self):
-    #     '''Create a docstring that has default arg info.'''
-    #     some_function = \
-    #         '''\
-    #         class TaskClass(object):
-    #             def some_function(self, some_arg=8):
-    #                 {curs}
-    #                 pass
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+                def some_method(self, something):
+                    {curs}
+                    return False
+            """
+        expected_output = \
+            '''\
+            {1}.
 
-    #         Args:
-    #             some_arg ({int}): {2}.
+            Args:
+                something ({2}): {3}.
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+            Returns:
+                bool: {4}.
 
-    # def test_build_docstring_default_arg_custom(self):
-    #     '''Build a docstring that has a default arg that is not built in.'''
-    #     some_function = \
-    #         '''\
-    #         class Torch(object):
-    #             def some_function(self, some_arg=collections.OrderedDict()):
-    #                 {curs}
-    #                 pass
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
-    #         Args:
-    #             some_arg ({<collections.OrderedDict>}): {2}.
+    def test_build_docstring_one_arg_0002(self):
+        some_function = \
+r"""\
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
 
-    # def test_build_return_docstring(self):
-    #     '''Make a docstring to describe a function that has a return value.'''
-    #     some_function = \
-    #         '''\
-    #         class Fountain(object):
-    #             def some_function(self, some_arg=collections.OrderedDict()):
-    #                 {curs}
-    #                 return True
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+class MultiTypeBlock(object):
 
-    #         Args:
-    #             some_arg ({<collections.OrderedDict>}): {2}.
+    '''A class that represents a section of a docstring.
 
-    #         Returns:
-    #             bool: {3}.
+    It contains methods to add information to its internal data as well as
+    how to draw that information, as text.
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+    '''
 
-    # def test_build_multi_return_single_type(self):
-    #     '''Build a docstring that has one return type but multiple returns.'''
-    #     some_function = \
-    #         '''\
-    #         class Process(object):
-    #             def some_function(self, some_arg=collections.OrderedDict()):
-    #                 {curs}
-    #                 if something:
-    #                     return True
-    #                 return False
+    def __init__(self, label):
+        '''Initialize block information, along with this object instance.'''
+        super(MultiTypeBlock, self).__init__()
+        self.label = label
+        self.block_info = []
 
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+    def is_empty(self):
+        return not self.block_info
 
-    #         Args:
-    #             some_arg ({<collections.OrderedDict>}): {2}.
+    def add_block_object_raw(self, info):
+        '''Add the information directly into the object instance's data.
 
-    #         Returns:
-    #             bool: {3}.
+        Args:
+            info (dict[str: str]): The information to add in, directly.
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+        '''
+        self.block_info.append(info)
 
-    # def test_build_multi_return_docstring(self):
-    #     '''Make a docstring to describe a function that has a return value.'''
-    #     some_function = \
-    #         '''\
-    #         class TipTop(object):
-    #             def some_function(self, some_arg=collections.OrderedDict()):
-    #                 {curs}
-    #                 if something:
-    #                     return True
-    #                 return ''
+    def add_block_object(self, arg_name='', arg_type='', text=''):
+        '''Format the information and add it to this object instance.
 
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+        Args:
+            arg_name (str): The name or label of this object.
+            arg_type (str): The object type (example: 'str', 'bool').
+            text (str): Any information to send along with this object.
 
-    #         Args:
-    #             some_arg ({<collections.OrderedDict>}): {2}.
+        Raises:
+            RuntimeError: If none of the optional args for this method were
+                          given any values.
 
-    #         Returns:
-    #             bool or str: {3}.
+        '''
+        if arg_name == '' and arg_type == '' and text == '':
+            raise RuntimeError('Please give at least a name, type or message.')
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+        self.block_info.append(
+            {{
+                'name': arg_name,
+                'arg_type': arg_type,
+                'message': text
+            }})
 
-    # def test_build_multi_yield_docstring(self):
-    #     '''Make a docstring to describe a function that has a yield value.'''
-    #     some_function = \
-    #         '''\
-    #         class JazzyBoy(object):
-    #             def some_function(self, some_arg=collections.OrderedDict()):
-    #                 {curs}
-    #                 if something:
-    #                     yield True
-    #                 yield []
+    def draw(self, method):
+        '''Create a string representation of this block.
 
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+        Args:
+            method (str): The way that the text will be drawn.
+                          For example, 'formatted' will wrap all variable data
+                          into '{{}}'s, so that Python can continue to format it.
 
-    #         Args:
-    #             some_arg ({<collections.OrderedDict>}): {2}.
+        Returns:
+            str: The docstring block, as text.
 
-    #         Yields:
-    #             bool or list: {3}.
+        '''
+        if method != 'formatted':
+            raise NotImplementedError('Only the "formatted" method is allowed.')
 
-    #         '''
-    #     self.compare_docstring_with_output(input_text=some_function,
-    #                                        expected_output=expected_output)
+        output_str = str(self.label) + ':\n'
+        for info_dict in self.block_info:
+            output_str += '{{indent}}{{name}}'.format(indent='    ',
+                                                  name=info_dict.get('name'))
+            info_type = self.get_type(info_dict)
+            output_str += info_type
+
+            output_str += ': '
+
+            info_message = info_dict.get('message', '')
+            output_str += '{{' + info_message + '}}.'
+
+            is_last = self.block_info.index(info_dict) == \
+                len(self.block_info) - 1
+
+            if not is_last:
+                output_str += '\n'
+
+        return output_str
+
+    def get_type(self, info):
+        block_type = info.get('type', '')
+        if block_type:
+            return ' ({{' + str(block_type) + '}}, optional)'
+        return ' ({{}})'
+
+
+class MultiNoTypeBlock(MultiTypeBlock):
+    def __init__(self, labels):
+        super(MultiNoTypeBlock, self).__init__(labels=labels)
+        self.labels = labels
+        self.block_info = []
+
+    def get_type(self, info):
+        {curs}
+        return ''
+
+
+class InlineTypeBlock(MultiTypeBlock):
+    def __init__(self, label):
+        super(InlineTypeBlock, self).__init__(label=label)
+
+    def draw(self, method):
+        super(InlineTypeBlock, self).draw(method=method)
+        output_str = str(self.label) + ':\n'
+        types_ = [block.get('type') for block in self.block_info]
+
+        types = []
+        for type_ in types_:
+            if type_ not in types:
+                types.append(type_)
+
+        try:
+            types[0] = '    ' + types[0]
+        except IndexError:
+            # This shouldn't ever happen because, ideally, if this method has
+            # information in its block, it should have some idea of its type
+            #
+            types = []
+
+        output_str += ' or '.join(types) + ':'
+        output_str += ' {{}}.'
+
+        return output_str
+
+
+class GoogleStylePython(object):
+
+    block_types = \
+        {{
+            'Args': MultiTypeBlock,
+            'Attributes': MultiTypeBlock,
+            'Raises': MultiNoTypeBlock,
+            'Returns': InlineTypeBlock,
+            'Yields': InlineTypeBlock,
+        }}
+
+    def __init__(self):
+        '''Initialize the object and do nothing else.'''
+        super(GoogleStylePython, self).__init__()
+
+    @classmethod
+    def get_block(cls, name):
+        return cls.block_types.get(name)
+
+
+if __name__ == '__main__':
+    print(__doc__)
+
+"""
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                info ({2}): {3}.
+
+            Returns:
+                str: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_docstring_multi_args(self):
+        '''Build docstrings for functions with more than one positional arg.'''
+        some_function = \
+            '''\
+            class AnotherClass(object):
+                def some_another_function(self, some_arg, another_arg):
+                    {curs}
+                    pass
+            '''.format(curs=self.cursor.pointer)
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2}): {3}.
+                another_arg ({4}): {5}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_docstring_default_arg(self):
+        '''Create a docstring that has default arg info.'''
+        some_function = \
+            '''\
+            class TaskClass(object):
+                def some_function(self, some_arg=8):
+                    {curs}
+                    pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:int}, optional): {3}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_docstring_default_arg_custom(self):
+        '''Build a docstring that has a default arg that is not built in.'''
+        some_function = \
+            '''\
+            class Torch(object):
+                def some_function(self, some_arg=collections.OrderedDict()):
+                    {curs}
+                    pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_return_docstring(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        some_function = \
+            '''\
+            class Fountain(object):
+                def some_function(self, some_arg=collections.OrderedDict()):
+                    {curs}
+                    return True
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            Returns:
+                bool: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_multi_return_single_type(self):
+        '''Build a docstring that has one return type but multiple returns.'''
+        some_function = \
+            '''\
+            class Process(object):
+                def some_function(self, some_arg=collections.OrderedDict()):
+                    {curs}
+                    if something:
+                        return True
+                    return False
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            Returns:
+                bool: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_multi_return_docstring(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        some_function = \
+            '''\
+            class TipTop(object):
+                def some_function(self, some_arg=collections.OrderedDict()):
+                    {curs}
+                    if something:
+                        return True
+                    return ''
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            Returns:
+                bool or str: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_build_multi_yield_docstring(self):
+        '''Make a docstring to describe a function that has a yield value.'''
+        some_function = \
+            '''\
+            class JazzyBoy(object):
+                def some_function(self, some_arg=collections.OrderedDict()):
+                    {curs}
+                    if something:
+                        yield True
+                    yield []
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:<collections.OrderedDict>}, optional): {3}.
+
+            Yields:
+                bool or list: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
     # def test_method_attribute(self):
     #     '''Add attribute(s) to a method if it is defined out of __init__.'''
@@ -596,7 +821,7 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
     #         {1}.
 
     #         Attributes:
-    #             out_of_init_attribute ({str}): {2}.
+    #             out_of_init_attribute ({2:str}): {3}.
 
     #         '''
     #     self.compare_docstring_with_output(input_text=some_function,
@@ -652,6 +877,58 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
     #         '''
     #     self.compare_docstring_with_output(input_text=some_function,
     #                                        expected_output=expected_output)
+
+
+class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
+    def test_no_raise(self):
+        some_function = \
+            '''\
+            def some_function():
+                {curs}
+                pass
+            '''
+        expected_output = \
+            '''{1}.'''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_one_raise(self):
+        some_function = \
+            '''\
+            def some_function():
+                {curs}
+                raise ValueError('TTTT')
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Raises:
+                ValueError: {2:TTTT}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+    def test_multi_raise(self):
+        some_function = \
+            '''\
+            def some_function():
+                {curs}
+                raise ValueError('TTTT')
+                raise TypeError('ZZZ')
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Raises:
+                ValueError: {2:TTTT}.
+                TypeError: {3:ZZZ}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
 
 
 # class BuildClassDocstringTestCase(unittest.TestCase):
