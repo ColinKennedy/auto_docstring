@@ -133,7 +133,33 @@ class ParserPython(object):
                 super(ExitVisitor, self).__init__(*args, **kwargs)
                 self.raises = []
                 self.returns = []
+                self.warnings = []
                 self.yields = []
+
+            def visit_Assign(self, node):
+                for target in node.targets:
+                    if not isinstance(target, ast.Subscript):
+                        continue
+
+                    if isinstance(target.value, ast.Attribute):
+                        # Example: self.something
+                        name = target.value.value.id + '.' + target.value.attr
+                        type_ = 'scoped'
+
+                    elif isinstance(target.value, ast.Name):
+                        name = target.value.id
+                        type_ = 'local'
+                    else:
+                        raise NotImplementedError(
+                            'Target: "{target}" is not supported by assign.'
+                            ''.format(target=target))
+
+                    self.warnings.append(
+                        {
+                            'name': name,
+                            'message': '',
+                            'type': type_,
+                        })
 
             def visit_Raise(self, node):
                 message = ''
@@ -192,11 +218,11 @@ class ParserPython(object):
                 pass
 
         visitor = ExitVisitor()
-        print('NODE', node.name)
         visitor.visit(node)
         raises = visitor.raises
         returns = visitor.returns
         yields = visitor.yields
+        warnings = visitor.warnings
 
         return \
             {
@@ -205,6 +231,7 @@ class ParserPython(object):
                     'Args': args,
                     'Raises': raises,
                     'Returns': returns,
+                    'Warnings': warnings,
                     'Yields': yields,
                 }
             }

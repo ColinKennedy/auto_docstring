@@ -1016,27 +1016,96 @@ class DocstringRaiseTestCase(CommonFunctionTestCase, unittest.TestCase):
                                            expected_output=expected_output)
 
 
-# class BuildClassDocstringTestCase(unittest.TestCase):
+# class WarningDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
+#     def test_no_warning(self):
+#         some_function = \
+#             '''\
+#             def some_function():
+#                 {curs}
+#                 pass
+#             '''
+#         expected_output = \
+#             '''{1}.'''
+#         self.compare_docstring_with_output(input_text=some_function,
+#                                            expected_output=expected_output)
 
-    # '''A suite of tests for class-level docstrings.'''
+#     def test_mutation_local_variable_warning(self):
+#         some_function = \
+#             '''\
+#             def some_function(something):
+#                 {curs}
+#                 something[3] = 'asdfd'
 
-    # # docstring summary line
-    # # Attribute
-    # # Attributes
+#             '''
+#         expected_output = \
+#             '''{1}.
 
-    # pass
+#             Args:
+#                 something ({2}): {3}.
+
+#             Warnings:
+#                 something is mutated in the function.
+
+#             '''
+#         self.compare_docstring_with_output(input_text=some_function,
+#                                            expected_output=expected_output)
+
+#     def test_mutation_instanceproperty_warning(self):
+
+#         some_function = \
+#             '''\
+#             class Something(object):
+#                 def some_function(self):
+#                     {curs}
+#                     self.something[3] = 'asdfd'
+
+#             '''
+#         expected_output = \
+#             '''{1}.
+
+#             Warnings:
+#                 self.something is mutated in the function.
+
+#             '''
+#         self.compare_docstring_with_output(input_text=some_function,
+#                                            expected_output=expected_output)
+
+#         pass
+
+#     def test_mutation_classproperty_warning(self):
+#         pass
+
+#     def test_early_exit_warning(self):
+#         pass
+
+#     def test_early_exit_warning(self):
+#         pass
+
+#     def test_all_warnings(self):
+#         pass
 
 
-# class BuildModuleDocstringTestCase(unittest.TestCase):
+# # class BuildClassDocstringTestCase(unittest.TestCase):
 
-    # '''A suite of tests for module-level docstrings.'''
+#     # '''A suite of tests for class-level docstrings.'''
 
-    # # Summary line
-    # # Attribute
-    # # Attributes
-    # # Summary lines of classes and docstrings?
+#     # # docstring summary line
+#     # # Attribute
+#     # # Attributes
 
-    # pass
+#     # pass
+
+
+# # class BuildModuleDocstringTestCase(unittest.TestCase):
+
+#     # '''A suite of tests for module-level docstrings.'''
+
+#     # # Summary line
+#     # # Attribute
+#     # # Attributes
+#     # # Summary lines of classes and docstrings?
+
+#     # pass
 
 
 # if __name__ == '__main__':
