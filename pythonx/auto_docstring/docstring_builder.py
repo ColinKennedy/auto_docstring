@@ -9,7 +9,7 @@ import re
 
 # IMPORT LOCAL LIBRARIES
 # TODO : Make this relative
-from core.formatting import str_format
+from .core.formatting import str_format
 
 
 class PassThroughDict(object):
