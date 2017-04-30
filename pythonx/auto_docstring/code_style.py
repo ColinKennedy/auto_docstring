@@ -117,7 +117,7 @@ class InlineTypeBlock(MultiTypeBlock):
                 item_types.append(type_)
 
         try:
-            item_types[0] = '    ' + item_types[0]
+            item_types[0] = '    ' + str(item_types[0])
         except IndexError:
             # This shouldn't ever happen because, ideally, if this method has
             # information in its block, it should have some idea of its type
