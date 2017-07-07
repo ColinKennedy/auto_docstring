@@ -350,6 +350,31 @@ class BuildFunctionDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
                                            expected_output=expected_output)
 
 
+    def test_function_with_unknown_return(self):
+        '''Return a function return type if its type was not found.'''
+        some_function = \
+            '''\
+            def pairwise(iterable):
+                {curs}
+                a, b = tee(iterable)
+                next(b, None)
+                return izip(a, b)
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                iterable ({2}): {3}.
+
+            Returns:
+                {4:izip}: {5}.
+
+            '''
+        self.compare_docstring_with_output(input_text=some_function,
+                                           expected_output=expected_output)
+
+
 class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
 
     '''A suite of docstring test cases for class instancemethods.'''

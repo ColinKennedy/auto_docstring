@@ -193,7 +193,7 @@ class ParserPython(object):
         Returns:
             str: The closest description for the current row.
 
-            '''
+        '''
         if row is None:
             row = self.row
 
@@ -483,7 +483,7 @@ def get_type_from_ast(obj, top_level=False, parent=None):
         try:
             function_value = obj.func.value
         except AttributeError:
-            raise ValueError(obj.func.id)
+            return obj.func.id
 
         if isinstance(function_value, (ast.Attribute, ast.Name)):
             cropped_obj = get_function_call(obj.func)
