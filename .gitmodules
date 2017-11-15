@@ -1,0 +1,3 @@
+[submodule "core"]
+	path = pythonx/auto_docstring/core
+	url = https://korinkite@bitbucket.org/korinkite/core.git

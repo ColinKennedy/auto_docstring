@@ -4,12 +4,9 @@
 '''A module that holds classes and functions to draw docstrings.'''
 
 # IMPORT STANDARD LIBRARIES
+import string
 import os
 import re
-
-# IMPORT LOCAL LIBRARIES
-# TODO : Make this relative
-from .core.formatting import str_format
 
 
 class PassThroughDict(object):
@@ -18,6 +15,113 @@ class PassThroughDict(object):
 
     def __getitem__(self, key):
         return key
+
+
+class NumberifyWordFormatter(string.Formatter):
+    def __init__(self):
+        super(NumberifyWordFormatter, self).__init__()
+        self.is_external_type = re.compile('(?P<name><[a-zA-Z0-9\.]+>)')
+        self.wrap_comp = re.compile('\{(?P<value>.+)\}')
+        self._used_number = 0
+        self.used_number = self._used_number
+
+    def _vformat(self, format_string, args, kwargs, used_args, recursion_depth):
+        if recursion_depth < 0:
+            raise ValueError('Max string recursion exceeded')
+        result = []
+        for literal_text, field_name, format_spec, conversion in \
+                self.parse(format_string):
+
+            # output the literal text
+            if literal_text:
+                result.append(literal_text)
+
+            # if there's a field, output it
+            if field_name is not None:
+                # this is some markup, find the object and do
+                #  the formatting
+
+                # given the field_name, find the object it references
+                # and the argument it came from
+                #
+                obj, arg_used = self.get_field(field_name, args, kwargs)
+                if self.is_external_type.match(format_spec):
+                    obj = obj[1:-1]
+
+                try:
+                    eval(format_spec)
+                except:
+                    pass
+                else:
+                    obj = obj[1:-1]
+
+                used_args.add(arg_used)
+
+                # do any conversion on the resulting object
+                obj = self.convert_field(obj, conversion)
+
+                # expand the format spec, if needed
+                format_spec = self._vformat(format_spec, args, kwargs,
+                                            used_args, recursion_depth-1)
+
+                # format the object and append to the result
+                result.append(self.format_field(obj, format_spec))
+
+        return ''.join(result)
+
+    def get_first(self, first):
+        return first
+
+    def get_field(self, field_name, args, kwargs):
+        first, rest = field_name._formatter_field_name_split()
+
+        obj = self.get_value(first, args, kwargs)
+
+        # loop through the rest of the field_name, doing
+        #  getattr or getitem as needed
+        is_external_type = self.is_external_type.match(field_name)
+        for is_attr, i in rest:
+            if is_external_type:
+                # self.used_number += 1
+                obj = '{' + str(self.used_number) + ':' + field_name + '}'
+                first = self.get_first(first)
+            elif is_attr:
+                match = self.wrap_comp.match(obj)
+                if match is not None:
+                    obj = '{' + match.group('value') + '.' + i + '}'
+            else:
+                obj = obj[i]
+        return obj, first
+
+    def get_value(self, key, args, kwargs):
+        self.used_number += 1
+        try:
+            return super(NumberifyWordFormatter, self).get_value(
+                key, args, kwargs)
+        except (IndexError, KeyError):
+            if not key or '<' in str(key):
+                return '{' + str(self.used_number) + '}'
+
+            if isinstance(key, (int, long)):
+                return '{' + str(key) + '}'
+
+            return '{' + str(self.used_number) + ':' + str(key) + '}'
+
+    def format_field(self, value, format_spec):
+        try:
+            return super(NumberifyWordFormatter, self).format_field(
+                value=value, format_spec=format_spec)
+        except ValueError:
+            # check for weird formatting, to be safee
+            match = self.wrap_comp.match(value)
+            if match:
+                value = value[1:-1]  # Strip the {}s around the string
+
+            return '{' + value + ':' + format_spec + '}'
+
+    def format(self, *args, **kwargs):
+        self.used_number = self._used_number
+        return super(NumberifyWordFormatter, self).format(*args, **kwargs)
 
 
 class DocstringPython(object):
@@ -73,7 +177,7 @@ class DocstringPython(object):
             block_object.add_block_object_raw(arg_info)
 
         auto_block_docstring = block_object.draw('formatted')
-        number_formatter = str_format.NumberifyWordFormatter()
+        number_formatter = NumberifyWordFormatter()
         return number_formatter.format(auto_block_docstring)
 
     def get_row_blocks(self):
@@ -110,7 +214,7 @@ class DocstringPython(object):
 
         offset_value = 1
         for index, block in enumerate(final_blocks):
-            number_formatter = str_format.NumberifyWordFormatter()
+            number_formatter = NumberifyWordFormatter()
             if block.is_empty():
                 continue
 
