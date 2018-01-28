@@ -75,6 +75,14 @@ class NumberifyWordFormatter(string.Formatter):
     def get_field(self, field_name, args, kwargs):
         first, rest = field_name._formatter_field_name_split()
 
+        is_complex_type = '[' in field_name and field_name.endswith(']')
+        if is_complex_type:
+            # This happens with iterable strings, like "list[str, int]"
+            self.used_number += 1
+            obj = '{' + str(self.used_number) + ':' + field_name + '}'
+            first = self.get_first(first)
+            return (obj, first)
+
         obj = self.get_value(first, args, kwargs)
 
         # loop through the rest of the field_name, doing
@@ -91,7 +99,7 @@ class NumberifyWordFormatter(string.Formatter):
                     obj = '{' + match.group('value') + '.' + i + '}'
             else:
                 obj = obj[i]
-        return obj, first
+        return (obj, first)
 
     def get_value(self, key, args, kwargs):
         self.used_number += 1

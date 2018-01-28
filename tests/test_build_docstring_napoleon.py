@@ -1045,6 +1045,54 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
         self.compare_docstring_with_output(input_text=some_function,
                                            expected_output=expected_output)
 
+    def test_container_args(self):
+        '''Test that our "Args:" build builds correctly, even with iterables.'''
+        code = \
+            '''\
+            class JazzyBoy(object):
+                def some_function(self, some_arg=['8', 8]):
+                    {curs}
+                    if something:
+                        yield True
+                    yield []
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2:list[str, int]}, optional): {3}.
+
+            Yields:
+                bool or list: {4}.
+
+            '''
+        self.compare_docstring_with_output(input_text=code,
+                                           expected_output=expected_output)
+
+    def test_returns_container(self):
+        '''Check that the "Returns" block works with iterable types.'''
+        code = \
+            '''\
+            class JazzyBoy(object):
+                def some_function(self):
+                    {curs}
+                    return ['*', 8]
+
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Returns:
+                list[str, int]: {2}.
+
+            '''
+        self.compare_docstring_with_output(input_text=code,
+                                           expected_output=expected_output)
+
+
     # # def test_method_attribute(self):
     # #     '''Add attribute(s) to a method if it is defined out of __init__.'''
     # #     some_function = \
