@@ -192,6 +192,7 @@ class DocstringPython(object):
         context = self.parser.get_context()
         row_info = self.parser.get_info(self.parser.get_row_type(),
                                         node_type=context)
+
         return row_info.get('blocks')
 
     def create_docstring(self, allowed_blocks='*'):

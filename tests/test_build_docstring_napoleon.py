@@ -1092,6 +1092,45 @@ class BuildMethodDocstringTestCase(CommonFunctionTestCase, unittest.TestCase):
         self.compare_docstring_with_output(input_text=code,
                                            expected_output=expected_output)
 
+    def test_args_container_nested(self):
+        '''Make sure that iterable types don't repeat themselves.'''
+        code = \
+            '''\
+            def foo(bar=[('8', 12), ('asdffsd', -1), ('asdf', 10), ('aatt', 123)]):
+                {curs}
+                pass
+
+            '''
+        expected = \
+            '''\
+            {1}.
+
+            Args:
+                bar ({2:list[tuple[str, int]]}, optional): {3}.
+
+            '''
+        self.compare_docstring_with_output(input_text=code,
+                                           expected_output=expected)
+
+    def test_returns_container_nested(self):
+        '''Make sure that iterable types don't repeat themselves.'''
+        code = \
+            '''\
+            def foo():
+                {curs}
+                return [('8', 12), ('asdffsd', -1), ('asdf', 10.8), ('aatt', 123)]
+
+            '''
+        expected = \
+            '''\
+            {1}.
+
+            Returns:
+                list[tuple[str, int]]: {2}.
+
+            '''
+        self.compare_docstring_with_output(input_text=code,
+                                           expected_output=expected)
 
     # # def test_method_attribute(self):
     # #     '''Add attribute(s) to a method if it is defined out of __init__.'''

@@ -11,6 +11,7 @@ import re
 
 # IMPORT THIRD-PARTY LIBRARIES
 # TODO : Make a relative import
+from core import grouping
 from core import check
 import six
 
@@ -92,6 +93,8 @@ class ExitVisitor(ast.NodeVisitor):
         return_type = get_type_from_ast(node.value,
                                         parent=self.visiting_node)
         if not isinstance(return_type, six.string_types):
+            # Note: We remove duplicates, here
+            return_type = grouping.uniquify_list(return_type)
             return_type = get_type_as_str(return_type)
         else:
             return_type = '{' + return_type + '}'
@@ -240,6 +243,7 @@ class ParserPython(object):
         args_len = len(node.args.args)
         defaults_len = len(node.args.defaults)
         offset_len = args_len - defaults_len
+
         for index, arg in enumerate(node.args.args):
             # Get the default argument (if any) for this arg
             defaults_index = index - offset_len
@@ -250,16 +254,18 @@ class ParserPython(object):
                     type_ = '<{module}.{attr}>'.format(
                         module=type_.func.value.id, attr=type_.func.attr)
                 else:
-                    type_ = get_type_as_str(
-                        get_type_from_ast(type_, parent=visitor.visiting_node))
+                    arg_type = get_type_from_ast(type_, parent=visitor.visiting_node)
+                    # Note: We are removing duplicate arg types, here
+                    arg_type = grouping.uniquify_list(arg_type)
+                    type_ = get_type_as_str(arg_type)
 
-            # Add arg and its type info (if found) to our list of args
             args.append(
                 {
                     'name': arg.id,
                     'type': type_,
                     'message': ''
                 })
+
         if node_type in ('method', 'classmethod'):
             try:
                 args = args[1:]
