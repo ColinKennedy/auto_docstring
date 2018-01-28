@@ -214,9 +214,12 @@ class DocstringPython(object):
                 block_object.add_block_object_raw(arg_info)
             final_blocks.append(block_object)
 
-        # Display each block's docstring information
-
+        # Display each block's docstring information - assume that this is a
+        # multi-line docstring and add two newlines
+        #
         output_str = '{1}.\n\n'
+
+        # If we don't have any blocks, make this as single-line docstring
         if not [block for block in final_blocks if not block.is_empty()]:
             output_str = '{1}.'
 
@@ -227,7 +230,6 @@ class DocstringPython(object):
                 continue
 
             block_str = block.draw('formatted')
-            is_last_element = index == len(final_blocks) - 1
             # Separate new blocks
             block_str += '\n\n'
 

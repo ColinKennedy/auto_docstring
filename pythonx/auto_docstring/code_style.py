@@ -88,10 +88,10 @@ class MultiTypeBlock(object):
         return output_str
 
     def get_type(self, info):
-            block_type = info.get('type', '')
-            if block_type:
-                return ' ({' + str(block_type) + '}, optional)'
-            return ' ({})'
+        block_type = info.get('type', '')
+        if block_type:
+            return ' ({' + str(block_type) + '}, optional)'
+        return ' ({})'
 
 
 class MultiNoTypeBlock(MultiTypeBlock):
