@@ -256,7 +256,11 @@ class ParserPython(object):
                 else:
                     arg_type = get_type_from_ast(type_, parent=visitor.visiting_node)
                     # Note: We are removing duplicate arg types, here
-                    arg_type = grouping.uniquify_list(arg_type)
+                    try:
+                        arg_type = grouping.uniquify_list(arg_type)
+                    except TypeError:
+                        pass
+
                     type_ = get_type_as_str(arg_type)
 
             args.append(
