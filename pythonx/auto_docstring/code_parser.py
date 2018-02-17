@@ -94,7 +94,10 @@ class ExitVisitor(ast.NodeVisitor):
                                         parent=self.visiting_node)
         if not isinstance(return_type, six.string_types):
             # Note: We remove duplicates, here
-            return_type = grouping.uniquify_list(return_type)
+            try:
+                return_type = grouping.uniquify_list(return_type)
+            except TypeError:
+                pass
             return_type = get_type_as_str(return_type)
         else:
             return_type = '{' + return_type + '}'
