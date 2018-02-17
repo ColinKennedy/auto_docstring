@@ -7,7 +7,6 @@
 import textwrap
 
 # IMPORT LOCAL LIBRARIES
-from . import cursor_pointer
 from .code_parser import (CollectorPython, ParserPython)
 from .code_style import GoogleStylePython
 from .docstring_builder import DocstringPython
@@ -116,87 +115,3 @@ def create_auto_docstring_block(code, row, language, style, block):
     builder = get_builder(
         code=code, row=row, language=language, style=style)
     return builder.create_docstring_block(block)
-
-
-def test():
-    '''Get a test class object.'''
-    cursor_marker_text = 'X'
-    # example_file = \
-    #     """\
-    #     class SomeClasWithInfo(object):
-
-    #         '''Some inner docstring.'''
-
-    #         def __init__(self, asdfasdf):
-    #             '''A method with info inside of it.
-
-    #             Args:
-    #                 asdfasdf (asdsd): asdfasdfsds adf. asdsfd
-
-    #             '''
-    #             super(SomeClasWithInfo, self).__init__()
-
-    #         @classmethod
-    #         def inner_method(cls, something, another, tt=8, lastly='asdfsf'):
-    #             '''Some info.
-
-    #             Args:
-    #                 something (asdfasdfasdf): asdfasdfsfd.
-    #                 another (asdfasdf): asdfasdfj
-
-    #             '''
-    #             {POSITION}
-    #             self.something = ('asdfasdf, 8')
-    #             raise ValueError("Thing 'here'")
-    #             raise NotImplementedError('Something with a really long string that '
-    #                                       'spans multiple lines.')
-    #             if self.something:
-    #                 return 'asdf'
-    #             return True
-    #             yield 'something'
-
-
-    #     class AnotherThing(SomeClasWithInfo):
-
-    #         '''Whatever.'''
-
-    #         def __init__(self, ttt):
-    #             '''asfdasdf.'''
-    #             super(AnotherThing, self).__init__(ttt)
-
-    #         def asdfasfd(self):
-    #             '''asdfasd.'''
-    #             pass
-
-
-    #     def some_asdfasdf(self):
-    #         '''.
-
-    #         Args:
-    #              ()
-
-    #         '''
-    #         pass
-    #     """.format(POSITION=cursor_marker_text)
-
-    example_file = \
-        """\
-        def some_function(some_arg):
-            {POSITION}
-            pass
-        """.format(POSITION=cursor_marker_text)
-    example_file = textwrap.dedent(example_file)
-    cursor = cursor_pointer.CursorText(cursor_marker_text)
-    row, column = cursor.get_position(example_file.split('\n'))
-    auto_docstring = create_auto_docstring(
-        example_file, row=row, language='python', style='Google')
-    indented_docstring = [(' ' * column) + line for line
-                          in auto_docstring.splitlines()]
-    indented_docstring = '\n'.join(indented_docstring)
-    print(indented_docstring)
-
-
-if __name__ == '__main__':
-    test()
-    # print(__doc__)
-

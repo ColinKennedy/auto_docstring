@@ -535,45 +535,11 @@ def get_type_from_ast(obj, top_level=False, parent=None):
         # If the object is defined locally, try to get its type and return it
         assign_object_type = None
 
-        # TODO : This is a test. remove it
-        # if obj.id == 'output':
-        #     print(parent.name)
-        #     # for assign_object in (node for node in ast.walk(parent)
-        #     #                       if isinstance(obj, ast.Name)):
-        #     #     try:
-        #     #         context = assign_object.ctx
-        #     #         if not isinstance(context, ast.Store) or \
-        #     #                 assign_object.id != obj.id:
-        #     #             raise AttributeError(
-        #     #                 'Assign object: "{ass}" didn\'t match "{obj}".'
-        #     #                 ''.format(ass=assign_object.id, obj=obj.id))
-        #     #     except AttributeError:
-        #     #         continue
-
-        #     #     print(assign_object)
-        #     #     print(context)
-        #     #     print(dir(context))
-
-        #     #     # if hasattr(assign_object, 'id') and assign_object.id == 'output':
-        #     #     #     print(u'assign_object.ctx', assign_object.ctx)
-        #     #     #     fields = assign_object._fields
-        #     #     #     if fields:
-        #     #     #         fields = [getattr(assign_object, field)
-        #     #     #                   for field in assign_object._fields]
-        #     #     #         print(fields)
-
 
         attribute_assign = None
         for assign_object in (node for node in ast.walk(parent)
                               if isinstance(node, ast.Assign)):
             for target in assign_object.targets:
-                # raise ValueError(get_type_from_ast(target, top_level=top_level,
-                #                                    parent=parent))
-                # try:
-                #     return NODE_TYPES[target.__class__]
-                # except KeyError:
-                #     pass
-
                 if hasattr(target, 'id') and target.id == obj.id:
                     for field in assign_object.value._fields:
                         field_obj = getattr(assign_object.value, field)
