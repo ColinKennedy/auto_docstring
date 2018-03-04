@@ -122,6 +122,7 @@ def get_object(obj):
 def get_value(node):
     iterable_types = {
         astroid.List: [],
+        astroid.Tuple: tuple(),
     }
     try:
         return node.value
