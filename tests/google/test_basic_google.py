@@ -62,6 +62,68 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+    def test_classmethod(self):
+        '''A classmethod on a class should not return "cls" as an arg.'''
+        code = \
+            '''
+            class Something(object):
+                @classmethod
+                def fizz(cls, foo, bar):
+                    {curs}
+                    pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                foo ({2}): {3}.
+                bar ({4}): {5}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_instancemethod(self):
+        '''A method on a class should not return "self" as an arg.'''
+        code = \
+            '''
+            class Something(object):
+                def fizz(self, foo, bar):
+                    {curs}
+                    pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                foo ({2}): {3}.
+                bar ({4}): {5}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_staticmethod(self):
+        '''A method on a class that should return all of its args.'''
+        code = \
+            '''
+            class Something(object):
+                @staticmethod
+                def fizz(foo, bar, buzz):
+                    {curs}
+                    pass
+            '''
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                foo ({2}): {3}.
+                bar ({4}): {5}.
+                buzz ({6}): {7}.
+
+            '''
+        self.compare(expected_output, code)
 
 class FunctionDefaultArgTestCase(common.CommonTestCase):
 

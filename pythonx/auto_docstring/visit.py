@@ -104,17 +104,16 @@ class Visitor(object):
 
         children = list(node.args.get_children())
 
-        # Drop the first arg if it's a bound method
-        drop_first_arg = False
+        drop_first_arg = isinstance(node.parent, astroid.ClassDef)
+
+        if not drop_first_arg:
+            return children
+
         for decorator in decorators:
-            if decorator.name == 'classmethod':
-                drop_first_arg = True
-                break
+            if decorator.name == 'staticmethod':
+                return children
 
-        if drop_first_arg:
-            return children[1:]
-
-        return children
+        return children[1:]
 
     @staticmethod
     def _organize_args(node, args):
