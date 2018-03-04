@@ -100,6 +100,10 @@ AUTO_DOCSTRING_ITER_SUFFIX
  - google default: ']'
  - sphinx default: ''
 
+
+AUTO_DOCSTING_TYPE_ORDER
+ - default: "chronological"
+ - default: "alphabetical"
 AUTO_DOCSTRING_STYLE = 'google'
 AUTO_DOCSTRING_DELIMITER
  - default: '"""'

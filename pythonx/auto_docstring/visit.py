@@ -79,9 +79,8 @@ class Visitor(object):
 
         '''
         function = node.scope()
-        value = get_value(node.value)
         self.functions[function].setdefault('yields', [])
-        self.functions[function]['yields'].append(value)
+        self.functions[function]['yields'].append(node.value)
 
     @staticmethod
     def _get_all_args(node):
@@ -242,8 +241,9 @@ def get_value(node):
         node (<astroid Node>): The node to get the parents of.
 
     Returns:
-        iter[<astroid Node>]:
+        object or iter[<astroid Node>]:
             An instance of the container, with the given `node`'s children.
+            If the given `node` is not iterable, return its value.
 
     '''
     def iterate(obj):
@@ -278,40 +278,3 @@ def default_to_regular(d):
     if isinstance(d, collections.defaultdict):
         d = {k: default_to_regular(v) for k, v in six.iteritems(d)}
     return d
-
-
-def _get_parents(node):
-    '''Find every parent of the given AST node.
-
-    This function is useful for Name Nodes, that have a scoped namespace
-
-    Example:
-        >>> from collections import OrderedDict
-        >>> def foo(bar=OrderedDict):
-        >>>     pass
-        >>>
-        >>> _get_parents(Name.OrderedDict)
-        ... # Result: [Module.collections]
-
-    Args:
-        node (<astroid Node>): The node to get the parents of.
-
-    Returns:
-        list[<asteroid Node>]: The found parents, if any.
-
-    '''
-    def __get_parent(node):
-        '''Yield parents as they are found, recursively.'''
-        try:
-            parent = node.parent
-        except AttributeError:
-            return
-            yield
-        else:
-            yield parent
-
-        for parent in __get_parent(node.parent):
-            if parent is not None:
-                yield parent
-
-    return list(__get_parent(node))

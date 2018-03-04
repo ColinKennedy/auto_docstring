@@ -133,64 +133,6 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_imported_function(self):
-        '''Build a docstring that has to "find" the function object.'''
-        code = \
-            '''
-            from itertools import islice
-
-            def foo():
-                {curs}
-                return islice([4, 5, 6, 7, 8, 9], 3)
-            '''
-
-        expected_output = '{1|<itertools.islice>}: {2}.'
-
-        self.compare(expected_output, code)
-
-    def test_imported_class(self):
-        '''Build a docstring that has to "find" the class object.'''
-        code = \
-            '''
-            from collections import Counter
-
-            def foo():
-                {curs}
-                return Counter()
-            '''
-
-        expected_output = '{1|<collections.Counter>}: {2}.'
-
-        self.compare(expected_output, code)
-
-    def test_imported_thirdparty_function(self):
-        '''Build a docstring that has to "find" the function object.'''
-        code = \
-            '''
-            from inspection import dirgrep
-
-            def foo():
-                {curs}
-                return dirgrep
-            '''
-
-        expected_output = '{1|<inspection.dirgrep>}: {2}.'
-        self.compare(expected_output, code)
-
-    def test_imported_thirdparty_class(self):
-        '''Build a docstring that has to "find" the class object.'''
-        code = \
-            '''
-            from auto_docstring.visit import Visitor
-
-            def foo():
-                {curs}
-                return Visitor()
-            '''
-
-        expected_output = '{1|<auto_docstring.visit.Visitor>}: {2}.'
-        self.compare(expected_output, code)
-
 
 class ReturnTestCase(common.CommonTestCase):
 
@@ -274,49 +216,49 @@ class ReturnTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
-    # def test_nested_multi(self):
-    #     '''Make a docstring for a nested container with more than one type.'''
-    #     code = \
-    #         '''
-    #         def foo(bar):
-    #             {curs}
-    #             return [('8', ), ('8', ), ('9', ), (12312.0, )]
-    #         '''
+    def test_nested_multi(self):
+        '''Make a docstring for a nested container with more than one type.'''
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                return [('8', ), ('8', ), ('9', ), (12312.0, )]
+            '''
 
-    #     expected_output = \
-    #         '''\
-    #         {1}.
+        expected_output = \
+            '''\
+            {1}.
 
-    #         Args:
-    #             bar ({2}): {3}.
+            Args:
+                bar ({2}): {3}.
 
-    #         Returns:
-    #             {4|list[tuple[str or float]]}: {5}.
+            Returns:
+                {4|list[tuple[str or float]]}: {5}.
 
-    #         '''
-    #     self.compare(expected_output, code)
+            '''
+        self.compare(expected_output, code)
 
-#     def test_nested_return_multi_001(self):
-#         '''Make a docstring for a nested container with more than one type.'''
-#         code = \
-#             '''
-#             def foo(bar):
-#                 {curs}
-#                 return [('8', ), ['8'], ('9', ), (12312.0, )]
-#             '''
+    def test_nested_multi_001(self):
+        '''Make a docstring for a nested container with more than one type.'''
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                return [('8', ), ['8'], ('9', ), (12312.0, )]
+            '''
 
-#         expected_output = \
-#             '''\
-#             {1}.
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 bar ({2}): {3}.
+            Args:
+                bar ({2}): {3}.
 
-#             Returns:
-#                 {4|list[tuple[str or float] or list[str]]}: {5}.
+            Returns:
+                {4|list[tuple[str or float] or list[str]]}: {5}.
 
-#             '''
-#         self.compare(expected_output, code)
+            '''
+        self.compare(expected_output, code)
 
     def test_multi_return_single_type(self):
         '''Build a docstring that has one return type but multiple returns.'''
@@ -478,3 +420,63 @@ class ReturnTestCase(common.CommonTestCase):
 
     #         '''
     #     self.compare(expected_output, code)
+
+    def test_imported_function(self):
+        '''Build a docstring that has to "find" the function object.'''
+        code = \
+            '''
+            from itertools import islice
+
+            def foo():
+                {curs}
+                return islice([4, 5, 6, 7, 8, 9], 3)
+            '''
+
+        expected_output = '{1|<itertools.islice>}: {2}.'
+
+        self.compare(expected_output, code)
+
+    def test_imported_class(self):
+        '''Build a docstring that has to "find" the class object.'''
+        code = \
+            '''
+            from collections import Counter
+
+            def foo():
+                {curs}
+                return Counter()
+            '''
+
+        expected_output = '{1|<collections.Counter>}: {2}.'
+
+        self.compare(expected_output, code)
+
+    # TODO : Finish these
+    # def test_imported_thirdparty_function(self):
+    #     '''Build a docstring that has to "find" the function object.'''
+    #     code = \
+    #         '''
+    #         from inspection import dirgrep
+
+    #         def foo():
+    #             {curs}
+    #             return dirgrep
+    #         '''
+
+    #     expected_output = '{1|<inspection.dirgrep>}: {2}.'
+    #     self.compare(expected_output, code)
+
+#     def test_imported_thirdparty_class(self):
+#         '''Build a docstring that has to "find" the class object.'''
+#         code = \
+#             '''
+#             from auto_docstring.visit import Visitor
+
+#             def foo():
+#                 {curs}
+#                 return Visitor()
+#             '''
+
+#         expected_output = '{1|<auto_docstring.visit.Visitor>}: {2}.'
+#         self.compare(expected_output, code)
+

@@ -3,7 +3,10 @@
 
 # IMPORT STANDARD LIBRARIES
 import abc
+import astroid
 import inspect
+import importlib
+import collections
 import __builtin__
 
 # IMPORT THIRD-PARTY LIBRARIES
@@ -94,6 +97,10 @@ class MultiTypeBlock(CommonBlock):
     def _info_key():
         return '_some_key'
 
+    @staticmethod
+    def _is_special_type(node):
+        return isinstance(node, astroid.Call)
+
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
@@ -101,44 +108,36 @@ class MultiTypeBlock(CommonBlock):
         if not check.is_itertype(obj):
             return get_type(obj)
 
-        container = visit.get_container(obj)
-        temp_container = []
+        output_types = []
         for subitem in obj:
-            value = cls._expand_types(subitem)
+            if cls._is_special_type(subitem):
+                # We'll need to deal with this type later so just ignore it now
+                output_types.append(subitem)
+                continue
 
-            if value:
-                temp_container.append(value)
+            try:
+                container = visit.get_container(subitem)
+            except KeyError:
+                # subitem was not iterable
+                value = visit.get_value(subitem)
+                output_types.append(get_type(value))
+                continue
 
-            # # Drill down one level deeper if we catch an instance
-            # if not inspect.isclass(value):
-            #     value = visit.get_value(subitem)
+            temp_container = []
+            for item in cls._expand_types(subitem):
+                temp_container.append(item)
 
-            # temp_container.append(value)
+            output_types.append(container.__class__(temp_container))
 
-        return container.__class__(temp_container)
+        return output_types
 
     @classmethod
     def _change_type_to_str(cls, obj):
-        all_types = []
-        for container in obj:
-            if not check.is_itertype(container):
-                all_types.append(get_type_name(container))
-                continue
+        if cls._is_special_type(obj):
+            return cls.get_import_path(get_object(obj))
 
-            # Make each element unique
-            container = container.__class__(grouping.uniquify(container))
-
-            # Convert the types down to just their names
-            container = cls._change_type_to_str(container)
-            all_types.append(container)
-
-        # Make the final types unique, too
-        all_types = grouping.uniquify(all_types)
-
-        args = ' or '.join(all_types)
-        return '{obj}[{args}]'.format(
-            obj=get_type_name(obj),
-            args=args)
+        unique_types = reduce_types(obj)
+        return make_iterable_label(unique_types)
 
 
 def get_type(obj):
@@ -173,3 +172,106 @@ def get_object(node):
         module = importlib.import_module(module)
         return getattr(module, parent.name)
 
+
+def get_container_types():
+    return \
+        {
+            list: list,
+            tuple: tuple,
+        }
+
+
+def reduce_types(obj):
+    def get_recursive_type(obj):
+        if not check.is_itertype(obj):
+            yield obj
+            return
+
+        item_types = []
+        _temp_container = []
+        for item in obj:
+            inner_item = reduce_types(item)
+            if inner_item not in _temp_container:
+                _temp_container.append(inner_item)
+
+        yield obj.__class__(_temp_container)
+
+    return list(get_recursive_type(obj))[0]
+
+
+def make_iterable_label(container):
+    def option_join_label(*args):
+        args = [item for item in args if item]
+        if not args:
+            return ''
+        elif len(args) == 1:
+            return args[0]
+
+        return ' or '.join(args)
+
+    def _make_container_label(container, items):
+        items = option_join_label(*items)
+        container_name = get_type_name(container)
+
+        if items:
+            return '{container_name}[{items}]'.format(
+                container_name=container_name,
+                items=items,
+            )
+        return container_name
+
+    types_ = collections.OrderedDict()
+
+    for item in container:
+        if not check.is_itertype(item):
+            if item not in types_:
+                types_[item] = []
+            continue
+
+        item_type = get_type(item)
+        types_.setdefault(item_type, [])
+        types_[get_type(item)].extend([item_ for item_ in item])
+
+    items = []
+    for type_, subtypes in six.iteritems(types_):
+        subtype_names = [get_type_name(subtype) for subtype in subtypes]
+        items.append(_make_container_label(type_, subtype_names))
+
+    return _make_container_label(container, items)
+
+
+def _get_parents(node):
+    '''Find every parent of the given AST node.
+
+    This function is useful for Name Nodes, that have a scoped namespace
+
+    Example:
+        >>> from collections import OrderedDict
+        >>> def foo(bar=OrderedDict):
+        >>>     pass
+        >>>
+        >>> _get_parents(Name.OrderedDict)
+        ... # Result: [Module.collections]
+
+    Args:
+        node (<astroid Node>): The node to get the parents of.
+
+    Returns:
+        list[<asteroid Node>]: The found parents, if any.
+
+    '''
+    def __get_parent(node):
+        '''Yield parents as they are found, recursively.'''
+        try:
+            parent = node.parent
+        except AttributeError:
+            return
+            yield
+        else:
+            yield parent
+
+        for parent in __get_parent(node.parent):
+            if parent is not None:
+                yield parent
+
+    return list(__get_parent(node))
