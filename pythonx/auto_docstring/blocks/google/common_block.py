@@ -188,7 +188,7 @@ def get_object(node):
     except AttributeError:
         module = '.'.join([parent_.name for parent_ in _get_parents(node)])
         module = importlib.import_module(module)
-        return getattr(module, parent.name)
+        return getattr(module, node.name)
 
 
 def get_container_types():
