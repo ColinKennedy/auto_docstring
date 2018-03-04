@@ -73,6 +73,12 @@ class MultiTypeBlock(CommonBlock):
             indent = common.get_default_indent()
 
         obj_type = cls._expand_types(expected_object)
+
+        # Note: If we accidentally created a nested list, unpack it
+        # TODO : This condition statment could be cleaned up a bit
+        if len(obj_type) == 1:
+            obj_type = obj_type[0]
+
         obj_type = cls._change_type_to_str(obj_type)
 
         line = '{indent}{{{obj_type}}}: {{}}.'.format(
@@ -113,29 +119,25 @@ class MultiTypeBlock(CommonBlock):
 
     @classmethod
     def _change_type_to_str(cls, obj):
-        # if not check.is_itertype(obj):
-        #     return obj
-
         all_types = []
         for container in obj:
             if not check.is_itertype(container):
-                return get_type(container)
+                all_types.append(get_type_name(container))
+                continue
 
-            _temp_container = []
-            for item in container:
-                _temp_container.append(type(visit.get_value(item)))
+            # Make each element unique
+            container = container.__class__(grouping.uniquify(container))
 
-            print('container', _temp_container)
-            # Make each type unique without losing order
-            _temp_container = grouping.uniquify_list(_temp_container)
+            # Convert the types down to just their names
+            container = cls._change_type_to_str(container)
+            all_types.append(container)
 
-            # Now convert each type to a string representation
-            _temp_container = [get_type_name(_item) for _item in _temp_container]
-            container = container.__class__(_temp_container)
+        # Make the final types unique, too
+        all_types = grouping.uniquify(all_types)
 
-        args = ' or '.join(container)
-        return '{container}[{args}]'.format(
-            container=get_type_name(container),
+        args = ' or '.join(all_types)
+        return '{obj}[{args}]'.format(
+            obj=get_type_name(obj),
             args=args)
 
 
