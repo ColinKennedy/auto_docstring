@@ -60,12 +60,13 @@ class CommonBlock(object):
 
     @staticmethod
     def _is_special_type(node):
-        return isinstance(node, (astroid.Call, astroid.Attribute))
+        return isinstance(node, (astroid.Call, astroid.Attribute, astroid.Name))
 
     # TODO : Do I actually need info? Remove, if not
     @classmethod
     def _get_special_type_str(cls, obj, info=None):
-        return cls.get_import_path(get_object(obj), info)
+        inferred_object = list(obj.infer())[0]
+        return cls.get_import_path(get_object(inferred_object), info)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -185,8 +186,7 @@ def get_object(node):
     try:
         return node.value
     except AttributeError:
-        parent = list(node.infer())[0]
-        module = '.'.join([parent_.name for parent_ in _get_parents(parent)])
+        module = '.'.join([parent_.name for parent_ in _get_parents(node)])
         module = importlib.import_module(module)
         return getattr(module, parent.name)
 
