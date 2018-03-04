@@ -55,8 +55,9 @@ class Visitor(object):
 
     def visit_return(self, node):
         function = node.scope()
+        obj = get_object(node.value)
         self.functions[function].setdefault('returns', [])
-        self.functions[function]['returns'].append(node.value.value)
+        self.functions[function]['returns'].append(obj)
 
     def visit_yield(self, node):
         function = node.scope()
