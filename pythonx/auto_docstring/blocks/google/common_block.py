@@ -10,8 +10,10 @@ import __builtin__
 import six
 
 # IMPORT LOCAL LIBRARIES
+from ... import visit
 from ... import common
 from ...core import check
+from ...core import grouping
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -71,7 +73,7 @@ class MultiTypeBlock(CommonBlock):
             indent = common.get_default_indent()
 
         obj_type = cls._expand_types(expected_object)
-        obj_type = cls._format_types(obj_type)
+        obj_type = cls._change_type_to_str(obj_type)
 
         line = '{indent}{{{obj_type}}}: {{}}.'.format(
             indent=indent,
@@ -88,30 +90,73 @@ class MultiTypeBlock(CommonBlock):
 
     @classmethod
     def _expand_types(cls, obj):
-        if check.is_itertype(obj):
-            if len(obj) == 1:
-                return cls.get_import_path(obj[0])
+        if not check.is_itertype(obj):
+            yield get_type(obj)
+            return
 
-            _temp_container = []
-            for item in obj:
-                item = cls._expand_types(item)
-                item_type = cls.get_import_path(item)
-                _temp_container.append(item_type)
+        for item in obj:
+            # If item is a astroid.List or some other iterable type, expand it
+            value = visit.get_value(item)
+            yield value
+            # _temp_container = [item_ for item_ in value]
+            # for index, subitem in enumerate(_temp_container):
+            #     _temp_container[index] = cls._expand_types(subitem)
 
-            obj = obj.__class__(_temp_container)
-            return obj
-
-        return obj
+            # yield value.__class__(_temp_container)
 
     @classmethod
-    def _format_types(cls, obj):
-        if not check.is_itertype(obj):
-            return obj
+    def _change_type_to_str(cls, obj):
+        # if not check.is_itertype(obj):
+        #     return obj
 
-        items = []
-        for item in obj:
-            item = cls._format_types(item)
-            if item not in items:
-                items.append(item)
+        all_types = []
+        for container in obj:
+            _temp_container = [item_ for item_ in container]
+            for index, item in enumerate(_temp_container):
+                _temp_container[index] = type(visit.get_value(item))
 
-        return ' or '.join(items)
+            # Make each type unique without losing order
+            _temp_container = grouping.uniquify_list(_temp_container)
+
+            # Now convert each type to a string representation
+            _temp_container = [get_type_name(_item) for _item in _temp_container]
+            container = container.__class__(_temp_container)
+
+        args = ' or '.join(container)
+        return '{container}[{args}]'.format(
+            container=get_type_name(container),
+            args=args)
+
+
+def get_type(obj):
+    return obj.__class__
+
+
+def get_type_name(obj):
+    if not inspect.isclass(obj):
+        obj = obj.__class__
+
+    return obj.__name__
+
+
+def get_object(node):
+    '''Find the underlying object of a given astroid Node.
+
+    If the given node is actually a Name, like how OrderedDict is a Name for
+    <collections.OrderedDict>, find its actual object and return it.
+
+    Args:
+        node (<astroid Node>): Some node to process.
+
+    Returns:
+        The node's actual value, in the script.
+
+    '''
+    try:
+        return node.value
+    except AttributeError:
+        parent = list(node.infer())[0]
+        module = '.'.join([parent_.name for parent_ in _get_parents(parent)])
+        module = importlib.import_module(module)
+        return getattr(module, parent.name)
+

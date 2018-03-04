@@ -84,8 +84,8 @@ class NumberifyWordFormatter(string.Formatter):
             # If it's our special syntax, just pass the replacement text through
             output = (replacement_text, field_name)
         else:
-            # output = self._get_field(field_name, args, kwargs)
-            output = super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
+            output = self._get_field(field_name, args, kwargs)
+            # output = super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
 
         self._used_names[field_name] = number
         self._used_numbers.add(number)
@@ -97,36 +97,38 @@ class NumberifyWordFormatter(string.Formatter):
         '''bool: If the given name should not be processed by this instance.'''
         return name.startswith('<') and name.endswith('>')
 
-    # def _get_field(self, field_name, args, kwargs):
-    #     '''Get the full, qualified field name from the given args.
+    def _get_field(self, field_name, args, kwargs):
+        '''Get the full, qualified field name from the given args.
 
-    #     Args:
-    #         field_name (str): The field to get the full object of.
-    #         args (list[str]): The positional args.
-    #         kwargs (dict[str]): The positional key/values for `field_name`.
+        Args:
+            field_name (str): The field to get the full object of.
+            args (list[str]): The positional args.
+            kwargs (dict[str]): The positional key/values for `field_name`.
 
-    #     Returns:
-    #         tuple[object, str]: The full, found object.
+        Returns:
+            tuple[object, str]: The full, found object.
 
-    #     '''
-    #     first, rest = field_name._formatter_field_name_split()
+        '''
+        first, rest = field_name._formatter_field_name_split()
 
-    #     try:
-    #         obj = self.get_value(first, args, kwargs)
-    #     except KeyError:
-    #         print('asdfds', field_name)
-    #         return (kwargs[field_name], first)
+        try:
+            obj = self.get_value(first, args, kwargs)
+        except KeyError:
+            # If field_name is a nested string, like "list[str]", then just
+            # pass it through without processing it
+            #
+            return (kwargs[field_name], first)
 
-    #     # loop through the rest of the field_name, doing
-    #     # getattr or getitem as needed
-    #     #
-    #     for is_attr, i in rest:
-    #         if is_attr:
-    #             obj = getattr(obj, i)
-    #         else:
-    #             obj = obj[i]
+        # loop through the rest of the field_name, doing
+        # getattr or getitem as needed
+        #
+        for is_attr, i in rest:
+            if is_attr:
+                obj = getattr(obj, i)
+            else:
+                obj = obj[i]
 
-    #     return (obj, first)
+        return (obj, first)
 
     def _get_next_number(self, text=''):
         '''Find the next number that this instance should use for formatting.

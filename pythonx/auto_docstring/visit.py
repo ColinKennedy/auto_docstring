@@ -45,7 +45,6 @@ class Visitor(object):
             info['args'].append(arg.name)
 
         for default, value, in six.moves.zip(*defaults):
-            value = get_object(value)
             info['defaults'].append((default.name, value))
 
         self.functions[node].update(info)
@@ -69,9 +68,8 @@ class Visitor(object):
 
         '''
         function = node.scope()
-        obj = get_object(node.value)
         self.functions[function].setdefault('returns', [])
-        self.functions[function]['returns'].append(obj)
+        self.functions[function]['returns'].append(node.value)
 
     def visit_yield(self, node):
         '''Whenever a Yield object is found, get its parent scope and store it.
@@ -221,28 +219,6 @@ def get_closest_docstring_node(row, info):
     return closest_node
 
 
-def get_object(node):
-    '''Find the underlying object of a given astroid Node.
-
-    If the given node is actually a Name, like how OrderedDict is a Name for
-    <collections.OrderedDict>, find its actual object and return it.
-
-    Args:
-        node (<astroid Node>): Some node to process.
-
-    Returns:
-        The node's actual value, in the script.
-
-    '''
-    try:
-        return node.value
-    except AttributeError:
-        parent = list(node.infer())[0]
-        module = '.'.join([parent_.name for parent_ in _get_parents(parent)])
-        module = importlib.import_module(module)
-        return getattr(module, parent.name)
-
-
 def get_value(node):
     '''Get the Python object(s) for the given node.
 
@@ -258,16 +234,16 @@ def get_value(node):
             An instance of the container, with the given `node`'s children.
 
     '''
-    iterable_types = {
-        astroid.List: [],
-        astroid.Tuple: tuple(),
-    }
-
     try:
         # Try to see if the node is actually not a container-type
         return node.value
     except AttributeError:
         pass
+
+    iterable_types = {
+        astroid.List: [],
+        astroid.Tuple: tuple(),
+    }
 
     # Build an instance of the container for the given node
     container = iterable_types[type(node)]

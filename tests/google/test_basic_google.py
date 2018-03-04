@@ -230,49 +230,49 @@ class ReturnTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
-#     def test_nested_single_type(self):
-#         '''Make a docstring that contains a container of only one object-type.'''
-#         code = \
-#             '''
-#             def foo(bar):
-#                 {curs}
-#                 return ['8', '234', '123151', '134.fasfdasd']
-#             '''
+    def test_nested_single_type(self):
+        '''Make a docstring that contains a container of only one object-type.'''
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                return ['8', '234', '123151', '134.fasfdasd']
+            '''
 
-#         expected_output = \
-#             '''\
-#             {1}.
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 bar ({2}): {3}.
+            Args:
+                bar ({2}): {3}.
 
-#             Returns:
-#                 {4|list[str]}: {5}.
+            Returns:
+                {4|list[str]}: {5}.
 
-#             '''
-#         self.compare(expected_output, code)
+            '''
+        self.compare(expected_output, code)
 
-#     def test_nested_return(self):
-#         '''Make a docstring that is a nested container.'''
-#         code = \
-#             '''
-#             def foo(bar):
-#                 {curs}
-#                 return [['8'], ['8'], ['9'], ['12312']]
-#             '''
+    def test_nested_return(self):
+        '''Make a docstring that is a nested container.'''
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                return [['8'], ['8'], ['9'], ['12312']]
+            '''
 
-#         expected_output = \
-#             '''\
-#             {1}.
+        expected_output = \
+            '''\
+            {1}.
 
-#             Args:
-#                 bar ({2}): {3}.
+            Args:
+                bar ({2}): {3}.
 
-#             Returns:
-#                 {4|list[list[str]]}: {5}.
+            Returns:
+                {4|list[list[str]]}: {5}.
 
-#             '''
-#         self.compare(expected_output, code)
+            '''
+        self.compare(expected_output, code)
 
 #     def test_nested_return_multi(self):
 #         '''Make a docstring for a nested container with more than one type.'''
