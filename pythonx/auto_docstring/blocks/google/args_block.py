@@ -30,11 +30,10 @@ class Args(common_block.CommonBlock):
             lines.append(line)
 
         for arg, value in defaults:
-            value = common_block.get_type_name(visit.get_value(value))
-            # if not cls._is_special_type(value):
-            #     value = visitor.get_value(value)
-            # else:
-            #     value = cls.get_import_path(value, info)
+            if cls._is_special_type(value):
+                value = cls._get_special_type_str(value, info)
+            else:
+                value = common_block.get_type_name(visit.get_value(value))
 
             line = '{indent}{arg} ({{{value}}}, optional): {{}}.'.format(
                 indent=indent,

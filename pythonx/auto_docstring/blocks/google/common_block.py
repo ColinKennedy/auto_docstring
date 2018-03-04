@@ -60,7 +60,12 @@ class CommonBlock(object):
 
     @staticmethod
     def _is_special_type(node):
-        return isinstance(node, astroid.Call)
+        return isinstance(node, (astroid.Call, astroid.Attribute))
+
+    # TODO : Do I actually need info? Remove, if not
+    @classmethod
+    def _get_special_type_str(cls, obj, info=None):
+        return cls.get_import_path(get_object(obj), info)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -81,12 +86,12 @@ class MultiTypeBlock(CommonBlock):
 
         obj_type = cls._expand_types(expected_object)
 
-        # Note: If we accidentally created a nested list, unpack it
-        # TODO : This condition statment could be cleaned up a bit
-        if len(obj_type) == 1:
-            obj_type = obj_type[0]
+        # # Note: If we accidentally created a nested list, unpack it
+        # # TODO : This condition statment could be cleaned up a bit
+        # if len(obj_type) == 1:
+        #     obj_type = obj_type[0]
 
-        obj_type = cls._change_type_to_str(obj_type)
+        obj_type = cls._change_type_to_str(*obj_type)
 
         line = '{indent}{{{obj_type}}}: {{}}.'.format(
             indent=indent,
@@ -132,9 +137,19 @@ class MultiTypeBlock(CommonBlock):
         return output_types
 
     @classmethod
-    def _change_type_to_str(cls, obj):
+    def _change_type_to_str(cls, *objs):
+        is_flat = len(objs) != 1
+        if is_flat:
+            output = ''
+            objs = reduce_types(objs)
+            for obj in objs:
+                output = make_options_label(output, make_iterable_label(obj))
+
+            return output
+
+        obj = objs[0]
         if cls._is_special_type(obj):
-            return cls.get_import_path(get_object(obj))
+            return cls._get_special_type_str(obj)
 
         if not check.is_itertype(obj):
             return get_type_name(obj)
@@ -202,18 +217,19 @@ def reduce_types(obj):
     return list(get_recursive_type(obj))[0]
 
 
+def make_options_label(*args):
+    args = [item for item in args if item]
+    if not args:
+        return ''
+    elif len(args) == 1:
+        return args[0]
+
+    return ' or '.join(args)
+
+
 def make_iterable_label(container):
-    def option_join_label(*args):
-        args = [item for item in args if item]
-        if not args:
-            return ''
-        elif len(args) == 1:
-            return args[0]
-
-        return ' or '.join(args)
-
     def _make_container_label(container, items):
-        items = option_join_label(*items)
+        items = make_options_label(*items)
         container_name = get_type_name(container)
 
         if items:
@@ -223,6 +239,16 @@ def make_iterable_label(container):
             )
         return container_name
 
+    if not check.is_itertype(container):
+        return get_type_name(container)
+
+    # Group every type together
+    # so if we have [str], [int], [float], (str, ) then it would look like this
+    # {
+    #      list: [str, int, float],
+    #      tuple: [str]
+    # }
+    #
     types_ = collections.OrderedDict()
 
     for item in container:
@@ -235,6 +261,7 @@ def make_iterable_label(container):
         types_.setdefault(item_type, [])
         types_[get_type(item)].extend([item_ for item_ in item])
 
+    # Now that every type is grouped together, make text out of each "iterable group"
     items = []
     for type_, subtypes in six.iteritems(types_):
         subtype_names = [get_type_name(subtype) for subtype in subtypes]
