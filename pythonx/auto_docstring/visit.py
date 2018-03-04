@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''The module that is responsible for parsing Python source-code.
+
+The source-code is parsed to find information needed to build docstrings.
+
+'''
+
 # IMPORT STANDARD LIBRARIES
 import importlib
 import collections
@@ -11,11 +17,21 @@ import astroid
 
 
 class Visitor(object):
+
+    '''A class that recursively walks AST Nodes and gathers docstings data.'''
+
     def __init__(self):
+        '''Create an object to store informatino about functions.'''
         super(Visitor, self).__init__()
         self.functions = collections.defaultdict(dict)
 
     def visit_functiondef(self, node):
+        '''Get the given FunctionDef `node` args.
+
+        Args:
+            node (<astroid.FunctionDef>): The node to get info for.
+
+        '''
         info = {
             'args': [],
             'defaults': [],
@@ -32,11 +48,13 @@ class Visitor(object):
             value = get_object(value)
             info['defaults'].append((default.name, value))
 
-        self.visit(node)
-
         self.functions[node].update(info)
 
+        # Recurse through the node's children so we can find more nodes
+        self.visit(node)
+
     def visit(self, node):
+        '''Visit the given Node's children.'''
         for child in node.get_children():
             try:
                 child.accept(self)
@@ -44,12 +62,24 @@ class Visitor(object):
                 self.visit(child)
 
     def visit_return(self, node):
+        '''Whenever a Return object is found, get its parent scope and store it.
+
+        Args:
+            node (<astroid.Return>): The node to get info for.
+
+        '''
         function = node.scope()
         obj = get_object(node.value)
         self.functions[function].setdefault('returns', [])
         self.functions[function]['returns'].append(obj)
 
     def visit_yield(self, node):
+        '''Whenever a Yield object is found, get its parent scope and store it.
+
+        Args:
+            node (<astroid.Return>): The node to get info for.
+
+        '''
         function = node.scope()
         value = get_value(node.value)
         self.functions[function].setdefault('yields', [])
@@ -57,6 +87,19 @@ class Visitor(object):
 
     @staticmethod
     def _get_all_args(node):
+        '''Find the args for the given `node`.
+
+        If the node is a classmethod or instancemethod, drop the first arg.
+
+        Args:
+            node (<astroid.FunctionDef>): The node to get the args of.
+
+        Returns:
+            list[<astroid Node>]:
+                The full list of args. This list contains positional args
+                that do and do not have default values.
+
+        '''
         try:
             decorators = node.decorators.get_children()
         except AttributeError:
@@ -78,6 +121,36 @@ class Visitor(object):
 
     @staticmethod
     def _organize_args(node, args):
+        '''Sort the given `args` and return them as two separate lists.
+
+        Basically, FunctionDef.get_children() is overly complicated. It returns
+        back the positional args of the function and its default values
+        in a single list.
+
+        Example:
+            >>> def foo(bar, fizz=8, buzz=123.3):
+            >>>     pass
+
+            >>> <FunctionDef.foo>.get_children()
+            ... # [AssignName.bar, AssignName.fizz, AssignName.buzz, Const.int, Const.float]
+
+        So we have to split up this list from
+            >>> [AssignName.bar, AssignName.fizz, AssignName.buzz, Const.int, Const.float]
+
+        to
+            >>> ([AssignName.bar], ([AssignName.fizz, AssignName.buzz], [Const.float, Const.int])
+
+        Args:
+            args (list[<astroid Node>]): The args to organize.
+
+        Returns:
+            tuple[
+                list[<astroid.AssignName>],
+                tuple[list[<astroid.AssignName>], list[<astroid Node>]]:
+                    The positional, required args, followed by args that
+                    have default values and then the list of default values.
+
+        '''
         number_of_defaults = len(node.args.defaults)
 
         defaults = []
@@ -92,8 +165,22 @@ class Visitor(object):
 
 
 def get_info(node):
+    '''Get everything needed to build docstrings from the given `node`.
+
+    Args:
+        node (<astroid.Module>): The node to break down into parts.
+
+    Returns:
+        dict[str]: The
+            "functions" (dict[<astroid.FunctionDef>, dict[str]]):
+                A function node and all of its gathered information.
+            "nodes" (dict[<astroid Node>, str]):
+                The found node and what group it belongs to. This string
+                should be a different key in this dictionary.
+                Example: "functions".
+
+    '''
     output = {'nodes': dict()}
-    functions = recursive_default_dict()
 
     visitor = Visitor()
     try:
@@ -113,6 +200,16 @@ def get_info(node):
 
 
 def get_closest_docstring_node(row, info):
+    '''Find the FunctionDef node whose docstring is closest to the given `row`.
+
+    Args:
+        row (int): The point in the code to use to find a FunctionDef node.
+        info (dict[str]): The known Node objects that will be used.
+
+    Returns:
+        <astroid Node>: The found astroid.FunctionDef node.
+
+    '''
     closest_node = None
     closest_row = 0
     functions = info.get('functions', [])
@@ -124,26 +221,55 @@ def get_closest_docstring_node(row, info):
     return closest_node
 
 
-def get_object(obj):
+def get_object(node):
+    '''Find the underlying object of a given astroid Node.
+
+    If the given node is actually a Name, like how OrderedDict is a Name for
+    <collections.OrderedDict>, find its actual object and return it.
+
+    Args:
+        node (<astroid Node>): Some node to process.
+
+    Returns:
+        The node's actual value, in the script.
+
+    '''
     try:
-        return obj.value
+        return node.value
     except AttributeError:
-        parent = list(obj.infer())[0]
+        parent = list(node.infer())[0]
         module = '.'.join([parent_.name for parent_ in _get_parents(parent)])
         module = importlib.import_module(module)
         return getattr(module, parent.name)
 
 
 def get_value(node):
+    '''Get the Python object(s) for the given node.
+
+    If the node is something like a Str or Num, get its value.
+    If the node is actually an iterable object that contains other nodes,
+    create a Python instance of the container and add its child nodes.
+
+    Args:
+        node (<astroid Node>): The node to get the parents of.
+
+    Returns:
+        iter[<astroid Node>]:
+            An instance of the container, with the given `node`'s children.
+
+    '''
     iterable_types = {
         astroid.List: [],
         astroid.Tuple: tuple(),
     }
+
     try:
+        # Try to see if the node is actually not a container-type
         return node.value
     except AttributeError:
         pass
 
+    # Build an instance of the container for the given node
     container = iterable_types[type(node)]
     _temp_container = []
     for item in node.elts:
@@ -153,27 +279,49 @@ def get_value(node):
 
 
 def recursive_default_dict():
+    '''<collections.defaultdict>: A dict that allows nested mappings.'''
     return collections.defaultdict(recursive_default_dict)
 
 
 def default_to_regular(d):
+    '''Convert a nested defaultdict into a regular dict.'''
     if isinstance(d, collections.defaultdict):
         d = {k: default_to_regular(v) for k, v in six.iteritems(d)}
     return d
 
 
-def _get_parents(obj):
-    def __get_parent(obj):
+def _get_parents(node):
+    '''Find every parent of the given AST node.
+
+    This function is useful for Name Nodes, that have a scoped namespace
+
+    Example:
+        >>> from collections import OrderedDict
+        >>> def foo(bar=OrderedDict):
+        >>>     pass
+        >>>
+        >>> _get_parents(Name.OrderedDict)
+        ... # Result: [Module.collections]
+
+    Args:
+        node (<astroid Node>): The node to get the parents of.
+
+    Returns:
+        list[<asteroid Node>]: The found parents, if any.
+
+    '''
+    def __get_parent(node):
+        '''Yield parents as they are found, recursively.'''
         try:
-            parent = obj.parent
+            parent = node.parent
         except AttributeError:
             return
             yield
         else:
             yield parent
 
-        for parent in __get_parent(obj.parent):
-            if parent:
+        for parent in __get_parent(node.parent):
+            if parent is not None:
                 yield parent
 
-    return list(__get_parent(obj))
+    return list(__get_parent(node))

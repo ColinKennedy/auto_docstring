@@ -230,6 +230,94 @@ class ReturnTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+#     def test_nested_single_type(self):
+#         '''Make a docstring that contains a container of only one object-type.'''
+#         code = \
+#             '''
+#             def foo(bar):
+#                 {curs}
+#                 return ['8', '234', '123151', '134.fasfdasd']
+#             '''
+
+#         expected_output = \
+#             '''\
+#             {1}.
+
+#             Args:
+#                 bar ({2}): {3}.
+
+#             Returns:
+#                 {4|list[str]}: {5}.
+
+#             '''
+#         self.compare(expected_output, code)
+
+#     def test_nested_return(self):
+#         '''Make a docstring that is a nested container.'''
+#         code = \
+#             '''
+#             def foo(bar):
+#                 {curs}
+#                 return [['8'], ['8'], ['9'], ['12312']]
+#             '''
+
+#         expected_output = \
+#             '''\
+#             {1}.
+
+#             Args:
+#                 bar ({2}): {3}.
+
+#             Returns:
+#                 {4|list[list[str]]}: {5}.
+
+#             '''
+#         self.compare(expected_output, code)
+
+#     def test_nested_return_multi(self):
+#         '''Make a docstring for a nested container with more than one type.'''
+#         code = \
+#             '''
+#             def foo(bar):
+#                 {curs}
+#                 return [('8', ), ('8', ), ('9', ), (12312.0, )]
+#             '''
+
+#         expected_output = \
+#             '''\
+#             {1}.
+
+#             Args:
+#                 bar ({2}): {3}.
+
+#             Returns:
+#                 {4|list[tuple[str or float]]}: {5}.
+
+#             '''
+#         self.compare(expected_output, code)
+
+#     def test_nested_return_multi_001(self):
+#         '''Make a docstring for a nested container with more than one type.'''
+#         code = \
+#             '''
+#             def foo(bar):
+#                 {curs}
+#                 return [('8', ), ['8'], ('9', ), (12312.0, )]
+#             '''
+
+#         expected_output = \
+#             '''\
+#             {1}.
+
+#             Args:
+#                 bar ({2}): {3}.
+
+#             Returns:
+#                 {4|list[tuple[str or float] or list[str]]}: {5}.
+
+#             '''
+#         self.compare(expected_output, code)
+
     def test_multi_return_single_type(self):
         '''Build a docstring that has one return type but multiple returns.'''
         code = \
