@@ -8,6 +8,7 @@ import astroid
 from . import visit
 from . import common
 from . import numberify
+from . import ultisnips_build
 
 
 def create_docstring(code, row, style=''):
@@ -17,7 +18,6 @@ def create_docstring(code, row, style=''):
     # Parse the code
     node = astroid.parse(code)
     full_info = visit.get_info(node)
-
     node_that_needs_a_docstring = visit.get_closest_docstring_node(row, full_info)
 
     # Find the node's group and then get its info
@@ -52,8 +52,17 @@ def create_docstring(code, row, style=''):
     #     '''
     #
     formatter = numberify.NumberifyWordFormatter()
-    numberized_docstring = formatter.format(initial_docstring)
-    return numberized_docstring
+    return formatter.format(initial_docstring)
+
+
+def create_ultisnips_docstring(code, row, style=''):
+    docstring = create_docstring(code, row, style=style)
+    return convert_to_ultisnips(docstring)
+
+
+def convert_to_ultisnips(code):
+    ultisnips_formatter = ultisnips_build.UltiSnipsTabstopFormatter()
+    return ultisnips_formatter.format(code)
 
 
 def add_docstring(code, row, style='', mode='replace'):
@@ -62,7 +71,7 @@ def add_docstring(code, row, style='', mode='replace'):
 
     if mode == 'replace':
         raise NotImplementedError('Need to write this')
-        code[row:] = docstring
+        # code[row:] = docstring
     elif mode == 'insert':
         code.insert(row, docstring)
     else:

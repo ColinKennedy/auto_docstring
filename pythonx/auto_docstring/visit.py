@@ -22,21 +22,11 @@ class Visitor(object):
             'in': node.parent,
         }
 
-        number_of_defaults = len(node.args.defaults)
-        all_args = list(node.args.get_children())
-        defaults = []
-
-        if number_of_defaults:
-            args = all_args[:-2 * (number_of_defaults)]
-            defaults = all_args[-2 * (number_of_defaults):]
-        else:
-            args = all_args
+        all_args = self._get_all_args(node)
+        args, defaults, values = self._organize_args(node, all_args)
 
         for arg in args:
             info['args'].append(arg.name)
-
-        values = defaults[len(defaults) // 2:]
-        defaults = defaults[:len(defaults) // 2:]
 
         for default, value, in six.moves.zip(defaults, values):
             value = get_object(value)
@@ -65,30 +55,56 @@ class Visitor(object):
         self.functions[function].setdefault('yields', [])
         self.functions[function]['yields'].append(value)
 
-    # visit_functiondef = visit
-    # visit_for = visit
-    # visit_if = visit
-    # visit_arguments = visit
-    # visit_assignname = visit
-    # visit_call = visit
+    @staticmethod
+    def _get_all_args(node):
+        try:
+            decorators = node.decorators.get_children()
+        except AttributeError:
+            decorators = []
 
+        children = list(node.args.get_children())
 
-def process_function(node):
-    visitor = Visitor()
-    node.accept(visitor)
+        # Drop the first arg if it's a bound method
+        drop_first_arg = False
+        for decorator in decorators:
+            if decorator.name == 'classmethod':
+                drop_first_arg = True
+                break
 
-    return visitor.functions
+        if drop_first_arg:
+            return children[1:]
+
+        return children
+
+    @staticmethod
+    def _organize_args(node, args):
+        number_of_defaults = len(node.args.defaults)
+
+        defaults = []
+        if number_of_defaults:
+            defaults = args[-2 * (number_of_defaults):]
+            args = args[:-2 * (number_of_defaults)]
+
+        values = defaults[len(defaults) // 2:]
+        defaults = defaults[:len(defaults) // 2:]
+
+        return (args, defaults, values)
 
 
 def get_info(node):
     output = {'nodes': dict()}
     functions = recursive_default_dict()
 
-    for child in node.get_children():
-        if isinstance(child, astroid.FunctionDef):
-            for function, info in six.iteritems(process_function(child)):
-                functions[function] = info
-                output['nodes'][function] = 'functions'
+    visitor = Visitor()
+    try:
+        node.accept(visitor)
+    except AttributeError:
+        visitor.visit(node)
+
+    functions = visitor.functions
+    for function, info in six.iteritems(functions):
+        functions[function] = info
+        output['nodes'][function] = 'functions'
 
     functions = default_to_regular(functions)
     output['functions'] = functions
@@ -161,4 +177,3 @@ def _get_parents(obj):
                 yield parent
 
     return list(__get_parent(obj))
-
