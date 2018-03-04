@@ -478,4 +478,3 @@ class ReturnTestCase(common.CommonTestCase):
 
     #         '''
     #     self.compare(expected_output, code)
-
