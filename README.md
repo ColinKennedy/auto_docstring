@@ -1,3 +1,10 @@
+- make tests for "Raises"
+ - also make sure that "Raises" works, even if the string ends in a '.'
+- Make sure that instancemethods don't contain "self" in the docstring
+- expanded - this keeps resolving to dir()
+ - also check that self. doesn't expand. Annoying!
+
+
 ## The new plan
 Docstrings will be built in several phases
   1. parse with AST
@@ -107,12 +114,24 @@ AUTO_DOCSTRING_SIMPLIFY_RETURN_TYPES
  - default: '1'
 AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE
  - default: '1'
-AUTO_DOCSTRING_FOLLOW_THIRD_PARTY = '0'
-AUTO_DOCSTRING_FOLLOW_VARIABLE = '0'
+AUTO_DOCSTRING_FOLLOW
+ - default: "third-party,built-in"
 AUTO_DOCSTRING_AUTO_RAW_PREFIX = '1'
 AUTO_DOCSTRING_QUALIFIED_TYPES
  - default: "full"
  - options: "full", "simple"
+AUTO_DOCSTRING_CLASS_TAG
+ - default: ""
+ - could be something like ":class:`{}`"
+ - no {}? Then just append
+AUTO_DOCSTRING_FUNCTION_TAG
+ - default: ""
+ - could be something like ":func:`{}`"
+ - no {}? Then just append
+AUTO_DOCSTRING_OBJECT_TAG
+ - default: ""
+ - could be something like ":obj:`{}`"
+ - no {}? Then just append
 
 spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
 return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
