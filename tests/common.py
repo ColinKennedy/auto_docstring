@@ -1,42 +1,76 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''Simple classes and functions that can be re-used by our unittests.'''
+
 # IMPORT STANDARD LIBRARIES
+import textwrap
 import unittest
 
+# IMPORT THIRD-PARTY LIBRARIES
+from auto_docstring import common as common_
+from auto_docstring import docstring_builder_two as docstring_builder
 
-class CursorText(object):
-    def __init__(self, pointer):
-        super(CursorText, self).__init__()
-        self.pointer = pointer
 
-    def get_position(self, lines):
-        detected_row_index = 0
-        detected_column_index = 0
-        for row_index, line in enumerate(lines):
-            try:
-                char_index = line.index(self.pointer)
-            except ValueError:
-                pass
-            else:
-                detected_row_index = row_index
-                detected_column_index = char_index
-                break
+def get_position(cursor, lines):
+    '''Find the given cursor in the given lines of code.
 
-        if not detected_row_index:
-            raise RuntimeError('Could not get position. Pointer: "{pnt}" not '
-                               'in lines, "{lines}".'
-                               ''.format(pnt=self.pointer, lines=lines))
+    Args:
+        cursor (str): The text to find in `lines`.
+        lines (iter[str]): The code that will be searched through.
 
-        return (detected_row_index, detected_column_index)
+    Returns:
+        tuple[int, int]: The row and column where `cursor` was found in `lines`.
+
+    '''
+    row = 0
+    column = 0
+    for current_row, line in enumerate(lines):
+        try:
+            current_column = line.index(cursor)
+        except ValueError:  #  Happens if index fails
+            pass
+        else:
+            row = current_row
+            column = current_column
+            break
+
+    return (row, column)
 
 
 class CommonTestCase(unittest.TestCase):
-    def setUp(self):
-        '''Create a cursor object that expects a 'X' to mean the position.'''
-        self.cursor = CursorText(pointer='X')
 
+    '''A unittest.TestCase that makes creating and comparing docstrings easy.'''
 
-if __name__ == '__main__':
-    print(__doc__)
+    def compare(self, expected_output, code):
+        '''Format and test the given source `code` and `expected_output`.
 
+        Warning:
+            There must be one line in the given `code` that contains "{curs}".
+            This line is considered the user's cursor position and will be used
+            to generate the docstring.
+
+        Raises:
+            RuntimeError: If "{curs}" was not found in `code`.
+
+        Args:
+            expected_output (str): The docstring that we expect to be returned.
+            code (str): The source-code that will be used to create a docstring.
+
+        '''
+        expected_output = textwrap.dedent(expected_output)
+        code = textwrap.dedent(code)
+
+        cursor = '{curs}'
+        row, _ = get_position(cursor, code.split('\n'))
+
+        if not row:
+            raise RuntimeError(
+                'Could not get position. Pointer: "{cursor}" not in code, "{code}".'
+                ''.format(cursor=cursor, code=code))
+
+        # Remove the cursor-text and then generate the docstring
+        code = code.format(curs='')
+
+        generated_docstring = docstring_builder.create_docstring(code, row=row)
+        self.assertEqual(expected_output, generated_docstring)
