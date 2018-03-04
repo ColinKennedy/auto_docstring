@@ -58,6 +58,10 @@ class CommonBlock(object):
         parent = inspect.getmodule(obj).__name__
         return '<{parent}.{name}>'.format(parent=parent, name=name)
 
+    @staticmethod
+    def _is_special_type(node):
+        return isinstance(node, astroid.Call)
+
 
 @six.add_metaclass(abc.ABCMeta)
 class MultiTypeBlock(CommonBlock):
@@ -97,10 +101,6 @@ class MultiTypeBlock(CommonBlock):
     def _info_key():
         return '_some_key'
 
-    @staticmethod
-    def _is_special_type(node):
-        return isinstance(node, astroid.Call)
-
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
@@ -135,6 +135,9 @@ class MultiTypeBlock(CommonBlock):
     def _change_type_to_str(cls, obj):
         if cls._is_special_type(obj):
             return cls.get_import_path(get_object(obj))
+
+        if not check.is_itertype(obj):
+            return get_type_name(obj)
 
         unique_types = reduce_types(obj)
         return make_iterable_label(unique_types)
