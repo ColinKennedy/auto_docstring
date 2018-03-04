@@ -28,7 +28,7 @@ class Visitor(object):
         for arg in args:
             info['args'].append(arg.name)
 
-        for default, value, in defaults:
+        for default, value, in six.moves.zip(*defaults):
             value = get_object(value)
             info['defaults'].append((default.name, value))
 
