@@ -77,10 +77,11 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
-                bar ({2|int}): {3}.
+                bar ({2|int}, optional): {3}.
 
             '''
 
@@ -96,14 +97,15 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
                 something ({2}): {3}.
                 another ({4|int}, optional): {5}.
 
             Returns:
-                bool: {6}.
+                {6|bool}: {7}.
 
             '''
 

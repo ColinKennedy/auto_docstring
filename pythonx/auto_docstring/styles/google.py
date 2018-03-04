@@ -60,11 +60,7 @@ class GoogleStyle(BaseStyle):
 
     @classmethod
     def draw(cls, info):
-        try:
-            spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
-        except TypeError:
-            spacing = 1
-
+        spacing = cls._get_spacing()
         lines = []
 
         for block_name in cls.get_default_block_order():
@@ -84,19 +80,10 @@ class GoogleStyle(BaseStyle):
 
             lines.extend(block_lines)
 
-        if cls._is_multiline(lines):
-            # Add the header
-            lines.insert(0, '{}.\n')
-
-            # Add extra newlines, as the footer
-            lines.append('')
-            lines.append('')
+        cls._add_header(lines)
+        cls._add_footer(lines)
 
         return lines
-
-    @staticmethod
-    def _is_multiline(lines):
-        return len(lines) > 1
 
     @staticmethod
     def get_default_block_order():
@@ -105,3 +92,30 @@ class GoogleStyle(BaseStyle):
             'returns',
             'yields',
         )
+
+    @staticmethod
+    def _is_multiline(lines):
+        return len(lines) > 1
+
+    @staticmethod
+    def _get_spacing():
+        try:
+            return int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
+        except TypeError:
+            return 1
+
+    @classmethod
+    def _add_header(cls, lines):
+        if cls._is_multiline(lines):
+            lines.insert(0, '{}.\n')
+        elif not lines:
+            lines.insert(0, '{}.')
+
+    @classmethod
+    def _add_footer(cls, lines):
+        if cls._is_multiline(lines):
+            # Add extra newlines, as the footer
+            lines.append('')
+            lines.append('')
+
+        return lines
