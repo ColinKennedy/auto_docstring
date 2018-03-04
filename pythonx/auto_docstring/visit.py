@@ -130,10 +130,11 @@ def get_value(node):
         pass
 
     container = iterable_types[type(node)]
+    _temp_container = []
     for item in node.elts:
-        container.append(item)
+        _temp_container.append(item)
 
-    return container
+    return container.__class__(_temp_container)
 
 
 def recursive_default_dict():
