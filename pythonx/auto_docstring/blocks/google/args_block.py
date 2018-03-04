@@ -29,15 +29,16 @@ class Args(common_block.CommonBlock):
             line = '{indent}{arg} ({{}}): {{}}.'.format(indent=indent, arg=arg)
             lines.append(line)
 
-        for arg, value in defaults:
+        for index, (arg, value) in enumerate(defaults):
             if cls._is_special_type(value):
                 value = cls._get_special_type_str(value, info)
             else:
                 value = common_block.get_type_name(visit.get_value(value))
 
-            line = '{indent}{arg} ({{{value}}}, optional): {{}}.'.format(
+            line = '{indent}{arg} ({{{id_}|{value}}}, optional): {{}}.'.format(
                 indent=indent,
                 arg=arg,
+                id_=index,
                 value=value,
             )
             lines.append(line)

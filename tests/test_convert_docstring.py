@@ -8,13 +8,15 @@ This module tests converting auto_docstring docstrings into UltiSnips docstrings
 '''
 
 # IMPORT STANDARD LIBRARIES
+import textwrap
 import unittest
 
 # IMPORT THIRD-PARTY LIBRARIES
+from auto_docstring import numberify
 from auto_docstring import docstring_builder_two as docstring_builder
 
 
-class ConvertUltiSnipsSnippet(unittest.TestCase):
+class NumberedToUltiSnips(unittest.TestCase):
 
     '''Convert docstrings into UltiSnips docstrings.'''
 
@@ -23,13 +25,13 @@ class ConvertUltiSnipsSnippet(unittest.TestCase):
         converted_docstring = docstring_builder.convert_to_ultisnips(docstring)
         self.assertEqual(converted_docstring, expected_output)
 
-    def test_no_args_convert(self):
+    def test_no_args(self):
         '''Test that a docstring with nothing in it does not convert.'''
         docstring = ''
         expected_output = ''
         self.compare(docstring, expected_output)
 
-    def test_arg_convert(self):
+    def test_arg(self):
         '''Convert a docstring with an arg.'''
         docstring = \
             '''\
@@ -49,7 +51,7 @@ class ConvertUltiSnipsSnippet(unittest.TestCase):
             '''
         self.compare(docstring, expected_output)
 
-    def test_multi_args_convert(self):
+    def test_multi_args(self):
         '''Convert a docstring with more than one arg.'''
         docstring = \
             '''\
@@ -71,7 +73,7 @@ class ConvertUltiSnipsSnippet(unittest.TestCase):
             '''
         self.compare(docstring, expected_output)
 
-    def test_kwargs_convert(self):
+    def test_kwargs(self):
         '''Convert a docstring with an optional arg.'''
         docstring = \
             '''\
@@ -91,7 +93,7 @@ class ConvertUltiSnipsSnippet(unittest.TestCase):
             '''
         self.compare(docstring, expected_output)
 
-    def test_multi_kwargs_convert(self):
+    def test_multi_kwargs(self):
         '''Convert a docstring with more than one optional args.'''
         docstring = \
             '''\
@@ -112,3 +114,37 @@ class ConvertUltiSnipsSnippet(unittest.TestCase):
 
             '''
         self.compare(docstring, expected_output)
+
+
+class UnnumberedToUltiSnips(unittest.TestCase):
+    def compare(self, docstring, expected_output):
+        '''Convert `docstring` and then test if it matches `expected_output`.'''
+        formatter = numberify.NumberifyWordFormatter()
+        docstring = formatter.format(docstring)
+        converted_docstring = docstring_builder.convert_to_ultisnips(docstring)
+        self.assertEqual(converted_docstring, expected_output)
+
+    def test_unique_kwargs(self):
+        '''Convert a docstring that has named fields with different numbers.'''
+        docstring = textwrap.dedent(
+            '''\
+            {}.
+
+            Args:
+                some_arg ({1|int}, optional): {}.
+                another ({2|int}, optional): {}.
+
+            ''')
+
+        expected_output = textwrap.dedent(
+            '''\
+            $1.
+
+            Args:
+                some_arg (${2:int}, optional): $3.
+                another (${4:int}, optional): $5.
+
+            ''')
+
+        self.compare(docstring, expected_output)
+

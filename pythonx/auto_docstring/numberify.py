@@ -4,6 +4,7 @@
 '''A module that contains classes and functions to convert Python strings.'''
 
 # IMPORT STANDARD LIBRARIES
+import re
 import string
 
 
@@ -23,6 +24,13 @@ class NumberifyWordFormatter(string.Formatter):
         >>> formatter.format("{name} {} here {name} {thing}")
         ... # Result: "{1|name} {2} here {1|name} {3|thing}")
 
+    If named fields have unique numbers, then their numbers will not be shared.
+
+    Example:
+        >>> formatter = NumberifyWordFormatter()
+        >>> formatter.format("{1|name} {} here {2|name} {thing}")
+        ... # Result: "{1|name} {2} here {3|name} {4|thing}")
+
     Note:
         The use of "|" for named fields is custom to this class. Normal
         Python formatters won't know what to do with it so beware. You'll need
@@ -30,6 +38,8 @@ class NumberifyWordFormatter(string.Formatter):
         See :mod:`auto_docstring.ultisnips_build` for an example.
 
     '''
+
+    _field_name_compile = re.compile('(?:(?P<number>\d+)\|)?(?P<name>[^\|]+)?')
 
     def __init__(self):
         '''Create empty containers for used names and numbers.'''
@@ -72,7 +82,10 @@ class NumberifyWordFormatter(string.Formatter):
                 The text to replace `field_name` with and the `field_name`.
 
         '''
-        number = self._get_next_number(field_name)
+        match = self._field_name_compile.match(field_name)
+        field_name = match.group('name') or ''
+        number = self._register_name_and_get_next_number(field_name, match.group('number'))
+
         if field_name:
             replacement_text = '{' + str(number) + '|' + field_name + '}'
         else:
@@ -86,9 +99,6 @@ class NumberifyWordFormatter(string.Formatter):
         else:
             output = self._get_field(field_name, args, kwargs)
             # output = super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
-
-        self._used_names[field_name] = number
-        self._used_numbers.add(number)
 
         return output
 
@@ -130,7 +140,7 @@ class NumberifyWordFormatter(string.Formatter):
 
         return (obj, first)
 
-    def _get_next_number(self, text=''):
+    def _register_name_and_get_next_number(self, field_name='', stored_number=None):
         '''Find the next number that this instance should use for formatting.
 
         If `text` is not empty, check if the name was already used and,
@@ -142,15 +152,21 @@ class NumberifyWordFormatter(string.Formatter):
             int: The next number to use.
 
         '''
+        self._used_names.setdefault(field_name, dict())
+
         try:
             latest_number = max(self._used_numbers) + 1
         except ValueError:
             latest_number = 1
 
-        if not text:
+        if not field_name:
+            self._used_names[field_name][stored_number] = latest_number
+            self._used_numbers.add(latest_number)
             return latest_number
 
         try:
-            return self._used_names[text]
+            return self._used_names[field_name][stored_number]
         except KeyError:
+            self._used_names[field_name][stored_number] = latest_number
+            self._used_numbers.add(latest_number)
             return latest_number

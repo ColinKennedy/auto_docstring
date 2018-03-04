@@ -66,7 +66,22 @@ class CommonBlock(object):
     @classmethod
     def _get_special_type_str(cls, obj, info=None):
         inferred_object = list(obj.infer())[0]
-        return cls.get_import_path(get_object(inferred_object), info)
+        # for item in dir(inferred_object):
+        #     try:
+        #         func = getattr(obj, item)
+        #     except :
+        #         continue
+
+        #     try:
+        #         print(item, func())
+        #     except :
+        #         print(item, func)
+        # print(dir(inferred_object))
+        try:
+            # If this was a Named node like foo = [], try to get a type that way
+            return get_type_name(visit.get_container_types()[type(inferred_object)])
+        except KeyError:
+            return cls.get_import_path(get_object(inferred_object), info)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -189,14 +204,6 @@ def get_object(node):
         module = '.'.join([parent_.name for parent_ in _get_parents(node)])
         module = importlib.import_module(module)
         return getattr(module, node.name)
-
-
-def get_container_types():
-    return \
-        {
-            list: list,
-            tuple: tuple,
-        }
 
 
 def reduce_types(obj):

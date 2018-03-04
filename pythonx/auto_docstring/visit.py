@@ -217,16 +217,20 @@ def get_closest_docstring_node(row, info):
     return closest_node
 
 
-def get_container(node):
-    iterable_types = {
-        list: [],
-        tuple: [],
-        astroid.List: [],
-        astroid.Tuple: tuple(),
-    }
+def get_container_types():
+    return \
+        {
+            list: list,
+            tuple: tuple,
+            astroid.List: list,
+            astroid.Tuple: tuple,
+        }
 
+
+def get_container(node):
+    iterable_types = get_container_types()
     # Build an instance of the container for the given node
-    return iterable_types[type(node)]
+    return iterable_types[type(node)]()
 
 
 def get_value(node):

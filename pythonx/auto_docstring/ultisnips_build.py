@@ -14,7 +14,6 @@ class UltiSnipsTabstopFormatter(string.Formatter):
         self._used_numbers = set()
 
     def get_field(self, field_name, args, kwargs):
-
         if '|' in field_name:
             label = '${{{}}}'
         else:

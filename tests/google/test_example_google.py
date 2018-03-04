@@ -62,37 +62,44 @@ class AdvancedTestCase(common.CommonTestCase):
 
         self.compare(code, expected_output)
 
-    # def test_list_comp(self):
-    #     code = \
-    #         '''\
-    #         def dirgrep(obj, keyPhrase='', case=True, stdout=True):
-    #             {curs}
-    #             flags = 0
+    def test_list_comp(self):
+        code = \
+            '''\
+            import re
 
-    #             if case:
-    #                 flags = re.IGNORECASE
+            def dirgrep(obj, keyPhrase='', case=True, stdout=True):
+                {curs}
+                flags = 0
 
-    #             output = [x for x in dir(obj) if re.search(keyPhrase, x, flags=flags)]
-    #             if stdout:
-    #                 for x in output: print x
-    #             return output
-    #         '''
+                if case:
+                    flags = re.IGNORECASE
 
-    #     expected_output = \
-    #         '''\
-    #         $1.
+                output = []
+                for x in dir(obj):
+                    if re.search(keyPhrase, x, flags=flags):
+                        output.append(x)
 
-    #         Args:
-    #             obj ($2): $3.
-    #             keyPhrase (${4:str}, optional): $5.
-    #             case (${6:bool}, optional): $7.
-    #             stdout (${8:bool}, optional): $9.
+                if stdout:
+                    for x in output:
+                        print x
+                return output
+            '''
 
-    #         Returns:
-    #             ${10:list}: $11.
+        expected_output = \
+            '''\
+            $1.
 
-    #         '''
-    #     self.compare(code, expected_output)
+            Args:
+                obj ($2): $3.
+                keyPhrase (${4:str}, optional): $5.
+                case (${6:bool}, optional): $7.
+                stdout (${8:bool}, optional): $9.
+
+            Returns:
+                ${10:list}: $11.
+
+            '''
+        self.compare(code, expected_output)
 
 #     # def test_build_docstring_0002_nested_function_parent(self):
 #     #     some_function = \
