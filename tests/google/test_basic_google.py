@@ -115,13 +115,16 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
         '''Build a standard-library object that needs to be imported.'''
         code = \
             '''
+            import collections
+
             def foo(bar=collections.OrderedDict()):
                 {curs}
                 pass
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
                 bar ({2|<collections.OrderedDict>}, optional): {3}.

@@ -24,13 +24,13 @@ class Visitor(object):
 
         number_of_defaults = len(node.args.defaults)
         all_args = list(node.args.get_children())
+        defaults = []
 
         if number_of_defaults:
             args = all_args[:-2 * (number_of_defaults)]
+            defaults = all_args[-2 * (number_of_defaults):]
         else:
             args = all_args
-
-        defaults = all_args[-2 * (number_of_defaults):]
 
         for arg in args:
             info['args'].append(arg.name)
