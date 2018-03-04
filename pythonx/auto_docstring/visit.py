@@ -23,12 +23,12 @@ class Visitor(object):
         }
 
         all_args = self._get_all_args(node)
-        args, defaults, values = self._organize_args(node, all_args)
+        args, defaults = self._organize_args(node, all_args)
 
         for arg in args:
             info['args'].append(arg.name)
 
-        for default, value, in six.moves.zip(defaults, values):
+        for default, value, in defaults:
             value = get_object(value)
             info['defaults'].append((default.name, value))
 
@@ -88,7 +88,7 @@ class Visitor(object):
         values = defaults[len(defaults) // 2:]
         defaults = defaults[:len(defaults) // 2:]
 
-        return (args, defaults, values)
+        return (args, (defaults, values))
 
 
 def get_info(node):
