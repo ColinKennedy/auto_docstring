@@ -90,19 +90,26 @@ class MultiTypeBlock(CommonBlock):
 
     @classmethod
     def _expand_types(cls, obj):
+        obj = visit.get_value(obj)
+
         if not check.is_itertype(obj):
-            yield get_type(obj)
-            return
+            return get_type(obj)
 
-        for item in obj:
-            # If item is a astroid.List or some other iterable type, expand it
-            value = visit.get_value(item)
-            yield value
-            # _temp_container = [item_ for item_ in value]
-            # for index, subitem in enumerate(_temp_container):
-            #     _temp_container[index] = cls._expand_types(subitem)
+        container = visit.get_container(obj)
+        temp_container = []
+        for subitem in obj:
+            value = cls._expand_types(subitem)
 
-            # yield value.__class__(_temp_container)
+            if value:
+                temp_container.append(value)
+
+            # # Drill down one level deeper if we catch an instance
+            # if not inspect.isclass(value):
+            #     value = visit.get_value(subitem)
+
+            # temp_container.append(value)
+
+        return container.__class__(temp_container)
 
     @classmethod
     def _change_type_to_str(cls, obj):
@@ -111,10 +118,14 @@ class MultiTypeBlock(CommonBlock):
 
         all_types = []
         for container in obj:
-            _temp_container = [item_ for item_ in container]
-            for index, item in enumerate(_temp_container):
-                _temp_container[index] = type(visit.get_value(item))
+            if not check.is_itertype(container):
+                return get_type(container)
 
+            _temp_container = []
+            for item in container:
+                _temp_container.append(type(visit.get_value(item)))
+
+            print('container', _temp_container)
             # Make each type unique without losing order
             _temp_container = grouping.uniquify_list(_temp_container)
 

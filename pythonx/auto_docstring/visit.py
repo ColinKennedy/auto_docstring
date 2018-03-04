@@ -219,6 +219,18 @@ def get_closest_docstring_node(row, info):
     return closest_node
 
 
+def get_container(node):
+    iterable_types = {
+        list: [],
+        tuple: [],
+        astroid.List: [],
+        astroid.Tuple: tuple(),
+    }
+
+    # Build an instance of the container for the given node
+    return iterable_types[type(node)]
+
+
 def get_value(node):
     '''Get the Python object(s) for the given node.
 
@@ -234,21 +246,23 @@ def get_value(node):
             An instance of the container, with the given `node`'s children.
 
     '''
+    def iterate(obj):
+        try:
+            # astroid.List
+            return node.elts
+        except AttributeError:
+            return node
+
     try:
         # Try to see if the node is actually not a container-type
         return node.value
     except AttributeError:
         pass
 
-    iterable_types = {
-        astroid.List: [],
-        astroid.Tuple: tuple(),
-    }
+    container = get_container(node)
 
-    # Build an instance of the container for the given node
-    container = iterable_types[type(node)]
     _temp_container = []
-    for item in node.elts:
+    for item in iterate(node):
         _temp_container.append(item)
 
     return container.__class__(_temp_container)
