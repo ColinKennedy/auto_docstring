@@ -37,6 +37,10 @@ class NumberifyWordFormatter(string.Formatter):
 
         return output
 
+    @staticmethod
+    def _is_thirdparty_field(name):
+        return name.startswith('<') and name.endswith('>')
+
     def _get_field(self, field_name, args, kwargs):
         first, rest = field_name._formatter_field_name_split()
 
@@ -55,10 +59,6 @@ class NumberifyWordFormatter(string.Formatter):
 
         return obj, first
 
-    @staticmethod
-    def _is_thirdparty_field(name):
-        return name.startswith('<') and name.endswith('>')
-
     def _get_next_number(self, text=''):
         try:
             latest_number = max(self._used_numbers) + 1
@@ -72,33 +72,3 @@ class NumberifyWordFormatter(string.Formatter):
             return self._used_names[text]
         except KeyError:
             return latest_number
-
-
-def _test():
-    import textwrap
-    code = textwrap.dedent(
-        '''{}.
-
-        {name}
-
-        Args:
-            foo ({}): {name}.
-
-        ''')
-
-
-    result = textwrap.dedent(
-        '''{1}.
-
-        {2|name}
-
-        Args:
-            foo ({3}): {2|name}.
-
-        ''')
-
-    formatter = NumberifyWordFormatter()
-    output = formatter.format(code)
-    print(output)
-    print(result)
-    print(output == result)
