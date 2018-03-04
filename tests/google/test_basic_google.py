@@ -148,10 +148,48 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    # TODO : third-party (importable)
-    # get the type from an imported class
-    # get the type from an imported function
-    # no return-type - can't figure it out
+    def test_imported_class(self):
+        '''Build a docstring that has to "find" the class object.'''
+        code = \
+            '''
+            from collections import Counter
+
+            def foo():
+                {curs}
+                return Counter()
+            '''
+
+        expected_output = '{1|<collections.Counter>}: {2}.'
+
+        self.compare(expected_output, code)
+
+    # def test_imported_thirdparty_function(self):
+    #     '''Build a docstring that has to "find" the function object.'''
+    #     code = \
+    #         '''
+    #         from auto_docstring.visit import default_to_regular
+
+    #         def foo():
+    #             {curs}
+    #             return default_to_regular()
+    #         '''
+
+    #     expected_output = '{1|<auto_docstring.visit.default_to_regular>}: {2}.'
+    #     self.compare(expected_output, code)
+
+    def test_imported_thirdparty_class(self):
+        '''Build a docstring that has to "find" the class object.'''
+        code = \
+            '''
+            from auto_docstring.visit import Visitor
+
+            def foo():
+                {curs}
+                return Visitor()
+            '''
+
+        expected_output = '{1|<auto_docstring.visit.Visitor>}: {2}.'
+        self.compare(expected_output, code)
 
 
 class ReturnTestCase(common.CommonTestCase):
