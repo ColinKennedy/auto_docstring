@@ -30,27 +30,30 @@ class NumberifyWordFormatter(string.Formatter):
             # If it's our special syntax, just pass the replacement text through
             output = (replacement_text, field_name)
         else:
-            output = super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
+            output = self._get_field(field_name, args, kwargs)
 
         self._used_names[field_name] = number
         self._used_numbers.add(number)
 
         return output
 
-    # def get_field(self, field_name, args, kwargs):
-    #     first, rest = field_name._formatter_field_name_split()
+    def _get_field(self, field_name, args, kwargs):
+        first, rest = field_name._formatter_field_name_split()
 
-    #     obj = self.get_value(first, args, kwargs)
+        try:
+            obj = self.get_value(first, args, kwargs)
+        except KeyError:
+            return (kwargs[field_name], first)
 
-    #     # loop through the rest of the field_name, doing
-    #     #  getattr or getitem as needed
-    #     for is_attr, i in rest:
-    #         if is_attr:
-    #             obj = getattr(obj, i)
-    #         else:
-    #             obj = obj[i]
+        # loop through the rest of the field_name, doing
+        #  getattr or getitem as needed
+        for is_attr, i in rest:
+            if is_attr:
+                obj = getattr(obj, i)
+            else:
+                obj = obj[i]
 
-    #     return obj, first
+        return obj, first
 
     @staticmethod
     def _is_thirdparty_field(name):

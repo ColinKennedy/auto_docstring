@@ -191,6 +191,8 @@ class ReturnTestCase(common.CommonTestCase):
         '''Build a docstring that has one return type but multiple returns.'''
         code = \
             '''
+            import collections
+
             def some_function(something=collections.OrderedDict):
                 {curs}
                 if something:
@@ -200,10 +202,11 @@ class ReturnTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
-                some_arg ({2|<collections.OrderedDict>}, optional): {3}.
+                something ({2|<collections.OrderedDict>}, optional): {3}.
 
             Returns:
                 {4|bool}: {5}.
@@ -218,9 +221,9 @@ class ReturnTestCase(common.CommonTestCase):
             '''
             import collections
 
-
             def foo(bar=collections.OrderedDict()):
                 {curs}
+
                 if bar:
                     return True
                 return ''
@@ -244,6 +247,8 @@ class ReturnTestCase(common.CommonTestCase):
         '''Make a docstring to describe a function that has a yield value.'''
         code = \
             '''
+            import collections
+
             def foo(bar=collections.OrderedDict()):
                 {curs}
                 if bar:
@@ -252,7 +257,8 @@ class ReturnTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
                 bar ({2|<collections.OrderedDict>}, optional): {3}.
@@ -267,6 +273,8 @@ class ReturnTestCase(common.CommonTestCase):
         '''Make sure that nested functions return the correct docstring.'''
         code = \
             '''
+            import collections
+
             def an_outer_function(*args, **kwargs):
                 def inner_function(bar=collections.OrderedDict()):
                     {curs}
@@ -276,7 +284,8 @@ class ReturnTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
                 bar ({2|<collections.OrderedDict>}, optional): {3}.
@@ -287,10 +296,12 @@ class ReturnTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
-    def test_nested_function_outer_function(self):
+    def test_nested_outer_function(self):
         '''Make sure that nested functions don't affect the created docstring.'''
         code = \
             '''
+            import collections
+
             def parent_function(foo='asfd'):
                 {curs}
                 def inner_function(bar=collections.OrderedDict()):
@@ -302,7 +313,8 @@ class ReturnTestCase(common.CommonTestCase):
             '''
 
         expected_output = \
-            '''{1}.
+            '''\
+            {1}.
 
             Args:
                 foo ({2|str}, optional): {3}.

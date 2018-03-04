@@ -9,4 +9,4 @@ class Yields(common_block.MultiTypeBlock):
 
     label = 'Yields'
     name = 'yields'
-    _info_key = 'yield'
+    _info_key = name

@@ -10,42 +10,73 @@ import six
 import astroid
 
 
+class Visitor(object):
+    def __init__(self):
+        super(Visitor, self).__init__()
+        self.functions = collections.defaultdict(dict)
+
+    def visit_functiondef(self, node):
+        info = {
+            'args': [],
+            'defaults': [],
+            'in': node.parent,
+        }
+
+        number_of_defaults = len(node.args.defaults)
+        all_args = list(node.args.get_children())
+
+        if number_of_defaults:
+            args = all_args[:-2 * (number_of_defaults)]
+        else:
+            args = all_args
+
+        defaults = all_args[-2 * (number_of_defaults):]
+
+        for arg in args:
+            info['args'].append(arg.name)
+
+        values = defaults[len(defaults) // 2:]
+        defaults = defaults[:len(defaults) // 2:]
+
+        for default, value, in six.moves.zip(defaults, values):
+            value = get_object(value)
+            info['defaults'].append((default.name, value))
+
+        self.visit(node)
+
+        self.functions[node].update(info)
+
+    def visit(self, node):
+        for child in node.get_children():
+            try:
+                child.accept(self)
+            except AttributeError:
+                self.visit(child)
+
+    def visit_return(self, node):
+        function = node.scope()
+        self.functions[function].setdefault('returns', [])
+        self.functions[function]['returns'].append(node.value.value)
+
+    def visit_yield(self, node):
+        function = node.scope()
+        value = get_value(node.value)
+        self.functions[function].setdefault('yields', [])
+        self.functions[function]['yields'].append(value)
+
+    # visit_functiondef = visit
+    # visit_for = visit
+    # visit_if = visit
+    # visit_arguments = visit
+    # visit_assignname = visit
+    # visit_call = visit
+
+
 def process_function(node):
-    # Parse the args/kwargs of the function
-    info = {
-        'args': [],
-        'defaults': [],
-        'in': node.parent,
-        'returns': [],
-    }
+    visitor = Visitor()
+    node.accept(visitor)
 
-    number_of_defaults = len(node.args.defaults)
-    all_args = list(node.args.get_children())
-
-    if number_of_defaults:
-        args = all_args[:-2 * (number_of_defaults)]
-    else:
-        args = all_args
-
-    defaults = all_args[-2 * (number_of_defaults):]
-
-    for arg in args:
-        info['args'].append(arg.name)
-
-    values = defaults[len(defaults) // 2:]
-    defaults = defaults[:len(defaults) // 2:]
-
-    for default, value, in six.moves.zip(defaults, values):
-        value = get_object(value)
-        info['defaults'].append((default.name, value))
-
-    # Gather return-data
-    for item in node.body:
-        if isinstance(item, astroid.Return):
-            value = item.value.value
-            info['returns'].append(value)
-
-    return info
+    return visitor.functions
 
 
 def get_info(node):
@@ -54,8 +85,9 @@ def get_info(node):
 
     for child in node.get_children():
         if isinstance(child, astroid.FunctionDef):
-            functions[child] = process_function(child)
-            output['nodes'][child] = 'functions'
+            for function, info in six.iteritems(process_function(child)):
+                functions[function] = info
+                output['nodes'][function] = 'functions'
 
     functions = default_to_regular(functions)
     output['functions'] = functions
@@ -68,7 +100,7 @@ def get_closest_docstring_node(row, info):
     closest_row = 0
     functions = info.get('functions', [])
     for function in functions:
-        if function.lineno <= row:
+        if function.lineno <= row and function.lineno > closest_row:
             closest_node = function
             closest_row = function.lineno
 
@@ -92,18 +124,30 @@ def get_object(obj):
 
         return list(_get_parent(obj))
 
-    if isinstance(obj, astroid.Call):
+    if isinstance(obj, (astroid.Call, astroid.Attribute)):
         # TODO : Delete the comment section here, later
         parent = list(obj.infer())[0]
         module = '.'.join([parent_.name for parent_ in get_parent(parent)])
         module = importlib.import_module(module)
         return getattr(module, parent.name)
 
-        # parent = list(obj.infer())[0]
-        # import_path = '.'.join([parent_.name for parent_ in get_parent(parent)] + [parent.name])
-        # return '<{}>'.format(import_path)
+    return obj.value
 
-    return obj
+
+def get_value(node):
+    iterable_types = {
+        astroid.List: [],
+    }
+    try:
+        return node.value
+    except AttributeError:
+        pass
+
+    container = iterable_types[type(node)]
+    for item in node.elts:
+        container.append(item)
+
+    return container
 
 
 def recursive_default_dict():

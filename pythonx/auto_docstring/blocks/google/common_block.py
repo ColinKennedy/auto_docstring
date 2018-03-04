@@ -70,7 +70,9 @@ class MultiTypeBlock(CommonBlock):
             lines = [cls.get_starting_line()]
             indent = common.get_default_indent()
 
-        obj_type = cls._format_obj_type(expected_object)
+        obj_type = cls._expand_types(expected_object)
+        obj_type = cls._format_types(obj_type)
+
         line = '{indent}{{{obj_type}}}: {{}}.'.format(
             indent=indent,
             obj_type=obj_type,
@@ -85,6 +87,31 @@ class MultiTypeBlock(CommonBlock):
         return '_some_key'
 
     @classmethod
-    def _format_obj_type(cls, obj):
-        if check.is_itertype(obj) and len(obj) == 1:
-            return cls.get_import_path(obj[0])
+    def _expand_types(cls, obj):
+        if check.is_itertype(obj):
+            if len(obj) == 1:
+                return cls.get_import_path(obj[0])
+
+            _temp_container = []
+            for item in obj:
+                item = cls._expand_types(item)
+                item_type = cls.get_import_path(item)
+                _temp_container.append(item_type)
+
+            obj = obj.__class__(_temp_container)
+            return obj
+
+        return obj
+
+    @classmethod
+    def _format_types(cls, obj):
+        if not check.is_itertype(obj):
+            return obj
+
+        items = []
+        for item in obj:
+            item = cls._format_types(item)
+            if item not in items:
+                items.append(item)
+
+        return ' or '.join(items)

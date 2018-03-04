@@ -29,7 +29,6 @@ class Args(common_block.CommonBlock):
             lines.append(line)
 
         for arg, value in defaults:
-            print('asdffsd', value, cls.get_import_path(value))
             line = '{indent}{arg} ({{{value}}}, optional): {{}}.'.format(
                 indent=indent,
                 arg=arg,
