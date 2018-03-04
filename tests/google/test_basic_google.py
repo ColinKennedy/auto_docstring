@@ -163,19 +163,19 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    # def test_imported_thirdparty_function(self):
-    #     '''Build a docstring that has to "find" the function object.'''
-    #     code = \
-    #         '''
-    #         from auto_docstring.visit import default_to_regular
+    def test_imported_thirdparty_function(self):
+        '''Build a docstring that has to "find" the function object.'''
+        code = \
+            '''
+            from inspection import dirgrep
 
-    #         def foo():
-    #             {curs}
-    #             return default_to_regular()
-    #         '''
+            def foo():
+                {curs}
+                return dirgrep
+            '''
 
-    #     expected_output = '{1|<auto_docstring.visit.default_to_regular>}: {2}.'
-    #     self.compare(expected_output, code)
+        expected_output = '{1|<inspection.dirgrep>}: {2}.'
+        self.compare(expected_output, code)
 
     def test_imported_thirdparty_class(self):
         '''Build a docstring that has to "find" the class object.'''

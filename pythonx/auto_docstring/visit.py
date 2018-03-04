@@ -109,14 +109,13 @@ def get_closest_docstring_node(row, info):
 
 
 def get_object(obj):
-    if isinstance(obj, (astroid.Call, astroid.Attribute)):
-        # TODO : Delete the comment section here, later
+    try:
+        return obj.value
+    except AttributeError:
         parent = list(obj.infer())[0]
-        module = '.'.join([parent_.name for parent_ in _get_parent(parent)])
+        module = '.'.join([parent_.name for parent_ in _get_parents(parent)])
         module = importlib.import_module(module)
         return getattr(module, parent.name)
-
-    return obj.value
 
 
 def get_value(node):
@@ -147,7 +146,7 @@ def default_to_regular(d):
     return d
 
 
-def _get_parent(obj):
+def _get_parents(obj):
     def __get_parent(obj):
         try:
             parent = obj.parent
