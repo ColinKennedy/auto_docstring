@@ -104,7 +104,7 @@ class ContainerType(Type):
                 continue
 
             try:
-                container = visit.get_container(subitem)
+                visit.get_container(subitem)
             except KeyError:
                 value = visit.get_value(subitem)
                 self.items.append(Type(value))
@@ -134,7 +134,7 @@ class ContainerType(Type):
                 container=container, items_text=items_text)
 
         def _get_container_type_name(container):
-            container_type = visit.get_container_types()[get_type(self.obj)]
+            container_type = visit.get_container_types()[container]
             return get_type_name(container_type)
 
         items = self._reduce(self.items)
@@ -154,7 +154,7 @@ class ContainerType(Type):
 
         if self.include_type:
             return make_container_label(
-                _get_container_type_name(self.obj),
+                _get_container_type_name(get_type(self.obj)),
                 output_text,
             )
 
@@ -262,10 +262,7 @@ class MultiTypeBlock(CommonBlock):
             lines = [cls.get_starting_line()]
             indent = common.get_default_indent()
 
-        obj_types = []
-        for item in expected_object:
-            obj_types.append(cls._expand_types(item))
-
+        obj_types = cls._expand_types(expected_object)
         output_text = cls._change_type_to_str(*obj_types)
 
         line = cls._make_line(output_text)
@@ -281,7 +278,7 @@ class MultiTypeBlock(CommonBlock):
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
         if check.is_itertype(obj):
-            return ContainerType(obj)
+            return ContainerType(obj, include_type=False)
         else:
             return Type(obj)
 
