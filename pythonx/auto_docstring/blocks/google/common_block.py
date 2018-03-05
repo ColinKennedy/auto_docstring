@@ -134,44 +134,29 @@ class ContainerType(Type):
                 container=container, items_text=items_text)
 
         def make_items_text(items):
-            return ' or '.join([item.as_str() for item in items])
+            return ' or '.join(items)
 
         items = self._reduce(self.items)
         groups = self._group(items)
         output = []
-        for container, subitems in groups:
+        for container, subitems in six.iteritems(groups):
             if not subitems:
                 output.append(container.as_str())
                 continue
 
-            items_text = make_items_text(subitems)
-            container_type = visit.get_container_types()[container.get_type()]
+            items_text = make_items_text([item.as_str() for item in subitems])
+            container_type = visit.get_container_types()[container]
             container_type_name = get_type_name(container_type)
 
             output.append(make_container_label(container_type_name, items_text))
 
-        output_text = ', '.join(output)
+        output_text = make_items_text(output)
+
         if self.include_type:
             container_type = visit.get_container_types()[get_type(self.obj)]
             return make_container_label(get_type_name(container_type), output_text)
 
         return output_text
-
-#         output = []
-#         for item in visit.iterate(items):
-#             output.append(item.as_str())
-
-#         items_text = ' or '.join(output)
-
-#         if not self.include_type:
-#             return items_text
-
-#         container = visit.get_container_types()[get_type(self.obj)]
-
-#         return '{container}[{items_text}]'.format(
-#             container=get_type_name(container),
-#             items_text=items_text,
-#         )
 
     def _reduce(self, items):
         def get_recursive_type(obj):
@@ -197,38 +182,22 @@ class ContainerType(Type):
         return list(get_recursive_type(items))[0]
 
     def _group(self, items):
-        # Group every type together
-        # TODO : Make into an ordered dict
-        # types_ = collections.OrderedDict()
-        types_ = dict()
-        output = []
+        output = collections.OrderedDict()
 
         for item in items:
             item_type = item.get_type()
-            types_.setdefault(item_type, [])
+            output.setdefault(item_type, [])
 
             if not check.is_itertype(item):
-                output.append((item, []))
+                output[item_type] = []
                 continue
 
-            output_subitems = []
             for subitem in item:
                 subitem_type = subitem.get_type()
-                if subitem_type not in types_[item_type]:
-                    types_[item_type].append(subitem_type)
-                    output_subitems.append(subitem)
-
-            output.append((item, output_subitems))
+                if subitem_type not in output[item_type]:
+                    output[item_type].append(subitem)
 
         return output
-
-#         # Now that every type is grouped together, make text out of each "iterable group"
-#         items = []
-#         for type_, subtypes in six.iteritems(types_):
-#             subtype_names = [get_type_name(subtype) for subtype in subtypes]
-#             items.append(_make_container_label(type_, subtype_names))
-
-#         return _make_container_label(container, items)
 
     def __iter__(self):
         for item in self.items:
@@ -306,7 +275,7 @@ class MultiTypeBlock(CommonBlock):
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
-        return ContainerType(obj, include_type=False)
+        return ContainerType(obj[0])
 
     @classmethod
     def _change_type_to_str(cls, objs):
