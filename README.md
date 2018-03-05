@@ -1,8 +1,7 @@
 - make tests for "Raises"
  - also make sure that "Raises" works, even if the string ends in a '.'
-- Make sure that instancemethods don't contain "self" in the docstring
-- expanded - this keeps resolving to dir()
- - also check that self. doesn't expand. Annoying!
+- Make tests for arg types 
+- Make docstring block
 
 
 ## The new plan
