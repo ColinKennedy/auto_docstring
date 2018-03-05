@@ -55,7 +55,8 @@ class SpecialType(Type):
     def is_valid(node):
         return isinstance(node, (astroid.Call, astroid.Attribute, astroid.Name))
 
-    def as_str(self):
+    # TODO : Check if info is necessary. If not, remove it
+    def as_str(self, info=None):
         def search(obj):
             outer_scope = obj.scope()
             return assign_search.find_node_type(outer_scope, name=obj.name)
@@ -88,7 +89,29 @@ class SpecialType(Type):
             type_was_not_found = isinstance(obj, six.string_types)
             if type_was_not_found:
                 return obj
-            return cls.get_import_path(obj, info)
+            return self.get_import_path(obj, info)
+
+    @staticmethod
+    def get_import_path(obj, info=None):
+        def is_builtin_type(obj):
+            objects = []
+            for attr in dir(__builtin__):
+                attr = getattr(__builtin__, attr)
+                objects.append(attr)
+            objects = tuple((obj_ for obj_ in objects if inspect.isclass(obj_)))
+            return obj in objects
+
+        class_type = obj
+
+        if not inspect.isclass(obj):
+            class_type = obj.__class__
+
+        if inspect.isbuiltin(obj) or is_builtin_type(class_type):
+            return class_type.__name__
+
+        name = obj.__name__
+        parent = inspect.getmodule(obj).__name__
+        return '<{parent}.{name}>'.format(parent=parent, name=name)
 
 
 class ContainerType(Type):
@@ -130,8 +153,11 @@ class ContainerType(Type):
 
     def as_str(self):
         def make_container_label(container, items_text):
-            return '{container}[{items_text}]'.format(
-                container=container, items_text=items_text)
+            if items_text:
+                return '{container}[{items_text}]'.format(
+                    container=container, items_text=items_text)
+            else:
+                return container
 
         def _get_container_type_name(container):
             container_type = visit.get_container_types()[container]
@@ -141,7 +167,15 @@ class ContainerType(Type):
         groups = self._group(items)
         output = []
         for container, subitems in six.iteritems(groups):
-            container_type_name = _get_container_type_name(container)
+            try:
+                container_type_name = _get_container_type_name(container)
+            except KeyError:
+                # If this happens, it just means that the container is not
+                # nested (example: a list[str]). container, in this case, is Str
+                # so we can get get its type, directly
+                #
+                container_type_name = get_type_name(container)
+
             if not subitems:
                 output.append(container_type_name)
                 continue
@@ -223,28 +257,6 @@ class CommonBlock(object):
     def get_starting_line(cls):
         return '{}:'.format(cls.label)
 
-    @staticmethod
-    def get_import_path(obj, info=None):
-        def is_builtin_type(obj):
-            objects = []
-            for attr in dir(__builtin__):
-                attr = getattr(__builtin__, attr)
-                objects.append(attr)
-            objects = tuple((obj_ for obj_ in objects if inspect.isclass(obj_)))
-            return obj in objects
-
-        class_type = obj
-
-        if not inspect.isclass(obj):
-            class_type = obj.__class__
-
-        if inspect.isbuiltin(obj) or is_builtin_type(class_type):
-            return class_type.__name__
-
-        name = obj.__name__
-        parent = inspect.getmodule(obj).__name__
-        return '<{parent}.{name}>'.format(parent=parent, name=name)
-
 
 @six.add_metaclass(abc.ABCMeta)
 class MultiTypeBlock(CommonBlock):
@@ -277,6 +289,7 @@ class MultiTypeBlock(CommonBlock):
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
+
         if check.is_itertype(obj):
             return ContainerType(obj, include_type=False)
         else:

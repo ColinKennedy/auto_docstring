@@ -22,6 +22,7 @@ class Args(common_block.CommonBlock):
         else:
             return '{indent}{arg} ({{}}): {{}}.'.format(indent=indent, arg=arg)
 
+    # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod
     def draw(cls, info):
         args = info.get('args', [])
@@ -41,7 +42,7 @@ class Args(common_block.CommonBlock):
 
         for index, (arg, value) in enumerate(defaults):
             if common_block.SpecialType.is_valid(value):
-                value = cls._get_special_type_str(value, info)
+                value = common_block.SpecialType(value).as_str(info)
             else:
                 value = common_block.get_type_name(visit.get_value(value))
 
