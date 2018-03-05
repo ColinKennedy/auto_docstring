@@ -16,7 +16,7 @@ class AdvancedTestCase(common.CommonTestCase):
     def compare(self, code, expected_output):
         code = textwrap.dedent(code)
         row, _ = common.get_position('{curs}', code.split('\n'))
-        code.format(curs='')
+        code = code.format(curs='')
 
         expected_output = textwrap.dedent(expected_output)
         generated_docstring = docstring_builder.create_ultisnips_docstring(code, row=row, style='google')

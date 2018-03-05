@@ -1,7 +1,9 @@
 - make tests for "Raises"
  - also make sure that "Raises" works, even if the string ends in a '.'
-- Make tests for arg types 
-- Make docstring block
+- Make tests for nested arg types 
+- Make tests for dicts - because it looks like dicts are currently a problem
+- Need to also support `**kwargs`
+- Make docstring block function
 
 
 ## The new plan

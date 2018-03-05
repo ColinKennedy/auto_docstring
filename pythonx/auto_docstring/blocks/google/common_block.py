@@ -72,6 +72,7 @@ class CommonBlock(object):
 
         inferred_object = list(obj.infer())[0]
         if inferred_object == astroid.Uninferable:
+            # We could not find a type so search for it (this is a blind search)
             return search(obj)
 
         try:
