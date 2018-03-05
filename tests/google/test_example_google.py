@@ -249,73 +249,50 @@ class AdvancedTestCase(common.CommonTestCase):
 #             '''
 #         self.compare(code, expected_output)
 
-#     def test_complex_type_0001(self):
-#         code = \
-#             '''\
-#             def get_clean_comma_sep_text(text, sep=', '):
-#                 {curs}
-#                 text = sep.join(
-#                     [text_.strip() for text_ in text.split(',') if text_.strip()])
-#                 text = text.rstrip(',')
-#                 return text
-#             '''
+    def test_complex_type_0001(self):
+        code = \
+            '''\
+            def get_clean_comma_sep_text(text, sep=', '):
+                {curs}
+                text = sep.join(
+                    [text_.strip() for text_ in text.split(',') if text_.strip()])
+                text = text.rstrip(',')
+                return text
+            '''
 
-#         expected_output = \
-#             '''\
-#             {1}.
+        expected_output = \
+            '''\
+            $1.
 
-#             Args:
-#                 text ({2}): {3}.
-#                 sep ({4:str}, optional): {5}.
+            Args:
+                text ($2): $3.
+                sep (${4:str}, optional): $5.
 
-#             Returns:
-#                 {6:str}: {7}.
+            Returns:
+                ${6:str}: $7.
 
-#             '''
+            '''
 
-#         self.compare(code, expected_output)
+        self.compare(code, expected_output)
 
-#     def test_multi_instancemethod(self):
-#         '''Build docstrings for functions with more than one positional arg.'''
-#         code = \
-#             '''\
-#             class AnotherClass(object):
-#                 def some_another_function(self, some_arg, another_arg):
-#                     {curs}
-#                     pass
-#             '''
+    def test_multi_instancemethod(self):
+        '''Build docstrings for functions with more than one positional arg.'''
+        code = \
+            '''\
+            class AnotherClass(object):
+                def some_another_function(self, some_arg, another_arg):
+                    {curs}
+                    pass
+            '''
 
-#         expected_output = \
-#             '''\
-#             $1.
+        expected_output = \
+            '''\
+            $1.
 
-#             Args:
-#                 some_arg ($2): $3.
-#                 another_arg ($4): $5.
+            Args:
+                some_arg ($2): $3.
+                another_arg ($4): $5.
 
-#             '''
+            '''
 
-#         self.compare(code, expected_output)
-
-#     def test_multi_args(self):
-#         '''Build docstrings for functions with more than one positional arg.'''
-#         code = \
-#             '''\
-#             class AnotherClass(object):
-#                 @classmethod
-#                 def some_another_function(cls, some_arg, another_arg):
-#                     {curs}
-#                     pass
-#             '''
-
-#         expected_output = \
-#             '''\
-#             $1.
-
-#             Args:
-#                 some_arg ($2): $3.
-#                 another_arg ($4): $5.
-
-#             '''
-
-#         self.compare(code, expected_output)
+        self.compare(code, expected_output)
