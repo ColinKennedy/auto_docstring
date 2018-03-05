@@ -210,10 +210,6 @@ class ContainerType(Type):
                 if not item.type_contained_in(seen):
                     seen.append(item)
 
-                # for subitem in inner_item:
-                #     if not subitem.type_contained_in(seen):
-                #         seen.append(subitem)
-
             yield seen
 
         return list(get_recursive_type(items))[0]
@@ -303,35 +299,6 @@ class MultiTypeBlock(CommonBlock):
                 items.append(item)
 
         return make_items_text(items)
-        # # 'flat' means that we won't include the parent container in the final string
-        # is_flat = len(objs) != 1
-        # if is_flat:
-        #     # Make special types into basic types
-        #     objs = [obj for obj in objs]
-        #     for index, obj in enumerate(objs):
-        #         if SpecialType.is_valid(obj):
-        #             objs[index] = cls._get_special_type_str(obj)
-
-        #     # Remove duplicates
-        #     objs = reduce_types(objs)
-
-        #     # Now actually create the label
-        #     output = ''
-        #     for obj in objs:
-        #         label = make_iterable_label(obj)
-        #         output = make_options_label(output, label)
-
-        #     return output
-
-        # obj = objs[0]
-        # if SpecialType.is_valid(obj):
-        #     return cls._get_special_type_str(obj)
-
-        # if not check.is_itertype(obj):
-        #     return get_type_name(obj)
-
-        # unique_types = reduce_types(obj)
-        # return make_iterable_label(unique_types)
 
     @staticmethod
     def _make_line(obj_type, indent):
@@ -381,67 +348,6 @@ def get_object(node):
         return node.name
 
 
-# def reduce_types(obj):
-#     def get_recursive_type(obj):
-#         if not check.is_itertype(obj):
-#             yield obj
-#             return
-
-#         item_types = []
-#         _temp_container = []
-#         for item in obj:
-#             inner_item = reduce_types(item)
-#             if inner_item not in _temp_container:
-#                 _temp_container.append(inner_item)
-
-#         yield obj.__class__(_temp_container)
-
-#     return list(get_recursive_type(obj))[0]
-
-
-#def make_iterable_label(container):
-#    def _make_container_label(container, items):
-#        items = make_options_label(*items)
-#        container_name = get_type_name(container)
-
-#        if items:
-#            return '{container_name}[{items}]'.format(
-#                container_name=container_name,
-#                items=items,
-#            )
-#        return container_name
-
-#    if not check.is_itertype(container):
-#        return get_type_name(container)
-
-#    # Group every type together
-#    # so if we have [str], [int], [float], (str, ) then it would look like this
-#    # {
-#    #      list: [str, int, float],
-#    #      tuple: [str]
-#    # }
-#    #
-#    types_ = collections.OrderedDict()
-
-#    for item in container:
-#        if not check.is_itertype(item):
-#            if item not in types_:
-#                types_[item] = []
-#            continue
-
-#        item_type = get_type(item)
-#        types_.setdefault(item_type, [])
-#        types_[get_type(item)].extend([item_ for item_ in item])
-
-#    # Now that every type is grouped together, make text out of each "iterable group"
-#    items = []
-#    for type_, subtypes in six.iteritems(types_):
-#        subtype_names = [get_type_name(subtype) for subtype in subtypes]
-#        items.append(_make_container_label(type_, subtype_names))
-
-#    return _make_container_label(container, items)
-
-
 def make_items_text(items):
     return ' or '.join(items)
 
@@ -481,91 +387,3 @@ def _get_parents(node):
                 yield parent
 
     return list(__get_parent(node))
-
-
-#    @classmethod
-#    def _change_type_to_str(cls, *objs):
-#        # 'flat' means that we won't include the parent container in the final string
-#        is_flat = len(objs) != 1
-#        if is_flat:
-#            # Make special types into basic types
-#            objs = [obj for obj in objs]
-#            for index, obj in enumerate(objs):
-#                if cls._is_special_type(obj):
-#                    objs[index] = cls._get_special_type_str(obj)
-
-#            # Remove duplicates
-#            objs = reduce_types(objs)
-
-#            # Now actually create the label
-#            output = ''
-#            for obj in objs:
-#                label = make_iterable_label(obj)
-#                output = make_options_label(output, label)
-
-#            return output
-
-#        obj = objs[0]
-#        if cls._is_special_type(obj):
-#            return cls._get_special_type_str(obj)
-
-#        if not check.is_itertype(obj):
-#            return get_type_name(obj)
-
-#        unique_types = reduce_types(obj)
-#        return make_iterable_label(unique_types)
-
-
-
-#def make_options_label(*args):
-#    args = [item for item in args if item]
-#    if not args:
-#        return ''
-#    elif len(args) == 1:
-#        return args[0]
-
-#    return ' or '.join(args)
-
-
-#def make_iterable_label(container):
-#    def _make_container_label(container, items):
-#        items = make_options_label(*items)
-#        container_name = get_type_name(container)
-
-#        if items:
-#            return '{container_name}[{items}]'.format(
-#                container_name=container_name,
-#                items=items,
-#            )
-#        return container_name
-
-#    if not check.is_itertype(container):
-#        return get_type_name(container)
-
-#    # Group every type together
-#    # so if we have [str], [int], [float], (str, ) then it would look like this
-#    # {
-#    #      list: [str, int, float],
-#    #      tuple: [str]
-#    # }
-#    #
-#    types_ = collections.OrderedDict()
-
-#    for item in container:
-#        if not check.is_itertype(item):
-#            if item not in types_:
-#                types_[item] = []
-#            continue
-
-#        item_type = get_type(item)
-#        types_.setdefault(item_type, [])
-#        types_[get_type(item)].extend([item_ for item_ in item])
-
-#    # Now that every type is grouped together, make text out of each "iterable group"
-#    items = []
-#    for type_, subtypes in six.iteritems(types_):
-#        subtype_names = [get_type_name(subtype) for subtype in subtypes]
-#        items.append(_make_container_label(type_, subtype_names))
-
-#    return _make_container_label(container, items)
-
