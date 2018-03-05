@@ -215,6 +215,59 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_raises(self):
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                raise ValueError('Info here.')
+
+                if bar:
+                    raise OSError('Info here.')
+            '''
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                bar ({2}): {3}.
+
+            Raises:
+                ValueError: {4|Info here.}.
+                OSError: {5|Info here.}.
+
+            '''
+
+        self.compare(expected_output, code)
+
+    # def test_raises_variable(self):
+    #     code = \
+    #         '''
+    #         def foo(bar):
+    #             {curs}
+    #             thing = ValueError
+    #             raise thing('Info here.')
+
+    #             if bar:
+    #                 raise OSError('Info here.')
+    #         '''
+
+    #     expected_output = \
+    #         '''\
+    #         {1}.
+
+    #         Args:
+    #             bar ({2}): {3}.
+
+    #         Raises:
+    #             ValueError: {4|Info here.}.
+    #             OSError: {5|Info here.}.
+
+    #         '''
+
+    #     self.compare(expected_output, code)
+
 
 class ReturnTestCase(common.CommonTestCase):
 

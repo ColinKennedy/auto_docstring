@@ -11,8 +11,9 @@ import six
 
 # IMPORT LOCAL LIBRARIES
 from ..blocks.google import args_block
-from ..blocks.google import returns_block
+from ..blocks.google import raises_block
 from ..blocks.google import yields_block
+from ..blocks.google import returns_block
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -55,6 +56,7 @@ class GoogleStyle(BaseStyle):
     _blocks = {
         args_block.Args.name: args_block.Args,
         returns_block.Returns.name: returns_block.Returns,
+        raises_block.Raises.name: raises_block.Raises,
         yields_block.Yields.name: yields_block.Yields,
     }
 
@@ -90,6 +92,7 @@ class GoogleStyle(BaseStyle):
         return (
             'args',
             'returns',
+            'raises',
             'yields',
         )
 
