@@ -118,12 +118,6 @@ class MultiTypeBlock(CommonBlock):
             indent = common.get_default_indent()
 
         obj_type = cls._expand_types(expected_object)
-
-        # # Note: If we accidentally created a nested list, unpack it
-        # # TODO : This condition statment could be cleaned up a bit
-        # if len(obj_type) == 1:
-        #     obj_type = obj_type[0]
-
         obj_type = cls._change_type_to_str(*obj_type)
 
         line = '{indent}{{{obj_type}}}: {{}}.'.format(
