@@ -47,6 +47,8 @@ class Visitor(object):
         for default, value, in six.moves.zip(*defaults):
             info['defaults'].append((default.name, value))
 
+        info['vararg'] = node.args.vararg
+
         self.functions[node].update(info)
 
         # Recurse through the node's children so we can find more nodes

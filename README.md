@@ -136,6 +136,8 @@ AUTO_DOCSTRING_OBJECT_TAG
  - default: ""
  - could be something like ":obj:`{}`"
  - no {}? Then just append
+AUTO_DOCSTRING_VARARG_PREFIX
+ - default: `"*"`
 
 spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
 return os.getenv('AUTO_DOCSTRING_INDENT', '    ')

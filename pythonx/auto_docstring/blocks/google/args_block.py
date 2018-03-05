@@ -17,8 +17,9 @@ class Args(common_block.CommonBlock):
     def draw(cls, info):
         args = info.get('args', [])
         defaults = info.get('defaults', [])
+        vararg = info.get('vararg', '')
 
-        if not args and not defaults:
+        if not args and not defaults and not vararg:
             return []
 
         indent = common.get_default_indent()
@@ -42,6 +43,15 @@ class Args(common_block.CommonBlock):
                 value=value,
             )
             lines.append(line)
+
+        if vararg:
+            lines.append(
+                '{indent}{arg} ({{{id_}|{value}}}, optional): {{}}.'.format(
+                    indent=indent,
+                    arg='*' + vararg,
+                    id_=len(defaults),
+                    value='tuple',
+            ))
 
         return lines
 

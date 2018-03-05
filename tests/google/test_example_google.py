@@ -101,45 +101,46 @@ class AdvancedTestCase(common.CommonTestCase):
             '''
         self.compare(code, expected_output)
 
-#     # def test_build_docstring_0002_nested_function_parent(self):
-#     #     some_function = \
-#     #         """\
-#     #         def delete_ui_if_exists(*uis):
-#     #             {curs}
-#     #             def actual_decorator(func):
-#     #                 '''The actual decorated function that will be passed.'''
-#     #                 def wrapped_func(*args):
-#     #                     '''Delete UIs before running the given function.
+    def test_nested_function_parent_001(self):
+        code = \
+            """\
+            def delete_ui_if_exists(*uis):
+                {curs}
+                def actual_decorator(func):
+                    '''The actual decorated function that will be passed.'''
+                    def wrapped_func(*args):
+                        '''Delete UIs before running the given function.
 
-#     #                     Args:
-#     #                         *args (list[str]): The args given by the original function.
+                        Args:
+                            *args (list[str]): The args given by the original function.
 
-#     #                     '''
-#     #                     for ui in uis:
-#     #                         try:
-#     #                             pm.deleteUI(ui)
-#     #                         except RuntimeError:
-#     #                             pass
+                        '''
+                        for ui in uis:
+                            try:
+                                pm.deleteUI(ui)
+                            except RuntimeError:
+                                pass
 
-#     #                     return func(*args)
-#     #                 return wrapped_func
-#     #             return actual_decorator
-#     #         """
-#     #     expected_output = \
-#     #         '''\
-#     #         {1}.
+                        return func(*args)
+                    return wrapped_func
+                return actual_decorator
+            """
 
-#     #         Args:
-#     #             *uis ({2}): {3}.
+        expected_output = \
+            '''\
+            $1.
 
-#     #         Returns:
-#     #             actual_decorator: {4}.
+            Args:
+                *uis (${2:tuple}, optional): $3.
 
-#     #         '''
-#     #     self.compare_docstring_with_output(input_text=some_function,
-#     #                                        expected_output=expected_output)
+            Returns:
+                ${4:actual_decorator}: $5.
 
-    def test_nested_function_parent(self):
+            '''
+
+        self.compare(code, expected_output)
+
+    def test_nested_function_parent_002(self):
         code = \
             """
             import os

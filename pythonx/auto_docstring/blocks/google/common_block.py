@@ -78,7 +78,11 @@ class CommonBlock(object):
             # If this was a Named node like foo = [], try to get a type that way
             return get_type_name(visit.get_container_types()[type(inferred_object)])
         except KeyError:
-            return cls.get_import_path(get_object(inferred_object), info)
+            obj = get_object(inferred_object)
+            type_was_not_found = isinstance(obj, six.string_types)
+            if type_was_not_found:
+                return obj
+            return cls.get_import_path(obj, info)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -203,15 +207,23 @@ def get_object(node):
         node (<astroid Node>): Some node to process.
 
     Returns:
-        The node's actual value, in the script.
+        object or str:
+            The node's actual value, in the script.
+            If no node value could be found, the name of the object is returned
+            as a string.
 
     '''
     try:
         return node.value
     except AttributeError:
+        pass
+
+    try:
         module = '.'.join([parent_.name for parent_ in _get_parents(node)])
         module = importlib.import_module(module)
         return getattr(module, node.name)
+    except ImportError:
+        return node.name
 
 
 def reduce_types(obj):
