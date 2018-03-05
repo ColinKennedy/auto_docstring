@@ -4,8 +4,6 @@
  - it should work with variables
  - maybe imported stuff, as well
 
-- Make sure that custom variables for "raises" works
- - also make sure that "Raises" works, even if the string ends in a '.'
 - Make tests for nested arg types 
 - Make tests for dicts - because it looks like dicts are currently a problem
 --- Need to also support `**kwargs`
