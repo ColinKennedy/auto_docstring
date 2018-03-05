@@ -78,6 +78,21 @@ class CommonBlock(object):
             # If this was a Named node like foo = [], try to get a type that way
             return get_type_name(visit.get_container_types()[type(inferred_object)])
         except KeyError:
+            # Example: tests.google.test_example_google.AdvancedTestCase.test_complex_type_0001
+            #          If the inferred object is a astroid.Const, get its type
+            #
+            try:
+                value = visit.get_value(inferred_object)
+            except KeyError:
+                value = None
+
+            if value is not None:
+                return get_type_name(value)
+
+            # If we got to this point, it's because the inferred_object is
+            # actually an Attribute or Call object. Try to get the import path
+            # for this object
+            #
             obj = get_object(inferred_object)
             type_was_not_found = isinstance(obj, six.string_types)
             if type_was_not_found:
