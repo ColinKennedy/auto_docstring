@@ -20,6 +20,146 @@ from ...core import grouping
 from ... import assign_search
 
 
+class Type(object):
+    def __init__(self, obj):
+        super(Type, self).__init__()
+        self.obj = obj
+
+    def type_contained_in(self, seq):
+        return self.get_type() in [item.get_type() for item in seq]
+
+    def get_type(self):
+        return get_type(self.obj)
+
+    def __eq__(self, other):
+        try:
+            return other.obj == self.obj
+        except AttributeError:
+            return False
+
+    def as_str(self):
+        return get_type_name(self.obj)
+
+    def __repr__(self):
+        return '{cls_}({obj!r})'.format(
+            cls_=self.__class__.__name__,
+            obj=self.obj,
+        )
+
+
+class SpecialType(Type):
+    def __init__(self, obj):
+        super(SpecialType, self).__init__(obj)
+
+    @staticmethod
+    def is_valid(node):
+        return isinstance(node, (astroid.Call, astroid.Attribute, astroid.Name))
+
+    def as_str(self):
+        def search(obj):
+            outer_scope = obj.scope()
+            return assign_search.find_node_type(outer_scope, name=obj.name)
+
+        inferred_object = list(self.obj.infer())[0]
+        if inferred_object == astroid.Uninferable:
+            # We could not find a type so search for it (this is a blind search)
+            return search(self.obj)
+
+        try:
+            # If this was a Named node like foo = [], try to get a type that way
+            return get_type_name(visit.get_container_types()[type(inferred_object)])
+        except KeyError:
+            # Example: tests.google.test_example_google.AdvancedTestCase.test_complex_type_0001
+            #          If the inferred object is a astroid.Const, get its type
+            #
+            try:
+                value = visit.get_value(inferred_object)
+            except KeyError:
+                value = None
+
+            if value is not None:
+                return get_type_name(value)
+
+            # If we got to this point, it's because the inferred_object is
+            # actually an Attribute or Call object. Try to get the import path
+            # for this object
+            #
+            obj = get_object(inferred_object)
+            type_was_not_found = isinstance(obj, six.string_types)
+            if type_was_not_found:
+                return obj
+            return cls.get_import_path(obj, info)
+
+
+class ContainerType(Type):
+    # TODO : Do I need include_type?
+    def __init__(self, obj, include_type=True):
+        super(ContainerType, self).__init__(obj)
+        self.items = []
+        self.include_type = include_type
+
+        for subitem in visit.iterate(obj):
+            if SpecialType.is_valid(subitem):
+                self.items.append(SpecialType(subitem))
+                continue
+
+            try:
+                container = visit.get_container(subitem)
+            except KeyError:
+                value = visit.get_value(subitem)
+                self.items.append(Type(value))
+            else:
+                self.items.append(self.__class__(subitem))
+
+    def _reduce(self, items):
+        def get_recursive_type(obj):
+            if not check.is_itertype(obj):
+                yield obj
+                return
+
+            seen = []
+
+            for item in obj:
+                inner_item = self._reduce(item)
+                inner_item = check.force_itertype(inner_item)
+
+                if not item.type_contained_in(seen):
+                    seen.append(item)
+
+                # for subitem in inner_item:
+                #     if not subitem.type_contained_in(seen):
+                #         seen.append(subitem)
+
+            yield seen
+
+        return list(get_recursive_type(items))[0]
+
+    def as_str(self):
+        print('reducing', self.items)
+        items = self._reduce(self.items)
+        print('reduced', items)
+
+        output = []
+        for item in visit.iterate(items):
+            output.append(item.as_str())
+
+        items_text = ' or '.join(output)
+
+        if not self.include_type:
+            return items_text
+
+        container = visit.get_container_types()[get_type(self.obj)]
+
+        return '{container}[{items_text}]'.format(
+            container=get_type_name(container),
+            items_text=items_text,
+        )
+
+    def __iter__(self):
+        for item in self.items:
+            yield item
+
+
 @six.add_metaclass(abc.ABCMeta)
 class CommonBlock(object):
     label = 'Header label'
@@ -59,47 +199,6 @@ class CommonBlock(object):
         parent = inspect.getmodule(obj).__name__
         return '<{parent}.{name}>'.format(parent=parent, name=name)
 
-    @staticmethod
-    def _is_special_type(node):
-        return isinstance(node, (astroid.Call, astroid.Attribute, astroid.Name))
-
-    # TODO : Do I actually need info? Remove, if not
-    @classmethod
-    def _get_special_type_str(cls, obj, info=None):
-        def search(obj):
-            outer_scope = obj.scope()
-            return assign_search.find_node_type(outer_scope, name=obj.name)
-
-        inferred_object = list(obj.infer())[0]
-        if inferred_object == astroid.Uninferable:
-            # We could not find a type so search for it (this is a blind search)
-            return search(obj)
-
-        try:
-            # If this was a Named node like foo = [], try to get a type that way
-            return get_type_name(visit.get_container_types()[type(inferred_object)])
-        except KeyError:
-            # Example: tests.google.test_example_google.AdvancedTestCase.test_complex_type_0001
-            #          If the inferred object is a astroid.Const, get its type
-            #
-            try:
-                value = visit.get_value(inferred_object)
-            except KeyError:
-                value = None
-
-            if value is not None:
-                return get_type_name(value)
-
-            # If we got to this point, it's because the inferred_object is
-            # actually an Attribute or Call object. Try to get the import path
-            # for this object
-            #
-            obj = get_object(inferred_object)
-            type_was_not_found = isinstance(obj, six.string_types)
-            if type_was_not_found:
-                return obj
-            return cls.get_import_path(obj, info)
-
 
 @six.add_metaclass(abc.ABCMeta)
 class MultiTypeBlock(CommonBlock):
@@ -118,13 +217,9 @@ class MultiTypeBlock(CommonBlock):
             indent = common.get_default_indent()
 
         obj_type = cls._expand_types(expected_object)
-        obj_type = cls._change_type_to_str(*obj_type)
+        obj_type = cls._change_type_to_str(obj_type)
 
-        line = '{indent}{{{obj_type}}}: {{}}.'.format(
-            indent=indent,
-            obj_type=obj_type,
-        )
-
+        line = cls._make_line(obj_type)
         lines.append(line)
 
         return lines
@@ -136,64 +231,48 @@ class MultiTypeBlock(CommonBlock):
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
-
-        if not check.is_itertype(obj):
-            return get_type(obj)
-
-        output_types = []
-        for subitem in obj:
-            if cls._is_special_type(subitem):
-                # We'll need to deal with this type later so just ignore it now
-                output_types.append(subitem)
-                continue
-
-            try:
-                container = visit.get_container(subitem)
-            except KeyError:
-                # subitem was not iterable
-                value = visit.get_value(subitem)
-                output_types.append(get_type(value))
-                continue
-
-            temp_container = []
-            for item in cls._expand_types(subitem):
-                temp_container.append(item)
-
-            output_types.append(container.__class__(temp_container))
-
-        return output_types
+        return ContainerType(obj, include_type=False)
 
     @classmethod
-    def _change_type_to_str(cls, *objs):
-        # 'flat' means that we won't include the parent container in the final string
-        is_flat = len(objs) != 1
-        if is_flat:
-            # Make special types into basic types
-            objs = [obj for obj in objs]
-            for index, obj in enumerate(objs):
-                if cls._is_special_type(obj):
-                    objs[index] = cls._get_special_type_str(obj)
+    def _change_type_to_str(cls, objs):
+        return objs.as_str()
+        # # 'flat' means that we won't include the parent container in the final string
+        # is_flat = len(objs) != 1
+        # if is_flat:
+        #     # Make special types into basic types
+        #     objs = [obj for obj in objs]
+        #     for index, obj in enumerate(objs):
+        #         if SpecialType.is_valid(obj):
+        #             objs[index] = cls._get_special_type_str(obj)
 
-            # Remove duplicates
-            objs = reduce_types(objs)
+        #     # Remove duplicates
+        #     objs = reduce_types(objs)
 
-            # Now actually create the label
-            output = ''
-            for obj in objs:
-                label = make_iterable_label(obj)
-                output = make_options_label(output, label)
+        #     # Now actually create the label
+        #     output = ''
+        #     for obj in objs:
+        #         label = make_iterable_label(obj)
+        #         output = make_options_label(output, label)
 
-            return output
+        #     return output
 
-        obj = objs[0]
-        if cls._is_special_type(obj):
-            return cls._get_special_type_str(obj)
+        # obj = objs[0]
+        # if SpecialType.is_valid(obj):
+        #     return cls._get_special_type_str(obj)
 
-        if not check.is_itertype(obj):
-            return get_type_name(obj)
+        # if not check.is_itertype(obj):
+        #     return get_type_name(obj)
 
-        unique_types = reduce_types(obj)
-        return make_iterable_label(unique_types)
+        # unique_types = reduce_types(obj)
+        # return make_iterable_label(unique_types)
+
+    @staticmethod
+    def _make_line(obj_type):
+        indent = common.get_default_indent()
+        return '{indent}{{{obj_type}}}: {{}}.'.format(
+            indent=indent,
+            obj_type=obj_type,
+        )
 
 
 def get_type(obj):

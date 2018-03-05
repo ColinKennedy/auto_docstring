@@ -40,7 +40,7 @@ class Args(common_block.CommonBlock):
             lines.append(line)
 
         for index, (arg, value) in enumerate(defaults):
-            if cls._is_special_type(value):
+            if common_block.SpecialType.is_valid(value):
                 value = cls._get_special_type_str(value, info)
             else:
                 value = common_block.get_type_name(visit.get_value(value))

@@ -305,12 +305,6 @@ def get_value(node):
             If the given `node` is not iterable, return its value.
 
     '''
-    def iterate(obj):
-        try:
-            return node.get_children()
-        except AttributeError:
-            return node
-
     try:
         # Try to see if the node is actually not a container-type
         return node.value
@@ -328,6 +322,13 @@ def get_value(node):
         _temp_container.append(item)
 
     return container.__class__(_temp_container)
+
+
+def iterate(obj):
+    try:
+        return obj.get_children()
+    except AttributeError:
+        return obj
 
 
 def recursive_default_dict():
