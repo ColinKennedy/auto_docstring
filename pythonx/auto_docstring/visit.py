@@ -233,6 +233,16 @@ def get_container(node):
     return iterable_types[type(node)]()
 
 
+def get_value_binop(node):
+    if not isinstance(node, astroid.BinOp):
+        return
+
+    for item in node.get_children():
+        value = get_value(item)
+        if value:
+            return value
+
+
 def get_value(node):
     '''Get the Python object(s) for the given node.
 
@@ -261,6 +271,10 @@ def get_value(node):
         return node.value
     except AttributeError:
         pass
+
+    value = get_value_binop(node)
+    if value:
+        return value
 
     container = get_container(node)
 

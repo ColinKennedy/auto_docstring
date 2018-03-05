@@ -139,64 +139,59 @@ class AdvancedTestCase(common.CommonTestCase):
 #     #     self.compare_docstring_with_output(input_text=some_function,
 #     #                                        expected_output=expected_output)
 
-#     def test_nested_function_parent(self):
-#         code = \
-#             """
-#             def which(program):
-#                 {curs}
-#                 pathExt = ['']
-#                 extList = None
+    def test_nested_function_parent(self):
+        code = \
+            """
+            import os
 
-#                 if sys.platform == 'win32':
-#                     extList = [ext.lower() for ext in os.environ['PATHEXT'].split(';')]
+            def which(program):
+                {curs}
+                pathExt = ['']
+                extList = None
 
-#                 def is_exe(fpath):
-#                     '''Checks if the filepath points to an executable file.
+                if sys.platform == 'win32':
+                    extList = [ext.lower() for ext in os.environ['PATHEXT'].split(';')]
 
-#                     Args:
-#                         fpath (str): The full filepath
+                def is_exe(fpath):
+                    exe = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+                    # search for executable under windows
+                    if not exe:
+                        if extList:
+                            for ext in extList:
+                                exePath = '%s%s' % (fpath, ext)
+                                if os.path.isfile(exePath) and os.access(exePath, os.X_OK):
+                                    pathExt[0] = ext
+                                    return True
+                            return False
+                    return exe
 
-#                     Returns:
-#                         bool: Whether or not the function is executable
+                fpath, fname = os.path.split(program)
 
-#                     '''
-#                     exe = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-#                     # search for executable under windows
-#                     if not exe:
-#                         if extList:
-#                             for ext in extList:
-#                                 exePath = '%s%s' % (fpath, ext) if os.path.isfile(exePath) and os.access(exePath, os.X_OK):
-#                                     pathExt[0] = ext
-#                                     return True
-#                             return False
-#                     return exe
+                if fpath:
+                    if is_exe(program):
+                        return '%s%s' % (program, pathExt[0])
+                else:
+                    for path in os.environ['PATH'].split(os.pathsep):
+                        path = path.strip('"')
+                        exe_file = os.path.join(path, program)
+                        if is_exe(exe_file):
+                            return '%s%s' % (exe_file, pathExt[0])
+                return ''
+            """
 
-#                 fpath, fname = os.path.split(program)
 
-#                 if fpath:
-#                     if is_exe(program):
-#                         return '%s%s' % (program, pathExt[0])
-#                 else:
-#                     for path in os.environ['PATH'].split(os.pathsep):
-#                         path = path.strip('"')
-#                         exe_file = os.path.join(path, program)
-#                         if is_exe(exe_file):
-#                             return '%s%s' % (exe_file, pathExt[0])
-#                 return ''
-#             """
+        expected_output = \
+            '''\
+            $1.
 
-#         expected_output = \
-#             '''\
-#             {1}.
+            Args:
+                program ($2): $3.
 
-#             Args:
-#                 program ({2}): {3}.
+            Returns:
+                ${4:str}: $5.
 
-#             Returns:
-#                 str: {4}.
-
-#             '''
-#         self.compare(code, expected_output)
+            '''
+        self.compare(code, expected_output)
 
     def test_nested_function(self):
         code = \
