@@ -195,6 +195,26 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_kwarg(self):
+        code = \
+            '''
+            def foo(*fizz, **bar):
+                {curs}
+                pass
+            '''
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                *fizz ({2|tuple}, optional): {3}.
+                **bar ({4|dict}, optional): {5}.
+
+            '''
+
+        self.compare(expected_output, code)
+
 
 class ReturnTestCase(common.CommonTestCase):
 

@@ -18,6 +18,7 @@ class Args(common_block.CommonBlock):
         args = info.get('args', [])
         defaults = info.get('defaults', [])
         vararg = info.get('vararg', '')
+        kwarg = info.get('kwarg', '')
 
         if not args and not defaults and not vararg:
             return []
@@ -51,6 +52,15 @@ class Args(common_block.CommonBlock):
                     arg='*' + vararg,
                     id_=len(defaults),
                     value='tuple',
+            ))
+
+        if kwarg:
+            lines.append(
+                '{indent}{arg} ({{{id_}|{value}}}, optional): {{}}.'.format(
+                    indent=indent,
+                    arg='**' + kwarg,
+                    id_=len(defaults) + 1,
+                    value='dict',
             ))
 
         return lines

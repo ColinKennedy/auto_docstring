@@ -48,6 +48,7 @@ class Visitor(object):
             info['defaults'].append((default.name, value))
 
         info['vararg'] = node.args.vararg
+        info['kwarg'] = node.args.kwarg
 
         self.functions[node].update(info)
 
