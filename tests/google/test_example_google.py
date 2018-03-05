@@ -198,56 +198,58 @@ class AdvancedTestCase(common.CommonTestCase):
 #             '''
 #         self.compare(code, expected_output)
 
-#     def test_nested_function(self):
-#         code = \
-#             """
-#             def which(program):
-#                 pathExt = ['']
-#                 extList = None
+    def test_nested_function(self):
+        code = \
+            """
+            import os
 
-#                 if sys.platform == 'win32':
-#                     extList = [ext.lower() for ext in os.environ['PATHEXT'].split(';')]
+            def which(program):
+                pathExt = ['']
+                extList = None
 
-#                 def is_exe(fpath):
-#                     {curs}
-#                     exe = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-#                     # search for executable under windows
-#                     if not exe:
-#                         if extList:
-#                             for ext in extList:
-#                                 exePath = '%s%s' % (fpath, ext)
-#                                 if os.path.isfile(exePath) and os.access(exePath, os.X_OK):
-#                                     pathExt[0] = ext
-#                                     return True
-#                             return False
-#                     return exe
+                if sys.platform == 'win32':
+                    extList = [ext.lower() for ext in os.environ['PATHEXT'].split(';')]
 
-#                 fpath, fname = os.path.split(program)
+                def is_exe(fpath):
+                    {curs}
+                    exe = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+                    # search for executable under windows
+                    if not exe:
+                        if extList:
+                            for ext in extList:
+                                exePath = '%s%s' % (fpath, ext)
+                                if os.path.isfile(exePath) and os.access(exePath, os.X_OK):
+                                    pathExt[0] = ext
+                                    return True
+                            return False
+                    return exe
 
-#                 if fpath:
-#                     if is_exe(program):
-#                         return '%s%s' % (program, pathExt[0])
-#                 else:
-#                     for path in os.environ['PATH'].split(os.pathsep):
-#                         path = path.strip('"')
-#                         exe_file = os.path.join(path, program)
-#                         if is_exe(exe_file):
-#                             return '%s%s' % (exe_file, pathExt[0])
-#                 return ''
-#             """
+                fpath, fname = os.path.split(program)
 
-#         expected_output = \
-#             '''\
-#             {1}.
+                if fpath:
+                    if is_exe(program):
+                        return '%s%s' % (program, pathExt[0])
+                else:
+                    for path in os.environ['PATH'].split(os.pathsep):
+                        path = path.strip('"')
+                        exe_file = os.path.join(path, program)
+                        if is_exe(exe_file):
+                            return '%s%s' % (exe_file, pathExt[0])
+                return ''
+            """
 
-#             Args:
-#                 fpath ({2}): {3}.
+        expected_output = \
+            '''\
+            $1.
 
-#             Returns:
-#                 bool or {4:exe}: {5}.
+            Args:
+                fpath ($2): $3.
 
-#             '''
-#         self.compare(code, expected_output)
+            Returns:
+                ${4:bool}: $5.
+
+            '''
+        self.compare(code, expected_output)
 
     def test_complex_type_0001(self):
         code = \

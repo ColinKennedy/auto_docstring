@@ -17,6 +17,7 @@ from ... import visit
 from ... import common
 from ...core import check
 from ...core import grouping
+from ... import assign_search
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -65,18 +66,14 @@ class CommonBlock(object):
     # TODO : Do I actually need info? Remove, if not
     @classmethod
     def _get_special_type_str(cls, obj, info=None):
-        inferred_object = list(obj.infer())[0]
-        # for item in dir(inferred_object):
-        #     try:
-        #         func = getattr(obj, item)
-        #     except :
-        #         continue
+        def search(obj):
+            outer_scope = obj.scope()
+            return assign_search.find_node_type(outer_scope, name=obj.name)
 
-        #     try:
-        #         print(item, func())
-        #     except :
-        #         print(item, func)
-        # print(dir(inferred_object))
+        inferred_object = list(obj.infer())[0]
+        if inferred_object == astroid.Uninferable:
+            return search(obj)
+
         try:
             # If this was a Named node like foo = [], try to get a type that way
             return get_type_name(visit.get_container_types()[type(inferred_object)])
@@ -154,12 +151,23 @@ class MultiTypeBlock(CommonBlock):
 
     @classmethod
     def _change_type_to_str(cls, *objs):
+        # 'flat' means that we won't include the parent container in the final string
         is_flat = len(objs) != 1
         if is_flat:
-            output = ''
+            # Make special types into basic types
+            objs = [obj for obj in objs]
+            for index, obj in enumerate(objs):
+                if cls._is_special_type(obj):
+                    objs[index] = cls._get_special_type_str(obj)
+
+            # Remove duplicates
             objs = reduce_types(objs)
+
+            # Now actually create the label
+            output = ''
             for obj in objs:
-                output = make_options_label(output, make_iterable_label(obj))
+                label = make_iterable_label(obj)
+                output = make_options_label(output, label)
 
             return output
 
