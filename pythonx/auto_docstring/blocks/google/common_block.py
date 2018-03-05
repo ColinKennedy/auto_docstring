@@ -265,7 +265,7 @@ class MultiTypeBlock(CommonBlock):
         obj_types = cls._expand_types(expected_object)
         output_text = cls._change_type_to_str(*obj_types)
 
-        line = cls._make_line(output_text)
+        line = cls._make_line(output_text, indent=indent)
         lines.append(line)
 
         return lines
@@ -316,8 +316,7 @@ class MultiTypeBlock(CommonBlock):
         # return make_iterable_label(unique_types)
 
     @staticmethod
-    def _make_line(obj_type):
-        indent = common.get_default_indent()
+    def _make_line(obj_type, indent):
         return '{indent}{{{obj_type}}}: {{}}.'.format(
             indent=indent,
             obj_type=obj_type,
