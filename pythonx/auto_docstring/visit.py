@@ -307,8 +307,7 @@ def get_value(node):
     '''
     def iterate(obj):
         try:
-            # astroid.List
-            return node.elts
+            return node.get_children()
         except AttributeError:
             return node
 
