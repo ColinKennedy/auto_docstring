@@ -77,6 +77,25 @@ class Visitor(object):
             node (<astroid.Return>): The node to get info for.
 
         '''
+        def is_yield_return(node):
+            sibling = node.next_sibling()
+            node_column_offset = node.col_offset
+
+            while sibling is not None:
+                is_in_same_statement = node_column_offset == sibling.col_offset
+                if isinstance(sibling.value, astroid.Yield) and is_in_same_statement:
+                    return True
+
+                if not is_in_same_statement:
+                    return False
+
+                sibling = sibling.next_sibling()
+
+            return False
+
+        if is_yield_return(node):
+            return
+
         function = node.scope()
         self.functions[function].setdefault('returns', [])
         self.functions[function]['returns'].append(node.value)
@@ -88,7 +107,24 @@ class Visitor(object):
             node (<astroid.Return>): The node to get info for.
 
         '''
+        def is_blank_yield(node):
+            sibling = node.previous_sibling()
+            node_column_offset = node.col_offset
+
+            while sibling is not None:
+                is_in_same_statement = node_column_offset == sibling.col_offset
+                if isinstance(sibling, astroid.Return) and is_in_same_statement:
+                    return True
+
+                sibling = sibling.previous_sibling()
+
+            return False
+
+        if is_blank_yield(node):
+            return
+
         function = node.scope()
+
         self.functions[function].setdefault('yields', [])
         self.functions[function]['yields'].append(node.value)
 

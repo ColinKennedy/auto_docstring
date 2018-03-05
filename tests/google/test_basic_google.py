@@ -533,6 +533,37 @@ class ReturnTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+    def test_yield_with_return(self):
+        code = \
+            '''
+            def generator(value):
+                {curs}
+                if value == 5:
+                    return
+
+                    # some comment
+                    """An empty string"""
+                    ''
+                    yield
+
+                for index in range(10):
+                    yield 10
+            '''
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                value ({2}): {3}.
+
+            Yields:
+                {4|int}: {5}.
+
+            '''
+
+        self.compare(expected_output, code)
+
     # def test_function_with_unknown_return(self):
     #     '''Return a function return type if its type was not found.'''
     #     code = \
