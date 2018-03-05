@@ -59,7 +59,8 @@ class SpecialType(Type):
     def as_str(self, info=None):
         def search(obj):
             outer_scope = obj.scope()
-            return assign_search.find_node_type(outer_scope, name=obj.name)
+            found_type = assign_search.find_node_type(outer_scope, name=obj.name)
+            return get_type_name(found_type)
 
         inferred_object = list(self.obj.infer())[0]
         if inferred_object == astroid.Uninferable:
@@ -289,7 +290,6 @@ class MultiTypeBlock(CommonBlock):
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
-
         if check.is_itertype(obj):
             return ContainerType(obj, include_type=False)
         else:
@@ -297,7 +297,12 @@ class MultiTypeBlock(CommonBlock):
 
     @classmethod
     def _change_type_to_str(cls, *objs):
-        return make_items_text([obj.as_str() for obj in objs])
+        items = []
+        for item in [obj.as_str() for obj in objs]:
+            if item not in items:
+                items.append(item)
+
+        return make_items_text(items)
         # # 'flat' means that we won't include the parent container in the final string
         # is_flat = len(objs) != 1
         # if is_flat:
