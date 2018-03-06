@@ -127,6 +127,10 @@ class ContainerType(Type):
                 self.items.append(SpecialType(subitem))
                 continue
 
+            if MappingContainerType.is_valid(subitem):
+                self.items.append(MappingContainerType(subitem))
+                continue
+
             try:
                 visit.get_container(subitem)
             except KeyError:
@@ -153,13 +157,6 @@ class ContainerType(Type):
         return False
 
     def as_str(self):
-        def make_container_label(container, items_text):
-            if items_text:
-                return '{container}[{items_text}]'.format(
-                    container=container, items_text=items_text)
-            else:
-                return container
-
         def _get_container_type_name(container):
             container_type = visit.get_container_types()[container]
             return get_type_name(container_type)
@@ -214,9 +211,12 @@ class ContainerType(Type):
 
         return list(get_recursive_type(items))[0]
 
+    # TODO : Right now I'm saving literal subitem, not subitem_type. Maybe this
+    # could be removed in the future? I won't do it just yet because the
+    # unittests aren't bulletproof. But revisit this later
+    #
     def _group(self, items):
         output = collections.OrderedDict()
-
         for item in items:
             item_type = item.get_type()
             output.setdefault(item_type, [])
@@ -227,7 +227,7 @@ class ContainerType(Type):
 
             for subitem in item:
                 subitem_type = subitem.get_type()
-                if subitem_type not in output[item_type]:
+                if subitem_type not in [stored.get_type() for stored in output[item_type]]:
                     output[item_type].append(subitem)
 
         return output
@@ -235,6 +235,32 @@ class ContainerType(Type):
     def __iter__(self):
         for item in self.items:
             yield item
+
+
+class MappingContainerType(Type):
+    def __init__(self, obj):
+        super(MappingContainerType, self).__init__(obj)
+        self.keys = []
+        self.values = []
+        for key, value in grouping.chunkwise_iter(obj.get_children(), 2):
+            self.keys.append(key)
+            self.values.append(value)
+
+    @staticmethod
+    def is_valid(node):
+        return isinstance(node, astroid.Dict)
+
+    def as_str(self):
+        keys = ContainerType(self.keys, include_type=False)
+        values = ContainerType(self.values, include_type=False)
+
+        if isinstance(self.obj, astroid.Dict):
+            container_name = 'dict'
+        else:
+            raise NotImplementedError('Type: "{type_}" is not supported.'.format(type_=self.obj))
+
+        items_text = make_join_text([keys.as_str(), values.as_str()])
+        return make_container_label(container_name, items_text)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -286,10 +312,14 @@ class MultiTypeBlock(CommonBlock):
     @classmethod
     def _expand_types(cls, obj):
         obj = visit.get_value(obj)
+
+        if MappingContainerType.is_valid(obj):
+            return MappingContainerType(obj, include_type=False)
+
         if check.is_itertype(obj):
             return ContainerType(obj, include_type=False)
-        else:
-            return Type(obj)
+
+        return Type(obj)
 
     @classmethod
     def _change_type_to_str(cls, *objs):
@@ -346,6 +376,18 @@ def get_object(node):
         return getattr(module, node.name)
     except ImportError:
         return node.name
+
+
+def make_container_label(container, items_text):
+    if items_text:
+        return '{container}[{items_text}]'.format(
+            container=container, items_text=items_text)
+
+    return container
+
+
+def make_join_text(items):
+    return ', '.join(items)
 
 
 def make_items_text(items):

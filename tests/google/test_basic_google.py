@@ -646,3 +646,71 @@ class ReturnTestCase(common.CommonTestCase):
 #         expected_output = '{1|<auto_docstring.visit.Visitor>}: {2}.'
 #         self.compare(expected_output, code)
 
+class DictTestCase(common.CommonTestCase):
+    def test_basic(self):
+        code = self._make_code(
+            '''
+            def foo(bar):
+                %s
+                return {'asfdsf': 8, 'tttt': 123}
+            ''')
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                bar ({2}): {3}.
+
+            Returns:
+                {4|dict[str, int]}: {5}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_basic_multi_type(self):
+        code = self._make_code(
+            '''
+            def foo(bar):
+                %s
+                return {'asfdsf': 8, False: 123.456}
+            ''')
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                bar ({2}): {3}.
+
+            Returns:
+                {4|dict[str or bool, int or float]}: {5}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_layered_type(self):
+        code = self._make_code(
+            '''
+            def foo(bar):
+                %s
+                return {('tasdf', 'astsdf', {False: True}): 8, False: 123.456}
+            ''')
+
+        expected_output = \
+            '''\
+            {1}.
+
+            Args:
+                bar ({2}): {3}.
+
+            Returns:
+                {4|dict[tuple[str or dict[bool, bool]] or bool, int or float]}: {5}.
+
+            '''
+        self.compare(expected_output, code)
+
+    @staticmethod
+    def _make_code(code):
+        code = code.replace('{', '{{').replace('}', '}}')
+        return code % '{curs}'
