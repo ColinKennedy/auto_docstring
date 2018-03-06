@@ -5,7 +5,9 @@
 import os
 
 # IMPORT LOCAL LIBRARIES
+from ... import visit
 from ... import common
+from . import common_block
 
 
 class Raises(object):

@@ -20,7 +20,6 @@ def register_code_style(name, obj):
 
 def get_block_order(name):
     order_info = os.getenv('AUTO_DOCSTRING_BLOCK_ORDER', '')
-    print('asfsd', _STYLE_BLOCK_ORDER_COMPILE.findall(order_info))
 
     for style, blocks in _STYLE_BLOCK_ORDER_COMPILE.findall(order_info):
         if style != name:
