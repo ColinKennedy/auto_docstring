@@ -294,3 +294,43 @@ class AdvancedTestCase(common.CommonTestCase):
             '''
 
         self.compare(code, expected_output)
+
+
+class CallTestCase(common.CommonTestCase):
+    def test_001(self):
+        code = self._make_code(
+            '''
+            def add_docstring(code, row, style='', mode='replace'):
+                %s
+                code = list(code)
+                docstring = create_docstring(code=code, row=row, style=style)
+
+                if mode == 'replace':
+                    raise NotImplementedError('Need to write this')
+                    # code[row:] = docstring
+                elif mode == 'insert':
+                    code.insert(row, docstring)
+                else:
+                    options = ('replace', 'insert')
+                    raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
+                                     ''.format(mode=mode, options=options))
+
+                return code
+            ''')
+
+        expected_output = \
+            '''
+            {1}.
+
+            Args:
+                code ({2}): {3}.
+                row ({4}): {5}.
+                style ({5|str}, optional): {6}.
+                mode ({7|str}, optional): {7}.
+
+            Returns:
+                {8|list}: {9}.
+
+            '''
+
+        self.compare(expected_output, code)

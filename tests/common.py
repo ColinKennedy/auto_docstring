@@ -74,3 +74,8 @@ class CommonTestCase(unittest.TestCase):
 
         generated_docstring = docstring_builder.create_docstring(code, row=row)
         self.assertEqual(expected_output, generated_docstring)
+
+    @staticmethod
+    def _make_code(code):
+        code = code.replace('{', '{{').replace('}', '}}')
+        return code % '{curs}'

@@ -709,8 +709,3 @@ class DictTestCase(common.CommonTestCase):
 
             '''
         self.compare(expected_output, code)
-
-    @staticmethod
-    def _make_code(code):
-        code = code.replace('{', '{{').replace('}', '}}')
-        return code % '{curs}'
