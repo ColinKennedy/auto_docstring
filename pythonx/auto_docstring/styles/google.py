@@ -91,8 +91,8 @@ class GoogleStyle(BaseStyle):
     def get_default_block_order():
         return (
             'args',
-            'returns',
             'raises',
+            'returns',
             'yields',
         )
 
