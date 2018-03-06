@@ -115,6 +115,26 @@ class NumberedToUltiSnips(unittest.TestCase):
             '''
         self.compare(docstring, expected_output)
 
+    def test_nested_braces(self):
+        '''Convert a docstring that contains {}s inside of {}s.'''
+        docstring = \
+            '''\
+            {1}.
+
+            Args:
+                some_arg ({2|some{thing}here}, optional): {3}.
+
+            '''
+        expected_output = \
+            '''\
+            $1.
+
+            Args:
+                some_arg (${2:some{thing}here}, optional): $3.
+
+            '''
+        self.compare(docstring, expected_output)
+
 
 class UnnumberedToUltiSnips(unittest.TestCase):
     def compare(self, docstring, expected_output):
