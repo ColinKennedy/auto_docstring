@@ -98,7 +98,6 @@ class NumberifyWordFormatter(string.Formatter):
             output = (replacement_text, field_name)
         else:
             output = self._get_field(field_name, args, kwargs)
-            # output = super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
 
         return output
 
@@ -129,16 +128,7 @@ class NumberifyWordFormatter(string.Formatter):
             #
             return (kwargs[field_name], first)
 
-        # loop through the rest of the field_name, doing
-        # getattr or getitem as needed
-        #
-        for is_attr, i in rest:
-            if is_attr:
-                obj = getattr(obj, i)
-            else:
-                obj = obj[i]
-
-        return (obj, first)
+        return super(NumberifyWordFormatter, self).get_field(field_name, args, kwargs)
 
     def _register_name_and_get_next_number(self, field_name='', stored_number=None):
         '''Find the next number that this instance should use for formatting.
