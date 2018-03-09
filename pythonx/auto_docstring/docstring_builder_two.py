@@ -96,8 +96,7 @@ def create_ultisnips_docstring(code, row, style=''):
 
 def convert_to_ultisnips(code):
     '''Convert an auto-generated docstring to a UltiSnips-style docstring.'''
-    ultisnips_formatter = ultisnips_build.UltiSnipsTabstopFormatter()
-    return ultisnips_formatter.format(code)
+    return ultisnips_build.parse(code)
 
 
 def add_docstring(code, row, style='', mode='replace'):

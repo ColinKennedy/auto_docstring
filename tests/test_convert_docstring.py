@@ -16,7 +16,7 @@ from auto_docstring import numberify
 from auto_docstring import docstring_builder_two as docstring_builder
 
 
-class NumberedToUltiSnips(unittest.TestCase):
+class NumberedToUltiSnipsTestCase(unittest.TestCase):
 
     '''Convert docstrings into UltiSnips docstrings.'''
 
@@ -35,10 +35,10 @@ class NumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring with an arg.'''
         docstring = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                some_arg ({2}): {3}.
+                some_arg ({2!f}): {3!f}.
 
             '''
         expected_output = \
@@ -55,11 +55,11 @@ class NumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring with more than one arg.'''
         docstring = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                some_arg ({2}): {3}.
-                another_arg ({4}): {5}.
+                some_arg ({2!f}): {3!f}.
+                another_arg ({4!f}): {5!f}.
 
             '''
         expected_output = \
@@ -77,10 +77,10 @@ class NumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring with an optional arg.'''
         docstring = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                some_arg ({2|int}, optional): {3}.
+                some_arg ({2:int!f}, optional): {3!f}.
 
             '''
         expected_output = \
@@ -97,11 +97,11 @@ class NumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring with more than one optional args.'''
         docstring = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                some_arg ({2|int}, optional): {3}.
-                another ({4|<collections.OrderedDict>}, optional): {5}.
+                some_arg ({2:int!f}, optional): {3!f}.
+                another ({4:<collections.OrderedDict>!f}, optional): {5!f}.
 
             '''
         expected_output = \
@@ -119,10 +119,10 @@ class NumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring that contains {}s inside of {}s.'''
         docstring = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                some_arg ({2|some{thing}here}, optional): {3}.
+                some_arg ({2:some{thing}here!f}, optional): {3!f}.
 
             '''
         expected_output = \
@@ -136,7 +136,7 @@ class NumberedToUltiSnips(unittest.TestCase):
         self.compare(docstring, expected_output)
 
 
-class UnnumberedToUltiSnips(unittest.TestCase):
+class UnnumberedToUltiSnipsTestCase(unittest.TestCase):
     def compare(self, docstring, expected_output):
         '''Convert `docstring` and then test if it matches `expected_output`.'''
         formatter = numberify.NumberifyWordFormatter()
@@ -148,11 +148,11 @@ class UnnumberedToUltiSnips(unittest.TestCase):
         '''Convert a docstring that has named fields with different numbers.'''
         docstring = textwrap.dedent(
             '''\
-            {}.
+            {!f}.
 
             Args:
-                some_arg ({1|int}, optional): {}.
-                another ({2|int}, optional): {}.
+                some_arg ({1:int!f}, optional): {!f}.
+                another ({2:int!f}, optional): {!f}.
 
             ''')
 

@@ -54,6 +54,9 @@ class NumberifyWordFormatter(string.Formatter):
 
         return super(NumberifyWordFormatter, self).format(*args, **kwargs)
 
+    def format_field(self, obj, format_spec):
+        return super(NumberifyWordFormatter, self).format_field(obj, format_spec)
+
     def get_field(self, field_name, args, kwargs):
         '''Create a numbered text from the given field.
 

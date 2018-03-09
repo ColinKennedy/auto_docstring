@@ -320,16 +320,16 @@ class CallTestCase(common.CommonTestCase):
 
         expected_output = \
             '''
-            {1}.
+            {1!f}.
 
             Args:
-                code ({2}): {3}.
-                row ({4}): {5}.
-                style ({5|str}, optional): {6}.
-                mode ({7|str}, optional): {7}.
+                code ({2!f}): {3!f}.
+                row ({4!f}): {5!f}.
+                style ({5:str!f}, optional): {6!f}.
+                mode ({7:str!f}, optional): {7!f}.
 
             Returns:
-                {8|list}: {9}.
+                {8:list!f}: {9!f}.
 
             '''
 
