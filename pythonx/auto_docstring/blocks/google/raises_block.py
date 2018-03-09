@@ -4,6 +4,9 @@
 # IMPORT STANDARD LIBRARIES
 import os
 
+# IMPORT THIRD-PARTY LIBRARIES
+import astroid
+
 # IMPORT LOCAL LIBRARIES
 from ... import visit
 from ... import common
@@ -17,28 +20,33 @@ class Raises(object):
 
     @classmethod
     def draw(cls, info):
-        empty_raises = [None, None]
-        raise_info = info.get('raises', empty_raises)
-        if raise_info == empty_raises:
+        raise_info = info.get('raises')
+        if not raise_info:
             return []
 
         starting_line = '{}:'.format(cls.label)
         lines = [starting_line]
 
-        for index, (raise_type, message) in enumerate(raise_info):
+        for raise_object in raise_info:
+            type_name = raise_object.exc.func.name
+            message = ''
             if cls._include_message():
-                lines.append(cls._make_line(raise_type, number=index, message=message))
-            else:
-                lines.append(cls._make_line(raise_type, number=index))
+                message = cls._get_message(raise_object)
+
+            lines.append(cls._make_line(type_name, message=message))
 
         return lines
 
     @staticmethod
-    def _make_line(raise_type, number=0, message=''):
+    def _make_line(raise_type, message=''):
         indent = common.get_default_indent()
         if message:
             return '{indent}{raise_type}: {{{number}|{message}}}.'.format(
-                indent=indent, raise_type=raise_type, number=number, message=message)
+                indent=indent,
+                raise_type=raise_type,
+                number=common_block.get_unique_number(),
+                message=message,
+            )
         else:
             return '{indent}{raise_type}: {{}}.'.format(
                 indent=indent, raise_type=raise_type)
@@ -49,3 +57,15 @@ class Raises(object):
             return bool(int(os.getenv('AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE', '1')))
         except TypeError:
             return True
+
+    @staticmethod
+    def _get_message(node):
+        # The first arg of an exception is always the message, unless
+        # the exception is some custom object
+        #
+        packed_message = node.exc.args[0]
+
+        if isinstance(packed_message, astroid.Call):
+            packed_message = list(packed_message.func.get_children())[0]
+
+        return visit.get_value(packed_message)

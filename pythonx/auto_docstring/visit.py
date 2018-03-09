@@ -66,9 +66,7 @@ class Visitor(object):
     def visit_raise(self, node):
         function = node.scope()
         self.functions[function].setdefault('raises', [])
-        message = get_value(node.exc.args[0])
-        type_name = node.exc.func.name
-        self.functions[function]['raises'].append((type_name, message))
+        self.functions[function]['raises'].append(node)
 
     def visit_return(self, node):
         '''Whenever a Return object is found, get its parent scope and store it.
