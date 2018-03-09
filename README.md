@@ -1,7 +1,9 @@
 - make tests for "Raises"
 
 - raises
- - it should work with variables
+ - it should work even if the raised object is actually a variable
+ - also, it should be able to grab the message even if the message is a
+   variable
  - maybe imported stuff, as well
 
 - Make tests for nested arg types 
