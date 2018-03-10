@@ -6,6 +6,7 @@ import functools
 
 # IMPORT THIRD-PARTY LIBRARIES
 import pyparsing
+import six
 
 # IMPORT LOCAL LIBRARIES
 from . import common
@@ -50,10 +51,14 @@ class RecursiveParser(object):
         # need {}s. The prefix "$" will be added, later.
         #
         try:
-            if len(items) == 1 and items[0].isdigit():
+            is_single_list = check.is_itertype(items) and len(items) == 1
+            if is_single_list and items[0].isdigit():
                 return items[0]
         except AttributeError:
             pass
+
+        if isinstance(items, six.string_types) and items.isdigit():
+            return items
 
         return '{{{}}}'.format(''.join(items))
 
@@ -65,7 +70,6 @@ class RecursiveParser(object):
         if not check.is_itertype(items):
             return items
 
-        # print('sdaf', items)
         is_convertible = self._is_list_convertible(items)
 
         for index, item in enumerate(items):
