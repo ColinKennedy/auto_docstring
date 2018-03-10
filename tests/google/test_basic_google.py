@@ -125,6 +125,7 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+
 class FunctionDefaultArgTestCase(common.CommonTestCase):
 
     '''Test different functions with default args.'''
@@ -267,6 +268,43 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
     #         '''
 
     #     self.compare(expected_output, code)
+
+    def test_none(self):
+        code = \
+            '''
+            def foo(bar=None):
+                {curs}
+                pass
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                bar ({2:NoneType!f}, optional): {3!f}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_nested_multi(self):
+        '''Make a docstring for a nested container with more than one type.'''
+        code = \
+            '''
+            def foo(bar=[('8', ), ('8', ), ('9', ), (12312.0, )]):
+                {curs}
+                pass
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                bar ({2:list[tuple[str or float]]!f}: {3!f}.
+
+            '''
+        self.compare(expected_output, code)
 
 
 class ReturnTestCase(common.CommonTestCase):

@@ -75,5 +75,7 @@ class Raises(object):
 
         if isinstance(packed_message, astroid.Call):
             packed_message = list(packed_message.func.get_children())[0]
+        elif isinstance(packed_message, astroid.Name):
+            packed_message = list(packed_message.infer())[0]
 
         return visit.get_value(packed_message)

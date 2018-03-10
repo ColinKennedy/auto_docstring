@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 # IMPORT STANDARD LIBRARIES
-import unittest
 import textwrap
 
 # IMPORT THIRD-PARTY LIBRARIES
@@ -13,6 +12,7 @@ from .. import common
 
 
 class AdvancedTestCase(common.CommonTestCase):
+    # TODO : reverse the input order
     def compare(self, code, expected_output):
         code = textwrap.dedent(code)
         row, _ = common.get_position('{curs}', code.split('\n'))
@@ -294,3 +294,38 @@ class AdvancedTestCase(common.CommonTestCase):
             '''
 
         self.compare(code, expected_output)
+
+    # def test_002(self):
+    #     code = self._make_code(
+    #         '''
+    #         def foo(arg1, arg2, thing=(('asfd', 'asdfsfd'), )):
+    #             %s
+    #             message = 'asdfsd'
+    #             if arg2:
+    #                 raise ValueError(message)
+
+    #             if arg1:
+    #                 raise NotImplementedError('bar{tttt}fizz'.format(tttt=9123))
+
+    #             return ['asdfsdf', 'adsfafds']
+    #         ''')
+
+    #     expected_output = \
+    #         '''\
+    #         $1.
+
+    #         Args:
+    #             arg1 ($2): $3.
+    #             arg2 ($4): $5.
+    #             thing (${6:tuple[tuple[str]]}): $7.
+
+    #         Raises:
+    #             ValueError: ${8:asdfsd}.
+    #             NotImplementedError: ${10:bar${9:tttt}fizz}.
+
+    #         Returns:
+    #             ${11:list[str]}: $12.
+
+    #         '''
+
+    #     self.compare(expected_output, code)
