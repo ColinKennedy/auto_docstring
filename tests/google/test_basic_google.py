@@ -20,7 +20,7 @@ class FunctionTestCase(common.CommonTestCase):
                 pass
             '''
 
-        expected_output = '''{1}.'''
+        expected_output = '''{1!f}.'''
         self.compare(expected_output, code)
 
     def test_one_arg(self):
@@ -34,10 +34,10 @@ class FunctionTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             '''
 
@@ -53,11 +53,11 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                foo ({2}): {3}.
-                bar ({4}): {5}.
+                foo ({2!f}): {3!f}.
+                bar ({4!f}): {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -74,11 +74,11 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                foo ({2}): {3}.
-                bar ({4}): {5}.
+                foo ({2!f}): {3!f}.
+                bar ({4!f}): {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -94,11 +94,11 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                foo ({2}): {3}.
-                bar ({4}): {5}.
+                foo ({2!f}): {3!f}.
+                bar ({4!f}): {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -115,12 +115,12 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                foo ({2}): {3}.
-                bar ({4}): {5}.
-                buzz ({6}): {7}.
+                foo ({2!f}): {3!f}.
+                bar ({4!f}): {5!f}.
+                buzz ({6!f}): {7!f}.
 
             '''
         self.compare(expected_output, code)
@@ -140,10 +140,10 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2|int}, optional): {3}.
+                bar ({2:int!f}, optional): {3!f}.
 
             '''
 
@@ -160,14 +160,14 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                something ({2}): {3}.
-                another ({4|int}, optional): {5}.
+                something ({2!f}): {3!f}.
+                another ({4:int!f}, optional): {5!f}.
 
             Returns:
-                {6|bool}: {7}.
+                {6:bool!f}: {7!f}.
 
             '''
 
@@ -186,10 +186,10 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2|<collections.OrderedDict>}, optional): {3}.
+                bar ({2:<collections.OrderedDict>!f}, optional): {3!f}.
 
             '''
 
@@ -205,11 +205,11 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                *fizz ({2|tuple}, optional): {3}.
-                **bar ({4|dict}, optional): {5}.
+                *fizz ({2:tuple!f}, optional): {3!f}.
+                **bar ({4:dict!f}, optional): {5!f}.
 
             '''
 
@@ -228,14 +228,14 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Raises:
-                ValueError: {4|Info here.}.
-                OSError: {5|Info here.}.
+                ValueError: {4:Info here.!f}.
+                OSError: {5:Info here.!f}.
 
             '''
 
@@ -282,7 +282,7 @@ class ReturnTestCase(common.CommonTestCase):
                 return True
             '''
 
-        expected_output = '{1|bool}: {2}.'''
+        expected_output = '{1:bool!f}: {2!f}.'''
         self.compare(expected_output, code)
 
     def test_builtin_object_multiline(self):
@@ -296,13 +296,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|bool}: {5}.
+                {4:bool!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -318,13 +318,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|list[str]}: {5}.
+                {4:list[str]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -340,13 +340,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|list[list[str]]}: {5}.
+                {4:list[list[str]]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -362,13 +362,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|list[tuple[str or float]]}: {5}.
+                {4:list[tuple[str or float]]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -384,13 +384,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|list[tuple[str or float] or list[str]]}: {5}.
+                {4:list[tuple[str or float] or list[str]]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -411,13 +411,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                something ({2|<collections.OrderedDict>}, optional): {3}.
+                something ({2:<collections.OrderedDict>!f}, optional): {3!f}.
 
             Returns:
-                {4|bool}: {5}.
+                {4:bool!f}: {5!f}.
 
             '''
 
@@ -440,13 +440,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2|<collections.OrderedDict>}, optional): {3}.
+                bar ({2:<collections.OrderedDict>!f}, optional): {3!f}.
 
             Returns:
-                {4|bool or str}: {5}.
+                {4:bool or str!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -466,13 +466,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2|<collections.OrderedDict>}, optional): {3}.
+                bar ({2:<collections.OrderedDict>!f}, optional): {3!f}.
 
             Yields:
-                {4|bool or list}: {5}.
+                {4:bool or list!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -493,13 +493,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2|<collections.OrderedDict>}, optional): {3}.
+                bar ({2:<collections.OrderedDict>!f}, optional): {3!f}.
 
             Yields:
-                {4|bool or list}: {5}.
+                {4:bool or list!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -522,13 +522,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                foo ({2|str}, optional): {3}.
+                foo ({2:str!f}, optional): {3!f}.
 
             Returns:
-                {4|bool}: {5}.
+                {4:bool!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -552,13 +552,13 @@ class ReturnTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                value ({2}): {3}.
+                value ({2!f}): {3!f}.
 
             Yields:
-                {4|int}: {5}.
+                {4:int!f}: {5!f}.
 
             '''
 
@@ -598,7 +598,7 @@ class ReturnTestCase(common.CommonTestCase):
                 return islice([4, 5, 6, 7, 8, 9], 3)
             '''
 
-        expected_output = '{1|<itertools.islice>}: {2}.'
+        expected_output = '{1:<itertools.islice>!f}: {2!f}.'
 
         self.compare(expected_output, code)
 
@@ -613,7 +613,7 @@ class ReturnTestCase(common.CommonTestCase):
                 return Counter()
             '''
 
-        expected_output = '{1|<collections.Counter>}: {2}.'
+        expected_output = '{1:<collections.Counter>!f}: {2!f}.'
 
         self.compare(expected_output, code)
 
@@ -657,13 +657,13 @@ class DictTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|dict[str, int]}: {5}.
+                {4:dict[str, int]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -678,13 +678,13 @@ class DictTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|dict[str or bool, int or float]}: {5}.
+                {4:dict[str or bool, int or float]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)
@@ -699,13 +699,13 @@ class DictTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {1}.
+            {1!f}.
 
             Args:
-                bar ({2}): {3}.
+                bar ({2!f}): {3!f}.
 
             Returns:
-                {4|dict[tuple[str or dict[bool, bool]] or bool, int or float]}: {5}.
+                {4:dict[tuple[str or dict[bool, bool]] or bool, int or float]!f}: {5!f}.
 
             '''
         self.compare(expected_output, code)

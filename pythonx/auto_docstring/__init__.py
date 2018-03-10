@@ -1,8 +1,7 @@
-from . import common
+from . import environment
 from .styles import google
 
-common.register_code_style(
+environment.register_code_style(
     name='google',
     obj=google.GoogleStyle,
 )
-

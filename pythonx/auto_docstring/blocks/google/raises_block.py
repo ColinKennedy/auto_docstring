@@ -9,8 +9,9 @@ import astroid
 
 # IMPORT LOCAL LIBRARIES
 from ... import visit
-from ... import common
 from . import common_block
+from ... import environment
+from ... import ultisnips_build
 
 
 class Raises(object):
@@ -27,21 +28,23 @@ class Raises(object):
         starting_line = '{}:'.format(cls.label)
         lines = [starting_line]
 
+        parser = ultisnips_build.RecursiveNumberifyParser()
         for raise_object in raise_info:
             type_name = raise_object.exc.func.name
             message = ''
             if cls._include_message():
                 message = cls._get_message(raise_object)
 
+            message = environment.drop_trailing_characters(message)
             lines.append(cls._make_line(type_name, message=message))
 
         return lines
 
     @staticmethod
     def _make_line(raise_type, message=''):
-        indent = common.get_default_indent()
+        indent = environment.get_default_indent()
         if message:
-            return '{indent}{raise_type}: {{{number}|{message}}}.'.format(
+            return '{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
                 indent=indent,
                 raise_type=raise_type,
                 number=common_block.get_unique_number(),

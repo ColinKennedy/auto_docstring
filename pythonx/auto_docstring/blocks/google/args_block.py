@@ -4,8 +4,8 @@
 
 # IMPORT LOCAL LIBRARIES
 from ... import visit
-from ... import common
 from . import common_block
+from ... import environment
 
 
 class Args(common_block.CommonBlock):
@@ -15,15 +15,15 @@ class Args(common_block.CommonBlock):
 
     @staticmethod
     def _make_line(arg, value=''):
-        indent = common.get_default_indent()
+        indent = environment.get_default_indent()
         if value:
-            return '{indent}{arg} ({{{id_}|{value}}}, optional): {{}}.'.format(
+            return '{indent}{arg} ({{{id_}:{value}!f}}, optional): {{!f}}.'.format(
                 indent=indent,
                 arg=arg,
                 id_=common_block.get_unique_number(),
                 value=value)
         else:
-            return '{indent}{arg} ({{}}): {{}}.'.format(indent=indent, arg=arg)
+            return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)
 
     # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod

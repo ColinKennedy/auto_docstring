@@ -328,6 +328,10 @@ class CallTestCase(common.CommonTestCase):
                 style ({5:str!f}, optional): {6!f}.
                 mode ({7:str!f}, optional): {7!f}.
 
+            Raises:
+                NotImplementedError: {10:Need to write this!f}.
+                ValueError: {11:Mode: "{12:mode!f}" is unsupported. Options were, "{13:options!f}".!f}.
+
             Returns:
                 {8:list!f}: {9!f}.
 

@@ -10,6 +10,7 @@ import astroid
 from . import visit
 from . import common
 from . import numberify
+from . import environment
 from . import ultisnips_build
 
 
@@ -30,7 +31,7 @@ def create_docstring(code, row, style=''):
 
     '''
     if not style:
-        style = common.OPTIONS.get('style')
+        style = environment.OPTIONS.get('style')
 
     # Parse the code
     node = astroid.parse(code)
@@ -68,8 +69,8 @@ def create_docstring(code, row, style=''):
     #
     #     '''
     #
-    formatter = numberify.NumberifyWordFormatter()
-    return formatter.format(initial_docstring)
+    parser = ultisnips_build.RecursiveNumberifyParser()
+    return parser.parse(initial_docstring)
 
 
 def create_ultisnips_docstring(code, row, style=''):
@@ -96,7 +97,7 @@ def create_ultisnips_docstring(code, row, style=''):
 
 def convert_to_ultisnips(code):
     '''Convert an auto-generated docstring to a UltiSnips-style docstring.'''
-    return ultisnips_build.parse(code)
+    return ultisnips_build.RecursiveParser().parse(code)
 
 
 def add_docstring(code, row, style='', mode='replace'):

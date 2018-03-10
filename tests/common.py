@@ -8,7 +8,6 @@ import textwrap
 import unittest
 
 # IMPORT THIRD-PARTY LIBRARIES
-from auto_docstring import common as common_
 from auto_docstring import docstring_builder_two as docstring_builder
 
 

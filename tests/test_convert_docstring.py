@@ -12,8 +12,92 @@ import textwrap
 import unittest
 
 # IMPORT THIRD-PARTY LIBRARIES
-from auto_docstring import numberify
+from auto_docstring import ultisnips_build
 from auto_docstring import docstring_builder_two as docstring_builder
+
+
+class UnnumberedToNumberedTestCase(unittest.TestCase):
+    def compare(self, docstring, expected_output):
+        '''Convert `docstring` and then test if it matches `expected_output`.'''
+        formatter = ultisnips_build.RecursiveNumberifyParser()
+        converted_docstring = formatter.parse(docstring)
+        self.assertEqual(converted_docstring, expected_output)
+
+    def test_matching_kwargs(self):
+        '''Convert a docstring that has named fields with the same numbers.
+
+        Also, notice that {5!f} is incorrect and is auto-corrected to 4.
+
+        '''
+        docstring = textwrap.dedent(
+            '''\
+            {!f}.
+
+            Args:
+                some_arg ({1:int!f}, optional): {!f}.
+                another ({1:int!f}, optional): {5!f}.
+
+            ''')
+
+        expected_output = textwrap.dedent(
+            '''\
+            {1!f}.
+
+            Args:
+                some_arg ({2:int!f}, optional): {3!f}.
+                another ({2:int!f}, optional): {4!f}.
+
+            ''')
+
+        self.compare(docstring, expected_output)
+
+    def test_mixed_syntax(self):
+        '''Convert a docstring that has a variety of syntax.'''
+        docstring = textwrap.dedent(
+            '''\
+            {}.
+
+            Args:
+                some_arg ({1:int!f}, optional): {33!f}.
+                another ({asdf:int}, optional): {!f}.
+
+            ''')
+
+        expected_output = textwrap.dedent(
+            '''\
+            {}.
+
+            Args:
+                some_arg ({1:int!f}, optional): {2!f}.
+                another ({asdf:int}, optional): {3!f}.
+
+            ''')
+
+        self.compare(docstring, expected_output)
+
+    def test_unique_kwargs(self):
+        '''Convert a docstring that has named fields with different numbers.'''
+        docstring = textwrap.dedent(
+            '''\
+            {!f}.
+
+            Args:
+                some_arg ({1:int!f}, optional): {!f}.
+                another ({2:int}, optional): {!f}.
+
+            ''')
+
+        expected_output = textwrap.dedent(
+            '''\
+            {1!f}.
+
+            Args:
+                some_arg ({2:int!f}, optional): {3!f}.
+                another ({2:int}, optional): {4!f}.
+
+            ''')
+
+        self.compare(docstring, expected_output)
 
 
 class NumberedToUltiSnipsTestCase(unittest.TestCase):
@@ -50,6 +134,7 @@ class NumberedToUltiSnipsTestCase(unittest.TestCase):
 
             '''
         self.compare(docstring, expected_output)
+
 
     def test_multi_args(self):
         '''Convert a docstring with more than one arg.'''
@@ -123,6 +208,7 @@ class NumberedToUltiSnipsTestCase(unittest.TestCase):
 
             Args:
                 some_arg ({2:some{thing}here!f}, optional): {3!f}.
+                bar ({4:some{5:thing!f}here!f}, optional): {6!f}.
 
             '''
         expected_output = \
@@ -131,40 +217,7 @@ class NumberedToUltiSnipsTestCase(unittest.TestCase):
 
             Args:
                 some_arg (${2:some{thing}here}, optional): $3.
+                bar (${4:some${5:thing}here}, optional): $6.
 
             '''
         self.compare(docstring, expected_output)
-
-
-class UnnumberedToUltiSnipsTestCase(unittest.TestCase):
-    def compare(self, docstring, expected_output):
-        '''Convert `docstring` and then test if it matches `expected_output`.'''
-        formatter = numberify.NumberifyWordFormatter()
-        docstring = formatter.format(docstring)
-        converted_docstring = docstring_builder.convert_to_ultisnips(docstring)
-        self.assertEqual(converted_docstring, expected_output)
-
-    def test_unique_kwargs(self):
-        '''Convert a docstring that has named fields with different numbers.'''
-        docstring = textwrap.dedent(
-            '''\
-            {!f}.
-
-            Args:
-                some_arg ({1:int!f}, optional): {!f}.
-                another ({2:int!f}, optional): {!f}.
-
-            ''')
-
-        expected_output = textwrap.dedent(
-            '''\
-            $1.
-
-            Args:
-                some_arg (${2:int}, optional): $3.
-                another (${4:int}, optional): $5.
-
-            ''')
-
-        self.compare(docstring, expected_output)
-

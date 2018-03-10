@@ -145,6 +145,8 @@ AUTO_DOCSTRING_OBJECT_TAG
  - no {}? Then just append
 AUTO_DOCSTRING_VARARG_PREFIX
  - default: `"*"`
+AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS
+ - default: '.'
 
 spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
 return os.getenv('AUTO_DOCSTRING_INDENT', '    ')

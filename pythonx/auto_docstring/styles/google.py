@@ -30,13 +30,6 @@ class BaseStyle(object):
     def draw():
         return ''
 
-    @classmethod
-    def get_block_order(cls):
-        if name:
-            return common.get_block_order(name)
-
-        return tuple()
-
     @staticmethod
     @abc.abstractmethod
     def get_default_block_order():
@@ -110,9 +103,9 @@ class GoogleStyle(BaseStyle):
     @classmethod
     def _add_header(cls, lines):
         if cls._is_multiline(lines):
-            lines.insert(0, '{}.\n')
+            lines.insert(0, '{!f}.\n')
         elif not lines:
-            lines.insert(0, '{}.')
+            lines.insert(0, '{!f}.')
 
     @classmethod
     def _add_footer(cls, lines):

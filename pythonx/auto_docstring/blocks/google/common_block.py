@@ -15,8 +15,8 @@ import six
 
 # IMPORT LOCAL LIBRARIES
 from ... import visit
-from ... import common
 from ...core import check
+from ... import environment
 from ...core import grouping
 from ... import assign_search
 
@@ -296,7 +296,7 @@ class MultiTypeBlock(CommonBlock):
 
         if info.get('lines'):
             lines = [cls.get_starting_line()]
-            indent = common.get_default_indent()
+            indent = environment.get_default_indent()
 
         obj_types = cls._expand_types(expected_object)
         output_text = cls._change_type_to_str(*obj_types)
@@ -333,7 +333,7 @@ class MultiTypeBlock(CommonBlock):
 
     @staticmethod
     def _make_line(obj_type, indent):
-        return '{indent}{{{obj_type}}}: {{}}.'.format(
+        return '{indent}{{:{obj_type}!f}}: {{!f}}.'.format(
             indent=indent,
             obj_type=obj_type,
         )
