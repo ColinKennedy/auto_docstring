@@ -3,7 +3,6 @@
 
 # IMPORT STANDARD LIBRARIES
 import abc
-import uuid
 import astroid
 import inspect
 import importlib
@@ -430,7 +429,3 @@ def _get_parents(node):
                 yield parent
 
     return list(__get_parent(node))
-
-
-def get_unique_number():
-    return uuid.uuid4().int

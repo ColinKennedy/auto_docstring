@@ -4,6 +4,7 @@
 
 # IMPORT LOCAL LIBRARIES
 from ... import visit
+from ... import common
 from . import common_block
 from ... import environment
 
@@ -20,7 +21,7 @@ class Args(common_block.CommonBlock):
             return '{indent}{arg} ({{{id_}:{value}!f}}, optional): {{!f}}.'.format(
                 indent=indent,
                 arg=arg,
-                id_=common_block.get_unique_number(),
+                id_=common.get_unique_number(),
                 value=value)
         else:
             return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)

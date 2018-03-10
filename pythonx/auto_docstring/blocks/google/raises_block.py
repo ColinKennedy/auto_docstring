@@ -9,7 +9,7 @@ import astroid
 
 # IMPORT LOCAL LIBRARIES
 from ... import visit
-from . import common_block
+from ... import common
 from ... import environment
 from ... import ultisnips_build
 
@@ -36,6 +36,11 @@ class Raises(object):
                 message = cls._get_message(raise_object)
 
             message = environment.drop_trailing_characters(message)
+            message = parser.add_conversion(message)
+
+            # TODO : Write message about importance
+            message = message[message.index(':') + 1:]
+
             lines.append(cls._make_line(type_name, message=message))
 
         return lines
@@ -47,7 +52,7 @@ class Raises(object):
             return '{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
                 indent=indent,
                 raise_type=raise_type,
-                number=common_block.get_unique_number(),
+                number=common.get_unique_number(),
                 message=message,
             )
         else:

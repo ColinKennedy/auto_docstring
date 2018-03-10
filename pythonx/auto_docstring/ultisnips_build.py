@@ -1,6 +1,15 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# IMPORT STANDARD LIBRARIES
+import functools
+
 # IMPORT THIRD-PARTY LIBRARIES
-from .core import check
 import pyparsing
+
+# IMPORT LOCAL LIBRARIES
+from . import common
+from .core import check
 
 
 class RecursiveParser(object):
@@ -54,14 +63,17 @@ class RecursiveParser(object):
 
     def expand(self, items, force_convert=False):
         if not check.is_itertype(items):
-            return self._convert(items, force=force_convert)
+            return items
 
+        # print('sdaf', items)
         is_convertible = self._is_list_convertible(items)
 
         for index, item in enumerate(items):
-            items[index] = self.expand(item, force_convert=force_convert or is_convertible)
+            expanded_item = self.expand(item, force_convert=force_convert or is_convertible)
+            items[index] = expanded_item
 
         # Re-add the "{}"s that pyparsing removed
+        items = self._convert(''.join(items), force=force_convert)
         output = self._wrap(items)
 
         # Is this is going to be used as an UltiSnips snippet, add the $
@@ -70,7 +82,7 @@ class RecursiveParser(object):
 
         return output
 
-    def parse(self, text, force_convert=False):
+    def _parse(self, text, function):
         # 1. We wrap the entire text in {}s, to make it a nested expression
         text = self._wrap(text)
 
@@ -80,13 +92,24 @@ class RecursiveParser(object):
 
         # 2. Since we made the expression nested a little while ago, lets unpack it
         parsed_text = _curlys.parseString(text).asList()[0]
-
-        result = self.expand(parsed_text, force_convert=force_convert)
+        result = function(parsed_text)
 
         # 3. The {}s that we added with `_wrap` need to be removed. So [1:-1] the result
         return result[1:-1]
 
+    def parse(self, text, force_convert=False):
+        function_to_run = functools.partial(self.expand, force_convert=force_convert)
+        return self._parse(text, function_to_run)
 
+
+
+
+
+
+
+
+
+# TODO : Split this into another file
 # IMPORT STANDARD LIBRARIES
 import re
 
@@ -109,13 +132,12 @@ class RecursiveNumberifyParser(RecursiveParser):
         except AttributeError:
             return dict()
 
-    @staticmethod
-    def _wrap(items):
-        return '{{{}}}'.format(''.join(items))
+    def _wrap(self, items):
+        text = ''.join(items)
+        return '{{{}}}'.format(text)
 
     def _convert(self, text, force=False):
         info = self._get_conversion_info(text)
-
         if not info:
             # If info is empty, we can safely return the original text
             return text
@@ -172,6 +194,31 @@ class RecursiveNumberifyParser(RecursiveParser):
         return super(RecursiveNumberifyParser, self).parse(
             text=text,
             force_convert=force_convert)
+
+    def add_conversion(self, text):
+        # expected - text that doesn't already have !f on it
+        def _add_conversion(items):
+            if not check.is_itertype(items):
+                return items
+
+            is_convertible = self._is_list_convertible(items)
+
+            for index, item in enumerate(items):
+                items[index] = _add_conversion(item)
+
+            if not is_convertible:
+                items.insert(0, ':')
+                items.insert(0, str(common.get_unique_number()))
+                items.append(self.conversion_text)
+
+            # Re-add the "{}"s that pyparsing removed
+            output = self._wrap(items)
+            return output
+
+        output = self._parse(text, function=_add_conversion)
+        # Remove the trailing !f that gets added
+        output = output[:-2]
+        return output
 
     def clear(self):
         self._used_names = self._used_names.__class__()
