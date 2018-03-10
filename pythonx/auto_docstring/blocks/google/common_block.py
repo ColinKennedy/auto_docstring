@@ -280,6 +280,27 @@ class CommonBlock(object):
     def get_starting_line(cls):
         return '{}:'.format(cls.label)
 
+    @staticmethod
+    def _expand_types(obj, include_type=False):
+        obj = visit.get_value(obj)
+
+        if MappingContainerType.is_valid(obj):
+            return MappingContainerType(obj, include_type=include_type)
+
+        if check.is_itertype(obj):
+            return ContainerType(obj, include_type=include_type)
+
+        return Type(obj)
+
+    @staticmethod
+    def _change_type_to_str(*objs):
+        items = []
+        for item in [obj.as_str() for obj in objs]:
+            if item not in items:
+                items.append(item)
+
+        return make_items_text(items)
+
 
 @six.add_metaclass(abc.ABCMeta)
 class MultiTypeBlock(CommonBlock):
@@ -308,27 +329,6 @@ class MultiTypeBlock(CommonBlock):
     @abc.abstractproperty
     def _info_key():
         return '_some_key'
-
-    @classmethod
-    def _expand_types(cls, obj):
-        obj = visit.get_value(obj)
-
-        if MappingContainerType.is_valid(obj):
-            return MappingContainerType(obj, include_type=False)
-
-        if check.is_itertype(obj):
-            return ContainerType(obj, include_type=False)
-
-        return Type(obj)
-
-    @classmethod
-    def _change_type_to_str(cls, *objs):
-        items = []
-        for item in [obj.as_str() for obj in objs]:
-            if item not in items:
-                items.append(item)
-
-        return make_items_text(items)
 
     @staticmethod
     def _make_line(obj_type, indent):

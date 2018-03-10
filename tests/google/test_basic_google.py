@@ -301,7 +301,7 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
             {1!f}.
 
             Args:
-                bar ({2:list[tuple[str or float]]!f}: {3!f}.
+                bar ({2:list[tuple[str or float]]!f}, optional): {3!f}.
 
             '''
         self.compare(expected_output, code)

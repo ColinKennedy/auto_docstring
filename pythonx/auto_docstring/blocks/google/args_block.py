@@ -48,7 +48,8 @@ class Args(common_block.CommonBlock):
             if common_block.SpecialType.is_valid(value):
                 value = common_block.SpecialType(value).as_str(info)
             else:
-                value = common_block.get_type_name(visit.get_value(value))
+                obj_types = cls._expand_types(value, include_type=True)
+                value = cls._change_type_to_str(obj_types)
 
             line = cls._make_line(arg=arg, value=value)
             lines.append(line)
