@@ -747,3 +747,17 @@ class DictTestCase(common.CommonTestCase):
 
             '''
         self.compare(expected_output, code)
+
+
+class TypesTestCase(common.CommonTestCase):
+    def test_compare(self):
+        code = \
+            """
+            def is_valid():
+                {curs}
+                return column == 0
+            """
+
+        expected_output = '{1:bool!f}: {2!f}.'
+
+        self.compare(expected_output, code)

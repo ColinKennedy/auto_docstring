@@ -287,6 +287,18 @@ def get_value_binop(node):
             return value
 
 
+def get_type(node):
+    all_types = {
+        astroid.Compare: bool,
+    }
+
+    try:
+        return all_types[type(node)]
+    except KeyError:
+        raise ValueError('Node: "{node}" was invalid. Options were: "{all_types}".'
+                         ''.format(node=node, all_types=all_types))
+
+
 def get_value(node):
     '''Get the Python object(s) for the given node.
 

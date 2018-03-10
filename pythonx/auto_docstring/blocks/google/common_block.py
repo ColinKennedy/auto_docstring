@@ -123,21 +123,37 @@ class ContainerType(Type):
         self.include_type = include_type
 
         for subitem in visit.iterate(obj):
+            # If it's a Name or Call object and its type needs to be inferred
             if SpecialType.is_valid(subitem):
                 self.items.append(SpecialType(subitem))
                 continue
 
+            # If it's a pairwise container, like a dict
             if MappingContainerType.is_valid(subitem):
                 self.items.append(MappingContainerType(subitem))
                 continue
 
+            # If the type is obvious (example: a Compare) object will be a bool)
+            try:
+                subitem_type = visit.get_type(subitem)
+                self.items.append(Type(subitem_type))
+                continue
+            except ValueError:
+                pass
+
+            # If subitem is a list, tuple, or other iterable container
             try:
                 visit.get_container(subitem)
-            except KeyError:
-                value = visit.get_value(subitem)
-                self.items.append(Type(value))
-            else:
                 self.items.append(self.__class__(subitem, include_type=True))
+                continue
+            except KeyError:
+                pass
+
+            # If it's not an object type or a container, then try to find that
+            # value of subitem, directly
+            #
+            value = visit.get_value(subitem)
+            self.items.append(Type(value))
 
     def type_contained_in(self, seq):
         result = super(ContainerType, self).type_contained_in(seq)
