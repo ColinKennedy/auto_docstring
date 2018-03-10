@@ -12,8 +12,7 @@ from .. import common
 
 
 class AdvancedTestCase(common.CommonTestCase):
-    # TODO : reverse the input order
-    def compare(self, code, expected_output):
+    def compare(self, expected_output, code):
         code = textwrap.dedent(code)
         row, _ = common.get_position('{curs}', code.split('\n'))
         code = code.format(curs='')
@@ -60,7 +59,7 @@ class AdvancedTestCase(common.CommonTestCase):
 
             '''
 
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_list_comp(self):
         code = \
@@ -99,7 +98,7 @@ class AdvancedTestCase(common.CommonTestCase):
                 ${10:list}: $11.
 
             '''
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_nested_function_parent_001(self):
         code = \
@@ -138,7 +137,7 @@ class AdvancedTestCase(common.CommonTestCase):
 
             '''
 
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_nested_function_parent_002(self):
         code = \
@@ -192,7 +191,7 @@ class AdvancedTestCase(common.CommonTestCase):
                 ${4:str}: $5.
 
             '''
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_nested_function(self):
         code = \
@@ -245,7 +244,7 @@ class AdvancedTestCase(common.CommonTestCase):
                 ${4:bool}: $5.
 
             '''
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_complex_type_0001(self):
         code = \
@@ -271,7 +270,7 @@ class AdvancedTestCase(common.CommonTestCase):
 
             '''
 
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     def test_multi_instancemethod(self):
         '''Build docstrings for functions with more than one positional arg.'''
@@ -293,7 +292,7 @@ class AdvancedTestCase(common.CommonTestCase):
 
             '''
 
-        self.compare(code, expected_output)
+        self.compare(expected_output, code)
 
     # def test_002(self):
     #     code = self._make_code(
