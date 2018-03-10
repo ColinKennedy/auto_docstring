@@ -20,6 +20,11 @@ class AdvancedTestCase(common.CommonTestCase):
         expected_output = textwrap.dedent(expected_output)
         generated_docstring = docstring_builder.create_ultisnips_docstring(code, row=row, style='google')
 
+        # for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
+        #     if char1 != char2:
+        #         raise ValueError(expected_output[:index])
+        #         raise ValueError(('asdfsfd', index, char1, char2))
+
         self.assertEqual(expected_output, generated_docstring)
 
     def test_function_0001(self):
@@ -294,37 +299,48 @@ class AdvancedTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    # def test_002(self):
-    #     code = self._make_code(
-    #         '''
-    #         def foo(arg1, arg2, thing=(('asfd', 'asdfsfd'), )):
-    #             %s
-    #             message = 'asdfsd'
-    #             if arg2:
-    #                 raise ValueError(message)
+    def test_002(self):
+        # Test that a message that starts with {, another that ends in }, and
+        # one more that does both
+        #
+        code = self._make_code(
+            '''
+            def foo(arg1, arg2, thing=(('asfd', 'asdfsfd'), )):
+                %s
+                message = 'asdfsd'
+                if arg2:
+                    raise ValueError(message)
 
-    #             if arg1:
-    #                 raise NotImplementedError('bar{tttt}fizz'.format(tttt=9123))
+                if thing[0]:
+                    raise TypeError('{ffff}bar'.format(ffff=9123))
 
-    #             return ['asdfsdf', 'adsfafds']
-    #         ''')
+                if thing[1]:
+                    raise RuntimeError('{zzzz}'.format(zzzz=9123))
 
-    #     expected_output = \
-    #         '''\
-    #         $1.
+                if arg1:
+                    raise NotImplementedError('bar{tttt}'.format(tttt=9123))
 
-    #         Args:
-    #             arg1 ($2): $3.
-    #             arg2 ($4): $5.
-    #             thing (${6:tuple[tuple[str]]}): $7.
+                return ['asdfsdf', 'adsfafds']
+            ''')
 
-    #         Raises:
-    #             ValueError: ${8:asdfsd}.
-    #             NotImplementedError: ${10:bar${9:tttt}fizz}.
+        expected_output = \
+            '''\
+            $1.
 
-    #         Returns:
-    #             ${11:list[str]}: $12.
+            Args:
+                arg1 ($2): $3.
+                arg2 ($4): $5.
+                thing (${6:tuple[tuple[str]]}, optional): $7.
 
-    #         '''
+            Raises:
+                ValueError: ${8:asdfsd}.
+                TypeError: ${10:${9:ffff}bar}.
+                RuntimeError: ${12:${11:zzzz}}.
+                NotImplementedError: ${14:bar${13:tttt}}.
 
-    #     self.compare(expected_output, code)
+            Returns:
+                ${15:list[str]}: $16.
+
+            '''
+
+        self.compare(expected_output, code)

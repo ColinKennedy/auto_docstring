@@ -205,7 +205,15 @@ class RecursiveNumberifyParser(RecursiveParser):
             if not check.is_itertype(items):
                 return items
 
-            is_convertible = self._is_list_convertible(items)
+            try:
+                is_convertible = self._is_list_convertible(items)
+            except AttributeError:
+                # If this happens, it's because items is a nested list
+                # Since lists are recursively processed by _add_conversion, it's
+                # OK to just set this value to False. Other recursion levels
+                # will sort it out
+                #
+                is_convertible = False
 
             for index, item in enumerate(items):
                 items[index] = _add_conversion(item)
