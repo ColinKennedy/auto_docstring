@@ -110,16 +110,8 @@
 
 #### Also check that "in" works correctly
 
-#### BoolOp
-def is_invalid_plugin(hierarchy, info):
-    uses = info.get('uses', [])
-    joined = (common.HIERARCHY_SEP).join(info.get('hierarchy', tuple()))
-    return hierarchy in uses and joined in uses
-
 
 #### ListComp
-
-
 def _get_duplicates(obj):
     
     return [item for item, count in collections.Counter(obj).items() if count > 1]
