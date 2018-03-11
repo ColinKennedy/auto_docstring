@@ -52,6 +52,44 @@ class GenericTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_no_message(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                raise ValueError
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Raises:
+                ValueError: {2!f}.
+
+            '''
+
+        self.compare(expected_output, code)
+
+    def test_blank_message(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                raise ValueError()
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Raises:
+                ValueError: {2!f}.
+
+            '''
+
+        self.compare(expected_output, code)
+
 
 class NameTestCase(common.CommonTestCase):
     def test_variable_message(self):

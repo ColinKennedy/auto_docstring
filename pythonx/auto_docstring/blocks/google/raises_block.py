@@ -30,7 +30,8 @@ class Raises(object):
 
         parser = ultisnips_build.RecursiveNumberifyParser()
         for raise_object in raise_info:
-            type_name = raise_object.exc.func.name
+            type_name = cls._get_exception_name(raise_object)
+
             message = ''
             if cls._include_message():
                 message = cls._get_message(raise_object)
@@ -56,7 +57,7 @@ class Raises(object):
                 message=message,
             )
         else:
-            return '{indent}{raise_type}: {{}}.'.format(
+            return '{indent}{raise_type}: {{!f}}.'.format(
                 indent=indent, raise_type=raise_type)
 
     @staticmethod
@@ -67,11 +68,29 @@ class Raises(object):
             return True
 
     @staticmethod
+    def _get_exception_name(node):
+        try:
+            # If the user wrote the exception like `raise ValueError()`
+            return node.exc.func.name
+        except AttributeError:
+            # If the user wrote the exception like `raise ValueError`
+            return node.exc.name
+
+    @staticmethod
     def _get_message(node):
         # The first arg of an exception is always the message, unless
         # the exception is some custom object
         #
-        packed_message = node.exc.args[0]
+        try:
+            packed_message = node.exc.args[0]
+        except AttributeError:
+            # If node.exc has no args, it means the user wrote the exception
+            # with no message, like this: `raise ValueError`
+            return ''
+        except IndexError:
+            # If args is empty, it means the user wrote the exception like this:
+            # `raise ValueError`
+            return ''
 
         if isinstance(packed_message, astroid.Call):
             packed_message = list(packed_message.func.get_children())[0]
