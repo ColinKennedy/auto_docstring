@@ -290,6 +290,7 @@ def get_value_binop(node):
 def get_type(node):
     all_types = {
         astroid.Compare: bool,
+        astroid.BoolOp: bool,
     }
 
     try:

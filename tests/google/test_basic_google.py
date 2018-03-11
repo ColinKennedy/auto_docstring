@@ -722,3 +722,92 @@ class TypesTestCase(common.CommonTestCase):
         expected_output = '{1:bool!f}: {2!f}.'
 
         self.compare(expected_output, code)
+
+    def test_boolop_001(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return '8' in ['8'] and False in (True, )
+            '''
+
+        expected_output = '{1:bool!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_in_statement(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return '8' in ['8']
+            '''
+
+        expected_output = '{1:bool!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    # TODO: Finish this one
+    # def test_listcomp(self):
+    #     code = \
+    #         '''
+    #         def foo():
+    #             {curs}
+    #             return [blah for blah in bar]
+    #     '''
+
+    #     expected_output = '{1:list!f}: {2}.'
+
+    #     self.compare(expected_output, code)
+
+
+class CastTestCase(common.CommonTestCase):
+    def test_basic(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                thing = some_uninferrable_object
+                return str(thing)
+            '''
+
+        expected_output = '{1:str!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    # TODO: Finish this one
+    # def test_listcomp_with_cast(self):
+    #     code = \
+    #         '''
+    #         def foo():
+    #             {curs}
+    #             return [str(index) for index in range(10)]
+    #     '''
+
+    #     expected_output = '{1:list[str]!f}: {2!f}.'
+
+    #     self.compare(expected_output, code)
+
+    def test_object_with_int(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return int(uninferreable_object)
+            '''
+
+        expected_output = '{1:int!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_object_with_set(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return set(uninferreable_object)
+            '''
+
+        expected_output = '{1:set!f}: {2!f}.'
+
+        self.compare(expected_output, code)

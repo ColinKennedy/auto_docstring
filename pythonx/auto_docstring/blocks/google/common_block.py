@@ -116,7 +116,6 @@ class SpecialType(Type):
 
 
 class ContainerType(Type):
-    # TODO : Do I need include_type?
     def __init__(self, obj, include_type=True):
         super(ContainerType, self).__init__(obj)
         self.items = []
