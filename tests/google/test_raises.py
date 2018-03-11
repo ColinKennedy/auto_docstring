@@ -116,6 +116,21 @@ class GenericTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_empty(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                try:
+                    bar.fizz()
+                except ValueError:
+                    raise
+            '''
+
+        expected_output = '{1!f}.'
+
+        self.compare(expected_output, code)
+
 
 class NameTestCase(common.CommonTestCase):
     def test_variable_message(self):

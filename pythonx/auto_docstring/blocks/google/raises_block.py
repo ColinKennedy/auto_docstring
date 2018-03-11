@@ -21,7 +21,9 @@ class Raises(object):
 
     @classmethod
     def draw(cls, info):
-        raise_info = info.get('raises')
+        raise_info = info.get('raises', [])
+        raise_info = cls._filter_unnamed(raise_info)
+
         if not raise_info:
             return []
 
@@ -73,8 +75,13 @@ class Raises(object):
             # If the user wrote the exception like `raise ValueError()`
             return node.exc.func.name
         except AttributeError:
+            pass
+
+        try:
             # If the user wrote the exception like `raise ValueError`
             return node.exc.name
+        except AttributeError:
+            return ''
 
     @staticmethod
     def _get_message(node):
@@ -98,3 +105,7 @@ class Raises(object):
             packed_message = list(packed_message.infer())[0]
 
         return visit.get_value(packed_message)
+
+    @classmethod
+    def _filter_unnamed(cls, raise_info):
+        return [info for info in raise_info if cls._get_exception_name(info)]
