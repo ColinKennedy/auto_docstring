@@ -216,59 +216,6 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_raises(self):
-        code = \
-            '''
-            def foo(bar):
-                {curs}
-                raise ValueError('Info here.')
-
-                if bar:
-                    raise OSError('Info here.')
-            '''
-
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                bar ({2!f}): {3!f}.
-
-            Raises:
-                ValueError: {4:Info here.!f}.
-                OSError: {5:Info here.!f}.
-
-            '''
-
-        self.compare(expected_output, code)
-
-    # def test_raises_variable(self):
-    #     code = \
-    #         '''
-    #         def foo(bar):
-    #             {curs}
-    #             thing = ValueError
-    #             raise thing('Info here.')
-
-    #             if bar:
-    #                 raise OSError('Info here.')
-    #         '''
-
-    #     expected_output = \
-    #         '''\
-    #         {1}.
-
-    #         Args:
-    #             bar ({2}): {3}.
-
-    #         Raises:
-    #             ValueError: {4|Info here.}.
-    #             OSError: {5|Info here.}.
-
-    #         '''
-
-    #     self.compare(expected_output, code)
-
     def test_none(self):
         code = \
             '''
@@ -307,7 +254,7 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
 
-class ReturnTestCase(common.CommonTestCase):
+class ReturnYieldTestCase(common.CommonTestCase):
 
     '''Test different return statement scenarios.'''
 
@@ -683,6 +630,20 @@ class ReturnTestCase(common.CommonTestCase):
 
 #         expected_output = '{1|<auto_docstring.visit.Visitor>}: {2}.'
 #         self.compare(expected_output, code)
+
+#     def test_uninferrable_001(self):
+#         code = \
+#             """
+#             def foo():
+#                 {curs}
+#                 for value in range(10):
+#                     yield value
+#             """
+
+#         expected_output = '''{1<value>!f}: {2!f}.'''
+
+#         self.compare(expected_output, code)
+
 
 class DictTestCase(common.CommonTestCase):
     def test_basic(self):

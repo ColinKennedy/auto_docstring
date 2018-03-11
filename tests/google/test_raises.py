@@ -90,6 +90,32 @@ class GenericTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_raises(self):
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                raise ValueError('Info here.')
+
+                if bar:
+                    raise OSError('Info here.')
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                bar ({2!f}): {3!f}.
+
+            Raises:
+                ValueError: {4:Info here.!f}.
+                OSError: {5:Info here.!f}.
+
+            '''
+
+        self.compare(expected_output, code)
+
 
 class NameTestCase(common.CommonTestCase):
     def test_variable_message(self):

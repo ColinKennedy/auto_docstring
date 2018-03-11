@@ -1,8 +1,6 @@
-
-
-#### 1
+#### 1 - working with built-in methods of objects
     @classmethod
-    def is_a_def_line(cls, line, allow_indent=True):
+    def is_a_def_line(cls, allow_indent=True):
         '''Determine if the current line is a definition statement.
 
         TODO:
@@ -13,21 +11,21 @@
             Put this function someplace else
 
         Args:
-            line (str): The line to check if it's a definition line
             allow_indent (bool): If False, only global functions will be True
 
         Returns:
             bool: Whether or not the line is a definition line
 
         '''
-        if not allow_indent and textmate.get_indent(line):
+		line = 'some text'
+        if not allow_indent:
             return False
 
         return line.strip().startswith(cls.def_startswith)
     # end is_a_def_line
 
 
-#### 2
+#### 2 - a list with a dict inside of it
     @classmethod
     def report(cls, filename):
         '''Return the given filename as data that Vim's quickfix window can use.
@@ -47,7 +45,7 @@
             },
         ]
 
-#### 3
+#### 3 - an unknown return object-type
 
     @classmethod
     def process(cls, results):
@@ -71,7 +69,7 @@
         return report_data(filename, trace, exception)
 
 
-#### 4
+#### 4 - this should be parseable
     @staticmethod
     def make_quickfix_details(details):
         '''Change the given unpacked traceback data into a dict that Vim can use.
