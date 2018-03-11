@@ -1,3 +1,86 @@
+#### (I think this is a bug with) a variable + .format() in raises
+
+    @classmethod
+    def _build_plugins(cls, source, name, info, assignment):
+        '''Create a Plugin or multiple Plugin objects.
+
+        This method is meant to be used with get_plugins. It just exists
+        to make it get_plugins more readable.
+
+        Args:
+            source (str):
+                The location to a file on disk that defined plugin.
+            name (str):
+                The key that was used in the Plugin Sheet file where the plugin
+                was defined.
+            info (dict[str]):
+                Any data about the plugin to include when the Plugin initializes.
+                "uses" is retrieved to figure out if plugin is an absolute or
+                relative plugin.
+            assignment (str):
+                The placement that this Plugin will go into.
+
+        Returns:
+            list[:class:`ways.api.DataPlugin`]:
+                The generated plugins. It will make one Plugin object if
+                info.get('uses', []) is empty. If "uses" is not empty, it will
+                create one Plugin for each item in "uses".
+
+        '''
+        duplicate_uses_message = 'Plugin: "{plug}" has duplicate hierarchies ' \
+                                 'in uses, "{uses}". Remove all duplicates.'
+
+        plugins = []
+        # There are two types of Context-Plugins, absolute and relative
+        # If a plugin has 'uses' defined, that plugin is relative
+        # because it needs another plugin/Context to function.
+        #
+        # We use all Context hierarchies defined in 'uses' to create
+        # absolute plugins from each relative plugin
+        #
+        uses = info.get('uses', [])
+        if uses:
+            duplicates = _get_duplicates(uses)
+
+            # TODO : "if duplicates:" stops bugs from happening
+            #        if a user wrote a plugin that has duplicate items in
+            #        'uses'. Ways likes to think that this is usually a
+            #        copy/paste accident and is not intentional.
+            #        and should never be intentional
+            #
+            #        Raising an error is really bad so we instead
+            #        should just "continue" and log the failure so that
+            #        a user can look it up, later
+            #
+            if duplicates:
+                raise ValueError(duplicate_uses_message.format(
+                    plug=name, uses=duplicates))
+
+            for hierarchy in uses:
+                if is_invalid_plugin(hierarchy, info):
+                    continue
+
+                context = sit.get_context(
+                    hierarchy, assignment=assignment, force=True)
+                info_ = cls._make_relative_context_absolute(info, parent=context)
+
+                plugin = plug.DataPlugin(
+                    name=name,
+                    sources=(source, ),
+                    info=dict_classes.ReadOnlyDict(info_),
+                    assignment=assignment)
+                plugins.append((plugin, assignment))
+        else:
+            plugin = plug.DataPlugin(
+                name=name,
+                sources=(source, ),
+                info=dict_classes.ReadOnlyDict(info),
+                assignment=assignment)
+            plugins.append((plugin, assignment))
+
+        return plugins
+
+
 #### 1 - working with built-in methods of objects
     @classmethod
     def is_a_def_line(cls, allow_indent=True):
@@ -23,6 +106,23 @@
 
         return line.strip().startswith(cls.def_startswith)
     # end is_a_def_line
+
+
+#### BoolOp
+def is_invalid_plugin(hierarchy, info):
+    uses = info.get('uses', [])
+    joined = (common.HIERARCHY_SEP).join(info.get('hierarchy', tuple()))
+    return hierarchy in uses and joined in uses
+
+
+#### ListComp
+
+
+def _get_duplicates(obj):
+    
+    return [item for item, count in collections.Counter(obj).items() if count > 1]
+
+AND other comps, like a set(generator) or dict(generator) etc etc
 
 
 #### 2 - a list with a dict inside of it
