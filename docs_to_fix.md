@@ -108,6 +108,8 @@
     # end is_a_def_line
 
 
+#### Also check that "in" works correctly
+
 #### BoolOp
 def is_invalid_plugin(hierarchy, info):
     uses = info.get('uses', [])
