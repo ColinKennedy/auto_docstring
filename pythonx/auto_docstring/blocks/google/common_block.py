@@ -73,6 +73,9 @@ class SpecialType(Type):
         except KeyError:
             pass
 
+        # TODO : This entire section seems like something that would be useful
+        #        to other classes. Possibly move, to another location
+
         # Example: tests.google.test_example_google.AdvancedTestCase.test_complex_type_0001
         #          If the inferred object is a astroid.Const, get its type
         #
