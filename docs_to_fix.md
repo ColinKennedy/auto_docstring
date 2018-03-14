@@ -1,3 +1,122 @@
+
+#### Raise using %s, instead of {}s
+
+def foo()
+
+
+
+
+#### Recursive return-finding
+
+def bar(thing=False):
+	if thing:
+		return ''
+	return 8
+
+
+def foo():
+	'''bool or str: Info here.'''
+	return bar()
+
+
+#### Drop the trailing '.'. Otherwise, the output message ends in '..'
+                raise RuntimeError('Something went wrong. The selected item '
+                                   'should have found a widget but found none.')
+
+
+#### Wow. Really?
+    def get_info(self):
+        return dict()
+
+
+#### Probably same as the one, above
+def get_default_indent():
+    return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
+
+
+#### This one, too
+
+def drop_trailing_characters(text):
+    # TODO : Allow ',' separated list
+    characters = get_trailing_characters_to_drop()
+    if text[len(characters):] == characters:
+        return text[:len(characters)]
+    return text
+
+
+#### Yet another
+
+def get_style_info():
+    return _STYLES
+
+
+#### Logistical docstrings
+
+def foo():
+	for index in range(10):
+		if index == 20:
+			return index
+
+This should be return index (int?) or NoneType - because there's a chance of
+None
+
+
+def foo():
+	if thing:
+		return 'asdf'
+	elif other_thing:
+		return True
+
+should be return str or bool or NoneType
+
+
+def foo():
+	items = {
+		'foo': False,
+	}
+
+	try:
+		return items[name]	
+	except KeyError:
+		return []
+
+
+should be bool or list, because those are the options
+if `return []` is just `return`
+
+
+def foo():
+	items = {
+		'foo': False,
+	}
+
+	try:
+		return items[name]	
+	except KeyError:
+		pass
+
+In this case, return is implied, because if we pass and there's nothing else,
+then it would obviously return None
+
+
+BUT
+
+def foo():
+	items = {
+		'foo': False,
+	}
+
+	try:
+		return items[name]	
+	except KeyError:
+		raise ValueError()
+
+This is fine, because raise is another type of exit. And exiting in all cases
+in the try/except is the same as if we returned. So it would not "also return
+NoneType" implicitly ...!
+
+
+
 #### (I think this is a bug with) a variable + .format() in raises
 
     @classmethod
@@ -138,6 +257,8 @@ AND other comps, like a set(generator) or dict(generator) etc etc
                 'text': '{name} file: "{filename}"'.format(name=cls._key, filename=filename),
             },
         ]
+	
+We know the keys and most of the values. Both should work.
 
 #### 3 - an unknown return object-type
 
@@ -192,3 +313,286 @@ AND other comps, like a set(generator) or dict(generator) etc etc
             })
 
         return output
+
+We know the keys / values of this dict, so we should know the output.
+
+#### Some kind of attribute issue
+def get_signals(widget, signal_type=QtCore.Signal, whitelist=None):
+    signals = []
+    for name in dir(widget):
+        if whitelist is not None and name not in whitelist:
+            continue
+
+        attribute = getattr(widget, name)
+        if isinstance(attribute, signal_type):
+            signals.append(attribute)
+
+    return signals
+	
+
+#### External object should also work
+def make_parser_validator(name, parser, parent=None):
+    name_regex = parser.get_token_parse(name, parse_type='regex')
+    return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
+
+
+
+
+#### Nested call
+    def get_current_shot_name(self):
+        return self.shot_combo_b.lineEdit().text()
+
+
+#### Nested call - Part Deux
+    def get_current_shot_name(self):
+		obj = self.shot_combo_b.lineEdit()
+        return obj.text()
+
+
+#### Bad characters
+    def _validate_user_input(self, index, require_number=True):
+        base_info = self.get_gui_info()
+
+        shot_name = self.get_current_shot_name()
+
+        try:
+            shots_to_create = int(self.shot_number_widget.text())
+        except ValueError:
+            if require_number:
+                raise ValueError('Shot must contain a number')
+            else:
+                shots_to_create = -1
+
+        required_items = [
+            (base_info['JOB'], 'job'),
+            (base_info['SCENE'], 'scene'),
+            (shot_name, 'shot name'),
+            (shots_to_create, 'number of shots to make'),
+        ]
+
+        if str(index).lower() in ['all', 'everything']:
+            index = len(required_items)
+
+        missing_items_message = 'Item: "{item}" was missing. Could not create shots.'
+        # TODO : Add some fancy stacktrace storing and a separate print to
+        #        a terminal or logger, here
+        missing_required_items = []
+        for item, error_label in required_items[:index]:
+            if not item:
+                missing_required_items.append(missing_items_message.format(item=item))
+                # TODO : add logging
+
+        if missing_required_items:
+            raise ValueError('\n'.join(missing_required_items))
+
+
+#### Change `*args` to tuple[str] and `**kwargs` to dict[str]
+
+    def format(self, *args, **kwargs):
+        self._used_numbers = self._used_numbers.__class__()
+        self._used_names = self._used_names.__class__()
+
+        return super(NumberifyWordFormatter, self).format(*args, **kwargs)
+
+
+
+#### Const.int(value=1) not supported. Add
+    def _register_name_and_get_next_number(self, field_name='', stored_number=None):
+        
+        self._used_names.setdefault(field_name, dict())
+
+        try:
+            latest_number = max(self._used_numbers) + 1
+        except ValueError:
+            latest_number = 1
+
+        if not field_name:
+            self._used_names[field_name][stored_number] = latest_number
+            self._used_numbers.add(latest_number)
+            return latest_number
+
+        try:
+            return self._used_names[field_name][stored_number]
+        except KeyError:
+            self._used_names[field_name][stored_number] = latest_number
+            self._used_numbers.add(latest_number)
+            return latest_number
+
+#### Another
+    @staticmethod
+    def _tag(text):
+        return text
+
+
+
+#### This should know that it's always just a list
+    @staticmethod
+    def _get_all_args(node):
+        try:
+            decorators = node.decorators.get_children()
+        except AttributeError:
+            decorators = []
+
+        children = list(node.args.get_children())
+
+        drop_first_arg = isinstance(node.parent, astroid.ClassDef)
+
+        if not drop_first_arg:
+            return children
+
+        for decorator in decorators:
+            if decorator.name == 'staticmethod':
+                return children
+
+        return children[1:]
+
+#### 
+    @staticmethod
+    def _include_message():
+        try:
+            return bool(int(os.getenv('AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE', '1')))
+        except TypeError:
+            return True
+
+#### Maybe?
+
+
+def get_ast_type(node):
+    all_types = {
+        astroid.BoolOp: bool,
+    }
+
+    try:
+        return all_types[type(node)]
+    except KeyError:
+        raise NotImplementedError('Node: "{node}" is not supported yet.'.format(node=node))
+
+
+#### Check this one
+
+def foo():
+	fum, bar = 8
+	return fum
+
+def foo():
+	fum, bar = [8, 9]
+	return fum
+
+
+
+#### More!
+
+
+def add_docstring(code, row, style='', mode='replace'):
+    '''Add an auto-generated docstring to the given `code`, at the given `row`.
+
+    Args:
+        code (str):
+            The code to create a docstring for.
+        row (int):
+            The point in the code to create a docstring for.
+        style (:obj:`str`, optional):
+            The style to use to create the docstring. If no style is given,
+            a default style is used from the `AUTO_DOCSTRING_STYLE`
+            environment variable. If that variable isn't set,
+            the code-style defaults to "google".
+        mode (:obj:`str`, optional):
+            "insert" - Adds the docstring above the given `row`.
+            "replace" - Replaces the text at the given `row` with the docstring.
+
+    Raises:
+        ValueError: If the given `mode` was invalid.
+
+    Returns:
+        str: The auto-generated, UltiSnips docstring.
+
+    '''
+    code = list(code)
+    docstring = create_docstring(code=code, row=row, style=style)
+
+    if mode == 'replace':
+        raise NotImplementedError('Need to write this')
+        # code[row:] = docstring
+    elif mode == 'insert':
+        code.insert(row, docstring)
+    else:
+        options = ('replace', 'insert')
+        raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
+                         ''.format(mode=mode, options=options))
+
+    return code
+
+
+#### Call raise
+
+def message():
+	return 'asfdasdf'
+
+
+def foo():
+	raise ValueError(message())
+
+
+#### attribute raise
+
+class Foo(object):
+
+	bar = 'ttt'
+
+
+def foo():
+	raise ValueError(Foo.bar)
+
+
+
+#### method raise
+todo : write example
+
+
+
+#### Another situation
+
+def thing(mode):
+	'''
+
+	Args:
+		mode (str):
+			'whatever': 
+			'another': 
+			'fff': 
+			'ttt': 
+
+	'''
+	if mode == 'whatever':
+		pass
+	elif mode == 'another':
+		pass
+	elif thing and mode == 'fff':
+		pass
+	elif (not thing.endswith('aa') and bar) or mode == 'ttt':
+		pass
+
+
+#### This is saying return is NoneType, but it shold be wrapper. I think ...
+def update_wrapper(wrapper,
+                   wrapped,
+                   assigned = WRAPPER_ASSIGNMENTS,
+                   updated = WRAPPER_UPDATES):
+    """Update a wrapper function to look like the wrapped function
+
+       wrapper is the function to be updated
+       wrapped is the original function
+       assigned is a tuple naming the attributes assigned directly
+       from the wrapped function to the wrapper function (defaults to
+       functools.WRAPPER_ASSIGNMENTS)
+       updated is a tuple naming the attributes of the wrapper that
+       are updated with the corresponding attribute from the wrapped
+       function (defaults to functools.WRAPPER_UPDATES)
+    """
+    for attr in assigned:
+        setattr(wrapper, attr, getattr(wrapped, attr))
+    for attr in updated:
+        getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
+    # Return the wrapper so this can be used as a decorator via partial()
+    return wrapper
+

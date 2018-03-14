@@ -1,10 +1,11 @@
-- make tests for "Raises"
-
 - raises
  - it should work even if the raised object is actually a variable
  - also, it should be able to grab the message even if the message is a
    variable
  - maybe imported stuff, as well
+
+- rename the classes in common_block to be "Iterable" and "Container" since
+  those terms describe those two much better
 
 - Make tests for nested arg types 
 - Make tests for dicts - because it looks like dicts are currently a problem
