@@ -291,6 +291,7 @@ def get_type(node):
     all_types = {
         astroid.Compare: bool,
         astroid.BoolOp: bool,
+        astroid.Dict: dict,
     }
 
     try:

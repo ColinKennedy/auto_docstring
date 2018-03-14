@@ -82,6 +82,14 @@ class SpecialType(Type):
             if value is not None:
                 return get_type_name(value)
 
+            # If the type is obvious (example: a Compare object will be a bool)
+            # Then just get the Python type and use it
+            #
+            try:
+                return get_type_name(visit.get_type(inferred_object))
+            except ValueError:
+                pass
+
             # If we got to this point, it's because the inferred_object is
             # actually an Attribute or Call object. Try to get the import path
             # for this object
@@ -438,18 +446,10 @@ def _get_parents(node):
         list[<asteroid Node>]: The found parents, if any.
 
     '''
-    def __get_parent(node):
-        '''Yield parents as they are found, recursively.'''
-        try:
-            parent = node.parent
-        except AttributeError:
-            return
-            yield
-        else:
-            yield parent
+    parents = []
+    parent = node.parent
+    while parent is not None:
+        parents.append(parent)
+        parent = parent.parent
 
-        for parent in __get_parent(node.parent):
-            if parent is not None:
-                yield parent
-
-    return list(__get_parent(node))
+    return parents

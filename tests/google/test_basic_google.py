@@ -292,6 +292,18 @@ class ReturnYieldTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+    def test_builtin_callable_type(self):
+        code = \
+            '''
+            def get_info():
+                {curs}
+                return dict()
+            '''
+
+        expected_output = '{1:dict!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
     def test_nested_single_type(self):
         '''Make a docstring that contains a container of only one object-type.'''
         code = \
