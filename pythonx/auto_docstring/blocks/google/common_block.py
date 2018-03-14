@@ -125,7 +125,8 @@ class SpecialType(Type):
 
         name = obj.__name__
         parent = inspect.getmodule(obj).__name__
-        return '<{parent}.{name}>'.format(parent=parent, name=name)
+
+        return make_third_party_label('{parent}.{name}'.format(parent=parent, name=name))
 
 
 class ContainerType(Type):
@@ -429,6 +430,10 @@ def make_join_text(items):
 
 def make_items_text(items):
     return ' or '.join(items)
+
+
+def make_third_party_label(text):
+    return '<{text}>'.format(text=text)
 
 
 def _get_parents(node):

@@ -561,29 +561,6 @@ class ReturnYieldTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    # def test_function_with_unknown_return(self):
-    #     '''Return a function return type if its type was not found.'''
-    #     code = \
-    #         '''\
-    #         def pairwise(iterable):
-    #             {curs}
-    #             a, b = tee(iterable)
-    #             next(b, None)
-    #             return izip(a, b)
-    #         '''
-    #     expected_output = \
-    #         '''\
-    #         {1}.
-
-    #         Args:
-    #             iterable ({2}): {3}.
-
-    #         Returns:
-    #             {4:izip}: {5}.
-
-    #         '''
-    #     self.compare(expected_output, code)
-
     def test_imported_function(self):
         '''Build a docstring that has to "find" the function object.'''
         code = \
@@ -655,6 +632,78 @@ class ReturnYieldTestCase(common.CommonTestCase):
 #         expected_output = '''{1<value>!f}: {2!f}.'''
 
 #         self.compare(expected_output, code)
+
+
+class BuiltInTestCase(common.CommonTestCase):
+    def test_unknown_function(self):
+        '''Return a function return type if its type was not found.'''
+        code = \
+            '''\
+            from itertools import izip
+
+            def pairwise(iterable):
+                {curs}
+                a, b = tee(iterable)
+                next(b, None)
+                return izip(a, b)
+            '''
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                iterable ({2!f}): {3!f}.
+
+            Returns:
+                {4:<itertools.izip>!f}: {5!f}.
+
+            '''
+        self.compare(expected_output, code)
+
+    # def test_unknown_type_002(self):
+    #     code = \
+    #         '''
+    #         from functools import partial
+
+    #         def wraps(wrapped):
+    #             {curs}
+    #             return partial(update_wrapper, wrapped=wrapped,
+    #                         assigned=assigned, updated=updated)
+    #         '''
+
+    #     expected_output = \
+    #         '''\
+    #         {1!f}.
+
+    #         Args:
+    #             wrapped ({2!f}): {3!f}.
+
+    #         Returns:
+    #             {4:<partial>!f}: {5}.
+
+    #         '''
+
+    #     self.compare(expected_output, code)
+
+    # def test_unknown_module_function(self):
+    #     # '''
+
+    #     # Currently we don't have a way of determining the return-type of these
+    #     # functions yet.
+
+    #     # '''
+    #     code = \
+    #         '''
+    #         import textwrap
+
+    #         def get_default_indent():
+    #             {curs}
+    #             return textwrap.dedent('asfasdfaf')
+    #         '''
+
+    #     expected_output = '{1:<textwrap.dedent>!f}: {2!f}.'
+
+    #     self.compare(expected_output, code)
 
 
 class DictTestCase(common.CommonTestCase):
