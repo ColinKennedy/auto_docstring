@@ -1,11 +1,3 @@
-
-#### Raise using %s, instead of {}s
-
-def foo()
-
-
-
-
 #### Recursive return-finding
 
 def bar(thing=False):

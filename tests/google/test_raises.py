@@ -131,6 +131,26 @@ class GenericTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_percent(self):
+        '''Convert %d/%s/%etc to inner tabstops.'''
+        code = \
+            '''
+            def foo():
+                {curs}
+                raise ValueError('Something "%s" here')
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Raises:
+                ValueError: {3:Something "{2:!f}" here!f}.
+
+             '''
+
+        self.compare(expected_output, code)
+
 
 class NameTestCase(common.CommonTestCase):
     def test_variable_message(self):

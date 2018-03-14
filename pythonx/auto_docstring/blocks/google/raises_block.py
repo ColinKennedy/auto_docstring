@@ -39,6 +39,9 @@ class Raises(object):
                 message = cls._get_message(raise_object)
 
             message = environment.drop_trailing_characters(message)
+            # TODO : Add '%d' and all the other ones, too
+            # Also, add significance for this block of text. Why is it needed? etc
+            message = message.replace('%s', '{}')
             message = parser.add_conversion(message)
 
             # TODO : Write message about importance

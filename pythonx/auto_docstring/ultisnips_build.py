@@ -228,6 +228,7 @@ class RecursiveNumberifyParser(RecursiveParser):
             return output
 
         output = self._parse(text, function=_add_conversion)
+
         # Remove the trailing !f that gets added
         output = output[:-2]
         return output
