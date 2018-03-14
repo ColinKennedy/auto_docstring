@@ -61,4 +61,3 @@ class Args(common_block.CommonBlock):
             lines.append(cls._make_line(arg='**' + kwarg, value='dict'))
 
         return lines
-

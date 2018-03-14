@@ -47,8 +47,8 @@ class RecursiveParser(object):
         # This try/except is a very unique syntax to UltiSnips. Basically, if a
         # tabstop in UltiSnips contains text, it looks like this "${3:foo}" where
         # "foo" is default text. If the tabstop is just a number though, you can
-        # write it as "${3}" or just "$3". This try/except will check if we actually
-        # need {}s. The prefix "$" will be added, later.
+        # write it as either "${3}" or just "$3". This try/except will check
+        # if we actually need {}s. The prefix "$" will be added, later.
         #
         try:
             is_single_list = check.is_itertype(items) and len(items) == 1

@@ -132,7 +132,9 @@ class ContainerType(Type):
                 self.items.append(MappingContainerType(subitem))
                 continue
 
-            # If the type is obvious (example: a Compare) object will be a bool)
+            # If the type is obvious (example: a Compare object will be a bool)
+            # Then just get the Python type and use it
+            #
             try:
                 subitem_type = visit.get_type(subitem)
                 self.items.append(Type(subitem_type))
@@ -181,11 +183,12 @@ class ContainerType(Type):
         output = []
         for container, subitems in six.iteritems(groups):
             try:
+                # If the container is nested, get its type name
                 container_type_name = _get_container_type_name(container)
             except KeyError:
                 # If this happens, it just means that the container is not
-                # nested (example: a list[str]). container, in this case, is Str
-                # so we can get get its type, directly
+                # nested (example: a list[str]). `container`, in this case,
+                # is just <astroid.Str> so we can get get its type, directly
                 #
                 container_type_name = get_type_name(container)
 
@@ -266,9 +269,13 @@ class MappingContainerType(Type):
         return isinstance(node, astroid.Dict)
 
     def as_str(self):
+        # A Container (i.e. dict) is processed as two lists would be
+        # and then stitched together to make the final result
+        #
         keys = ContainerType(self.keys, include_type=False)
         values = ContainerType(self.values, include_type=False)
 
+        # TODO : Possibly use visit.py to get this, instead.
         if isinstance(self.obj, astroid.Dict):
             container_name = 'dict'
         else:
@@ -280,6 +287,7 @@ class MappingContainerType(Type):
 
 @six.add_metaclass(abc.ABCMeta)
 class CommonBlock(object):
+
     label = 'Header label'
 
     @staticmethod
@@ -329,14 +337,15 @@ class MultiTypeBlock(CommonBlock):
         lines = []
         indent = ''
 
+        # Check if I need this if-statement
         if info.get('lines'):
             lines = [cls.get_starting_line()]
             indent = environment.get_default_indent()
 
         obj_types = cls._expand_types(expected_object)
-        output_text = cls._change_type_to_str(*obj_types)
+        type_info_as_str = cls._change_type_to_str(*obj_types)
 
-        line = cls._make_line(output_text, indent=indent)
+        line = cls._make_line(type_info_as_str, indent=indent)
         lines.append(line)
 
         return lines

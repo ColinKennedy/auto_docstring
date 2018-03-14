@@ -21,6 +21,7 @@ class AssignmentVisitor(object):
                 self.visit(child)
 
 
+# TODO : This can probably be moved
 def get_ast_type(node):
     all_types = {
         astroid.BoolOp: bool,
@@ -47,44 +48,6 @@ def find_node_type(node, name):
         if name in get_assign_names(assign):
             matches.append(assign)
 
+    # TODO : Pay attention to the docstring on this one. It's kind of special
     for assign in reversed(matches):
         return get_ast_type(assign.value)
-
-
-# def main():
-#     '''The main execution of the current script.'''
-# # IMPORT STANDARD LIBRARIES
-# import textwrap
-#     code = textwrap.dedent(
-#         '''
-#         def is_exe(fpath):
-
-#             exe = os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-#             # search for executable under windows
-#             if not exe:
-#                 if extList:
-#                     for ext in extList:
-#                         exePath = '%s%s' % (fpath, ext)
-#                         if os.path.isfile(exePath) and os.access(exePath, os.X_OK):
-#                             pathExt[0] = ext
-#                             return True
-#                     return False
-#             return exe
-#         ''')
-
-#     node = astroid.parse(code)
-#     visitor = AssignmentVisitor()
-#     visitor.visit(node)
-#     name = 'exe'
-
-#     matches = []
-#     for assign in visitor.assignments:
-#         if name in get_assign_names(assign):
-#             matches.append(assign)
-
-#     for assign in reversed(matches):
-#         return get_ast_type(assign.value)
-
-
-# if __name__ == '__main__':
-#     main()
