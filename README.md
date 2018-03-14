@@ -148,13 +148,17 @@ AUTO_DOCSTRING_VARARG_PREFIX
  - default: `"*"`
 AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS
  - default: '.'
-AUTO_DOCSTRING_NESTED_TABSTOP_IN_TYPES
+AUTO_DOCSTRING_NESTED_TABSTOP_IN_ITERABLE
+ - If 0, the effect is this: '{1:list[tuple[str]]!f}'
+ - If 1, the effect is this: '{1:list[{2:tuple[str]!f}]!f}'
+AUTO_DOCSTRING_NESTED_TABSTOP_IN_CONTAINER
  - If 0, the effect is this: '{1:list[tuple[str]]!f}'
  - If 1, the effect is this: '{1:list[{2:tuple[str]!f}]!f}'
 AUTO_DOCSTRING_NESTED_TABSTOP_IN_RAISE
  - If 0, the effect is this: 'ValueError: {1:Thing "whatever"!f}'
  - If 1, the effect is this: 'ValueError: {1:Thing "{2:whatever!f}"!f}'
-
+AUTO_DOCSTRING_EXPAND_CONTAINER_ITEMS
+ - it will print out each key/value items that it knows about, if possible
 
 spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
 return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
