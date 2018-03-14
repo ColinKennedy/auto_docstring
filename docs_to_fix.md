@@ -11,9 +11,7 @@ def foo():
 	return bar()
 
 
-#### Drop the trailing '.'. Otherwise, the output message ends in '..'
-                raise RuntimeError('Something went wrong. The selected item '
-                                   'should have found a widget but found none.')
+The dream, baby!
 
 
 #### Wow. Really?

@@ -109,8 +109,8 @@ class GenericTestCase(common.CommonTestCase):
                 bar ({2!f}): {3!f}.
 
             Raises:
-                ValueError: {4:Info here.!f}.
-                OSError: {5:Info here.!f}.
+                ValueError: {4:Info here!f}.
+                OSError: {5:Info here!f}.
 
             '''
 
@@ -146,6 +146,26 @@ class GenericTestCase(common.CommonTestCase):
 
             Raises:
                 ValueError: {3:Something "{2:!f}" here!f}.
+
+             '''
+
+        self.compare(expected_output, code)
+
+    def test_drop_dot(self):
+        '''Remove "." if it is in the docstring.'''
+        code = \
+            '''
+            def foo():
+                {curs}
+                raise ValueError('Something here.')
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Raises:
+                ValueError: {2:Something here!f}.
 
              '''
 
@@ -223,7 +243,7 @@ class CallTestCase(common.CommonTestCase):
                 %s
                 raise NotImplementedError('Need to write this')
                 raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
-                                    ''.format(mode=mode, options=options))
+                                 ''.format(mode=mode, options=options))
             ''')
 
         expected_output = \
@@ -232,7 +252,7 @@ class CallTestCase(common.CommonTestCase):
 
             Raises:
                 NotImplementedError: {2:Need to write this!f}.
-                ValueError: {5:Mode: "{3:mode!f}" is unsupported. Options were, "{4:options!f}".!f}.
+                ValueError: {5:Mode: "{3:mode!f}" is unsupported. Options were, "{4:options!f}"!f}.
 
             '''
 
@@ -271,7 +291,7 @@ class CallTestCase(common.CommonTestCase):
 
             Raises:
                 NotImplementedError: {10:Need to write this!f}.
-                ValueError: {13:Mode: "{11:mode!f}" is unsupported. Options were, "{12:options!f}".!f}.
+                ValueError: {13:Mode: "{11:mode!f}" is unsupported. Options were, "{12:options!f}"!f}.
 
             Returns:
                 {14:list!f}: {15!f}.

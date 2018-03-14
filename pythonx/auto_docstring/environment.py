@@ -56,8 +56,9 @@ def register_code_style(name, obj):
 
 
 def drop_trailing_characters(text):
-    # TODO : Allow ',' separated list
+    # TODO : Allow ',' separated list of characters that can be dropped
     characters = get_trailing_characters_to_drop()
-    if text[len(characters):] == characters:
-        return text[:len(characters)]
+    character_length = -1 * len(characters)
+    if text[character_length:] == characters:
+        return text[:character_length]
     return text
