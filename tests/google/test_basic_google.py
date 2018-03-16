@@ -626,6 +626,19 @@ class StandardTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+    def test_double_line(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                fum, bar = [8, 9]
+                return fum
+            '''
+
+        expected_output = '{1:int!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
     def test_callable_type(self):
         code = \
             '''

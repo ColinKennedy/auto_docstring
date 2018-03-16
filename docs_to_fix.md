@@ -508,16 +508,6 @@ def add_docstring(code, row, style='', mode='replace'):
     return code
 
 
-#### Call raise
-
-def message():
-	return 'asfdasdf'
-
-
-def foo():
-	raise ValueError(message())
-
-
 #### attribute raise
 
 class Foo(object):
