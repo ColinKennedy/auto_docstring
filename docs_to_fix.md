@@ -453,18 +453,6 @@ def get_ast_type(node):
         raise NotImplementedError('Node: "{node}" is not supported yet.'.format(node=node))
 
 
-#### Check this one
-
-def foo():
-	fum, bar = 8
-	return fum
-
-def foo():
-	fum, bar = [8, 9]
-	return fum
-
-
-
 #### More!
 
 
