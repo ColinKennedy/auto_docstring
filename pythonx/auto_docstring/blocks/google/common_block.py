@@ -57,15 +57,19 @@ class SpecialType(Type):
 
     # TODO : Check if info is necessary. If not, remove it
     def as_str(self, info=None):
-        def search(obj):
-            outer_scope = obj.scope()
-            found_type = assign_search.find_node_type(outer_scope, name=obj.name)
-            return get_type_name(found_type)
+        builtin_type = self._process_as_builtin_func(self.obj)
+        if builtin_type:
+            return get_type_name(builtin_type)
+
+        if isinstance(self.obj, astroid.Attribute):
+            return self._process_as_thirdparty_attribute(self.obj)
+        elif isinstance(self.obj, astroid.Call):
+            return self._process_as_thirdparty_func(self.obj)
 
         inferred_object = list(self.obj.infer())[0]
         if inferred_object == astroid.Uninferable:
             # We could not find a type so search for it (this is a blind search)
-            return search(self.obj)
+            return self.search(self.obj)
 
         try:
             # If this was a Named node like foo = [], try to get a type that way
@@ -127,6 +131,105 @@ class SpecialType(Type):
         parent = inspect.getmodule(obj).__name__
 
         return make_third_party_label('{parent}.{name}'.format(parent=parent, name=name))
+
+    @staticmethod
+    def search(obj):
+        outer_scope = obj.scope()
+        found_type = assign_search.find_node_type(outer_scope, name=obj.name)
+        return get_type_name(found_type)
+
+    @staticmethod
+    def _process_as_builtin_func(obj):
+        # These are functions that we know the Python output to
+        try:
+            obj = obj.func
+        except AttributeError:
+            pass
+
+        function_name_to_astroid_type = {
+            'bool': bool,
+            'dict': dict,
+            'float': float,
+            'int': int,
+            'list': list,
+            'set': set,
+            'str': str,
+            'tuple': tuple,
+        }
+
+        try:
+            return function_name_to_astroid_type[obj.name]
+        except (AttributeError, KeyError):
+            return None
+
+    @staticmethod
+    def _process_as_thirdparty_attribute(obj):
+        def get_import_name(obj):
+            try:
+                return obj.name
+            except AttributeError:
+                return get_import_name(obj.expr)
+
+        def get_attribute_name(obj):
+            try:
+                return obj.attrname
+            except AttributeError:
+                return ''
+
+        def get_local_attribute_path(obj):
+            base = obj.expr
+            output = obj.attrname
+
+            while base:
+                if hasattr(base, 'name'):
+                    output = base.name + '.' + output
+                    break
+
+                output = base.attrname + '.' + output
+                base = base.expr
+
+            return output
+
+        module = obj.root()
+        search_name = get_import_name(obj)
+        attribute_name = get_attribute_name(obj)
+
+        object_line_number = obj.lineno
+        import_path = ''
+
+        for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
+            if item.lineno >= object_line_number:
+                break
+
+            if isinstance(item, astroid.Import):
+                for name, alias in item.names:
+                    if not alias:
+                        alias = name
+
+                    if alias == search_name:
+                        import_path = name + '.' + attribute_name
+                        break
+
+            # If it was imported using "from X import Y"
+            if isinstance(item, astroid.ImportFrom):
+                for name, _ in item.names:
+                    if name == search_name:
+                        import_path = item.modname + '.' + search_name
+                        break
+
+        if not import_path:
+            import_path = get_local_attribute_path(obj)
+
+        return make_third_party_label(import_path)
+
+    @classmethod
+    def _process_as_thirdparty_func(cls, obj):
+        try:
+            obj = obj.func
+        except AttributeError:
+            pass
+
+        return cls._process_as_thirdparty_attribute(obj)
 
 
 class ContainerType(Type):

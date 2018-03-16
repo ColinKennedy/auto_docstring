@@ -258,52 +258,6 @@ class ReturnYieldTestCase(common.CommonTestCase):
 
     '''Test different return statement scenarios.'''
 
-    def test_builtin_object_single(self):
-        '''Make a docstring to describe a function that has a return value.'''
-        code = \
-            '''
-            def foo():
-                {curs}
-                return True
-            '''
-
-        expected_output = '{1:bool!f}: {2!f}.'''
-        self.compare(expected_output, code)
-
-    def test_builtin_object_multiline(self):
-        '''Make a docstring to describe a function that has a return value.'''
-        code = \
-            '''
-            def foo(bar):
-                {curs}
-                return True
-            '''
-
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                bar ({2!f}): {3!f}.
-
-            Returns:
-                {4:bool!f}: {5!f}.
-
-            '''
-        self.compare(expected_output, code)
-
-    def test_builtin_callable_type(self):
-        code = \
-            '''
-            def get_info():
-                {curs}
-                return dict()
-            '''
-
-        expected_output = '{1:dict!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
     def test_nested_single_type(self):
         '''Make a docstring that contains a container of only one object-type.'''
         code = \
@@ -634,7 +588,56 @@ class ReturnYieldTestCase(common.CommonTestCase):
 #         self.compare(expected_output, code)
 
 
-class BuiltInTestCase(common.CommonTestCase):
+class StandardTestCase(common.CommonTestCase):
+
+    '''A test case for built-in objects and standard library objects.'''
+
+    def test_object_single(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        code = \
+            '''
+            def foo():
+                {curs}
+                return True
+            '''
+
+        expected_output = '{1:bool!f}: {2!f}.'''
+        self.compare(expected_output, code)
+
+    def test_object_multiline(self):
+        '''Make a docstring to describe a function that has a return value.'''
+        code = \
+            '''
+            def foo(bar):
+                {curs}
+                return True
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                bar ({2!f}): {3!f}.
+
+            Returns:
+                {4:bool!f}: {5!f}.
+
+            '''
+        self.compare(expected_output, code)
+
+    def test_callable_type(self):
+        code = \
+            '''
+            def get_info():
+                {curs}
+                return dict()
+            '''
+
+        expected_output = '{1:dict!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
     def test_unknown_function(self):
         '''Return a function return type if its type was not found.'''
         code = \
@@ -660,50 +663,100 @@ class BuiltInTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
-    # def test_unknown_type_002(self):
-    #     code = \
-    #         '''
-    #         from functools import partial
+    def test_unknown_type_001(self):
+        code = \
+            '''
+            from functools import partial
 
-    #         def wraps(wrapped):
-    #             {curs}
-    #             return partial(update_wrapper, wrapped=wrapped,
-    #                         assigned=assigned, updated=updated)
-    #         '''
+            def wraps(wrapped):
+                {curs}
+                return partial(update_wrapper, wrapped=wrapped,
+                            assigned=assigned, updated=updated)
+            '''
 
-    #     expected_output = \
-    #         '''\
-    #         {1!f}.
+        expected_output = \
+            '''\
+            {1!f}.
 
-    #         Args:
-    #             wrapped ({2!f}): {3!f}.
+            Args:
+                wrapped ({2!f}): {3!f}.
 
-    #         Returns:
-    #             {4:<partial>!f}: {5}.
+            Returns:
+                {4:<functools.partial>!f}: {5!f}.
 
-    #         '''
+            '''
 
-    #     self.compare(expected_output, code)
+        self.compare(expected_output, code)
 
-    # def test_unknown_module_function(self):
-    #     # '''
+    def test_unknown_type_002(self):
+        code = \
+            '''
+            import functools as func
 
-    #     # Currently we don't have a way of determining the return-type of these
-    #     # functions yet.
+            def wraps(wrapped):
+                {curs}
+                return func.partial(
+                    update_wrapper, wrapped=wrapped,
+                    assigned=assigned, updated=updated)
+            '''
 
-    #     # '''
-    #     code = \
-    #         '''
-    #         import textwrap
+        expected_output = \
+            '''\
+            {1!f}.
 
-    #         def get_default_indent():
-    #             {curs}
-    #             return textwrap.dedent('asfasdfaf')
-    #         '''
+            Args:
+                wrapped ({2!f}): {3!f}.
 
-    #     expected_output = '{1:<textwrap.dedent>!f}: {2!f}.'
+            Returns:
+                {4:<functools.partial>!f}: {5!f}.
 
-    #     self.compare(expected_output, code)
+            '''
+
+        self.compare(expected_output, code)
+
+    def test_unknown_type_003(self):
+        code = \
+            '''
+            def wraps(wrapped):
+                {curs}
+                return foo.bar.partial(
+                    update_wrapper, wrapped=wrapped,
+                    assigned=assigned, updated=updated)
+            '''
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                wrapped ({2!f}): {3!f}.
+
+            Returns:
+                {4:<foo.bar.partial>!f}: {5!f}.
+
+            '''
+
+        self.compare(expected_output, code)
+
+    def test_unknown_module_function(self):
+        # '''
+
+        # Currently we don't have a way of determining the return-type of these
+        # functions yet.
+
+        # '''
+        code = \
+            '''
+            import textwrap
+
+            def get_default_indent():
+                {curs}
+                return textwrap.dedent('asfasdfaf')
+            '''
+
+        expected_output = '{1:<textwrap.dedent>!f}: {2!f}.'
+
+        self.compare(expected_output, code)
 
 
 class DictTestCase(common.CommonTestCase):

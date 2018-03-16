@@ -14,11 +14,6 @@ def foo():
 The dream, baby!
 
 
-#### Wow. Really?
-    def get_info(self):
-        return dict()
-
-
 #### Probably same as the one, above
 def get_default_indent():
     return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
