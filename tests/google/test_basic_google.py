@@ -801,6 +801,34 @@ class StandardTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    # TODO : Make this return list[str]
+    def test_known_global_variable(self):
+        code = \
+            '''
+            _STYLES = ['asdfsdf']
+
+            def get_style_info():
+                {curs}
+                return _STYLES
+            '''
+
+        expected_output = '{1:list!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_unknown_global_variable(self):
+        '''If we cannot find a Name object's type, return its literal label.'''
+        code = \
+            '''
+            def get_style_info():
+                {curs}
+                return _STYLES
+            '''
+
+        expected_output = '{1:_STYLES!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
 
 class DictTestCase(common.CommonTestCase):
     def test_basic(self):

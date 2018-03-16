@@ -29,12 +29,6 @@ def drop_trailing_characters(text):
     return text
 
 
-#### Yet another
-
-def get_style_info():
-    return _STYLES
-
-
 #### Logistical docstrings
 
 def foo():

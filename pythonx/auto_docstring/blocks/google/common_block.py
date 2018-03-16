@@ -66,7 +66,15 @@ class SpecialType(Type):
         elif isinstance(self.obj, astroid.Call):
             return self._process_as_thirdparty_func(self.obj)
 
-        inferred_object = list(self.obj.infer())[0]
+        try:
+            inferred_object = list(self.obj.infer())[0]
+        except astroid.NameInferenceError:
+            # We couldn't infer the type so, assuming self.obj is astroid.Name,
+            # return the name, directly
+            #
+            return self.obj.name
+
+
         if inferred_object == astroid.Uninferable:
             # We could not find a type so search for it (this is a blind search)
             return self.search(self.obj)
