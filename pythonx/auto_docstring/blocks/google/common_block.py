@@ -62,7 +62,7 @@ class SpecialType(Type):
             return get_type_name(builtin_type)
 
         if isinstance(self.obj, astroid.Attribute):
-            return self._process_as_thirdparty_attribute(self.obj)
+            return self._process_as_thirdparty_attribute(self.obj, wrap=True)
         elif isinstance(self.obj, astroid.Call):
             return self._process_as_thirdparty_func(self.obj)
 
@@ -163,7 +163,7 @@ class SpecialType(Type):
             return None
 
     @staticmethod
-    def _process_as_thirdparty_attribute(obj):
+    def _process_as_thirdparty_attribute(obj, wrap=False):
         def get_import_name(obj):
             try:
                 return obj.name
@@ -178,17 +178,17 @@ class SpecialType(Type):
 
         def get_local_attribute_path(obj):
             base = obj.expr
-            output = obj.attrname
+            bases = []
 
             while base:
                 if hasattr(base, 'name'):
-                    output = base.name + '.' + output
+                    bases.append(base.name)
                     break
 
-                output = base.attrname + '.' + output
+                bases.append(base.attrname)
                 base = base.expr
 
-            return output
+            return '.'.join(reversed(bases))
 
         module = obj.root()
         search_name = get_import_name(obj)
@@ -207,7 +207,7 @@ class SpecialType(Type):
                         alias = name
 
                     if alias == search_name:
-                        import_path = name + '.' + attribute_name
+                        import_path = name
                         break
 
             # If it was imported using "from X import Y"
@@ -220,7 +220,12 @@ class SpecialType(Type):
         if not import_path:
             import_path = get_local_attribute_path(obj)
 
-        return make_third_party_label(import_path)
+        if wrap:
+            if attribute_name:
+                import_path += '.' + attribute_name
+            return make_third_party_label(import_path)
+
+        return import_path
 
     @classmethod
     def _process_as_thirdparty_func(cls, obj):
@@ -229,7 +234,7 @@ class SpecialType(Type):
         except AttributeError:
             pass
 
-        return cls._process_as_thirdparty_attribute(obj)
+        return cls._process_as_thirdparty_attribute(obj, wrap=True)
 
 
 class ContainerType(Type):

@@ -545,6 +545,36 @@ class ReturnYieldTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_third_party_callable_001(self):
+        '''Get the full import path because the module is find-able.'''
+        code = \
+            '''
+            from PySide import QtGui
+
+            def make_parser_validator():
+                {curs}
+                name_regex = parser.get_token_parse(name, parse_type='regex')
+                return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
+            '''
+
+        expected_output = '{1:<PySide.QtGui.QRegExpValidator>!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_third_party_callable_002(self):
+        '''Get the direct object because the module is not find-able.'''
+        code = \
+            '''
+            def make_parser_validator():
+                {curs}
+                name_regex = parser.get_token_parse(name, parse_type='regex')
+                return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
+            '''
+
+        expected_output = '{1:<QtGui.QRegExpValidator>!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
     # TODO : Finish these
     # def test_imported_thirdparty_function(self):
     #     '''Build a docstring that has to "find" the function object.'''

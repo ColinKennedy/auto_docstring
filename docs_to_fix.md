@@ -315,14 +315,6 @@ def get_signals(widget, signal_type=QtCore.Signal, whitelist=None):
     return signals
 	
 
-#### External object should also work
-def make_parser_validator(name, parser, parent=None):
-    name_regex = parser.get_token_parse(name, parse_type='regex')
-    return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
-
-
-
-
 #### Nested call
     def get_current_shot_name(self):
         return self.shot_combo_b.lineEdit().text()
