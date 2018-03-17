@@ -57,6 +57,16 @@ class SpecialType(Type):
 
     # TODO : Check if info is necessary. If not, remove it
     def as_str(self, info=None):
+        # See if the object is a built-in, callable object
+        # - if it is, return that type's name
+        # - if not and it is a callable object, like another function
+        #   then get its return-type signature
+        #     - If it cannot get the callable object's signature, return the
+        #       name of the callable object, in <>s
+        # - If the object is local to this module that we are making a docstring
+        #   for, then our last possible-effort would be to try to use astroid to
+        #   "infer" what that object's type would be, and return it
+        #
         builtin_type = self._process_as_builtin_func(self.obj)
         if builtin_type:
             return get_type_name(builtin_type)
@@ -221,15 +231,28 @@ class SpecialType(Type):
 
             return ''
 
+        def get_local_method_types(module, obj):
+            for classobj in module.nodes_of_class(astroid.ClassDef):
+                raise ValueError(classobj)
+
         module = obj.root()
 
-        function_signature = get_local_function_types(module, obj)
-        if function_signature:
-            return function_signature
+        if environment.allow_type_follow():
+            function_signature = get_local_function_types(module, obj)
+            if function_signature:
+                return function_signature
+
+            method_signature = get_local_method_types(module, obj)
+            if method_signature:
+                return method_signature
 
         # If we reached this point, it means that the object we were looking for
         # isn't defined in the same module as the docstring we are building.
-        # Search imports to find the full path
+
+        # TODO : In the future, add a way to traverse up the import and then get
+        #        ITS docstring. Right now, this code will just return the name
+        #        of the import as a "third-party" name, like <textwrap.dedent>
+        #        (and not "str", like it should be)
         #
         import_path = ''
         search_name = get_import_name(obj)

@@ -14,6 +14,13 @@ _STYLES = dict()
 _STYLE_BLOCK_ORDER_COMPILE = re.compile('(?P<name>\w+):(?P<blocks>[\w+,])')
 
 
+def allow_type_follow():
+    try:
+        return bool(int(os.getenv('AUTO_DOCSTRING_TYPE_FOLLOW', '1')))
+    except TypeError:
+        return True
+
+
 def get_block_order(name):
     order_info = os.getenv('AUTO_DOCSTRING_BLOCK_ORDER', '')
 

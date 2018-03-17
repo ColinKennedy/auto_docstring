@@ -160,6 +160,13 @@ AUTO_DOCSTRING_NESTED_TABSTOP_IN_RAISE
  - If 1, the effect is this: 'ValueError: {1:Thing "{2:whatever!f}"!f}'
 AUTO_DOCSTRING_EXPAND_CONTAINER_ITEMS
  - it will print out each key/value items that it knows about, if possible
+AUTO_DOCSTRING_AUTO_ARG_DETAILS
+ - default: 0
+AUTO_DOCSTRING_TYPE_FOLLOW
+ - default: 1
+ - Lets you look up function docstrings, recursively, like for example if a
+   function returns the result of another function
+   If False, the original function name will just be returned
 
 spacing = int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
 return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
