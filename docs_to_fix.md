@@ -1,3 +1,119 @@
+
+#### 
+def split_into_parts(obj, split, as_type=tuple):
+    
+    obj = check.force_itertype(obj)
+    obj = (part.strip() for obj_ in obj for part in obj_.split(split))
+    return as_type(part for part in obj if part)
+
+
+#### 
+def split_hierarchy(obj, as_type=tuple):
+    '''Split a hierarchy into pieces, using the "/" character.
+
+    Args:
+        obj (str or tuple[str]):
+            The hierarchy to split.
+        as_type (:obj:`callable`, optional):
+            The iterable type to return the hierarchy.
+
+    Returns:
+        tuple[str]:
+            The hierarchy, split into pieces.
+
+    '''
+    try:
+        if obj[0] == HIERARCHY_SEP:
+            items = itertools.chain(
+                [HIERARCHY_SEP], split_into_parts(obj, split=HIERARCHY_SEP, as_type=list))
+            return tuple(items)
+    except IndexError:
+        pass
+
+    return split_into_parts(obj, split=HIERARCHY_SEP, as_type=as_type)
+
+
+#### 
+
+
+def import_object(name):
+    '''Import a object of any kind, as long as it is on the PYTHONPATH.
+
+    Args:
+        name (str): An import name (Example: 'ways.api.Plugin')
+
+    Raises:
+        ImportError: If some object down the name chain was not importable or
+                     if the entire name could not be found in the PYTHONPATH.
+
+    Returns:
+        The imported module, classobj, or callable function, or object.
+
+    '''
+    components = name.split('.')
+    module = __import__(components[0])
+    for comp in components[1:]:
+        module = getattr(module, comp)
+    return module
+
+
+#### 
+def decode(obj):
+    '''dict[str]: Convert a URL-encoded string back into a dict.'''
+    return conform_decode(six.moves.urllib.parse.parse_qs(obj))
+
+def conform_decode(info):
+    '''Make sure that 'create_using' returns a single string.'''
+    return {key: value[0] if len(value) == 1 else value
+            for key, value in six.iteritems(info)}
+
+
+#### 
+
+
+def encode(obj):
+    '''Make the given descriptor information into a standard URL encoding.
+
+    Args:
+        obj (dict[str]): The Descriptor information to serialize.
+        This is normally something like
+        {'create_using': ways.api.FolderDescriptor}.
+
+    Returns:
+        str: The output encoding.
+
+    '''
+    # pylint: disable=redundant-keyword-arg
+    return six.moves.urllib.parse.urlencode(obj, doseq=True)
+
+
+#### 
+
+
+    def get_child_tokens(self, token):
+        '''Find the child tokens of a given token.
+
+        Args:
+            token (str): The name of the token to get child tokens for.
+
+        Returns:
+            list[str]: The child tokens for the given token. If the given token
+                       is not a parent to any child tokens, return nothing.
+
+        '''
+        mapping_details = self.get_all_mapping_details()
+
+        try:
+            mapping = mapping_details[token].get('mapping', '')
+        except KeyError:
+            return []
+
+        if mapping:
+            return find_tokens(mapping)
+
+        return []
+
+
 #### Recursive return-finding
 
 def bar(thing=False):
