@@ -125,6 +125,97 @@ class FunctionTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
+    # def test_implicit_if_001(self):
+    #     code = self._make_code(
+    #         '''
+    #         def add_docstring(code, row, style='', mode='replace'):
+    #             %s
+    #             code = list(code)
+    #             docstring = create_docstring(code=code, row=row, style=style)
+
+    #             if mode == 'replace':
+    #                 raise NotImplementedError('Need to write this')
+    #                 # code[row:] = docstring
+    #             elif mode == 'insert':
+    #                 code.insert(row, docstring)
+    #             else:
+    #                 options = ('replace', 'insert')
+    #                 raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
+    #                                 ''.format(mode=mode, options=options))
+
+    #             return code
+
+    #         ''')
+
+    #     expected_output = \
+    #         '''\
+    #         {1!f}.
+
+    #         Args:
+    #             code ({2!f}): {3!f}.
+    #             row ({4!f}): {5!f}.
+    #             style ({6:str!f}, optional): {7!f}.
+    #             mode ({8:str!f}, optional): {9!f}.
+    #                 "insert" - {10!f}.
+    #                 "replace" - {11!f}.
+
+    #         Raises:
+    #             NotImplementedError:
+    #             ValueError: Mode: "{mode}" is unsupported. Options were, "{options}".'
+
+    #         Returns:
+    #             list:
+
+    #         '''
+
+    #     self.compare(expected_output, code)
+
+    # def test_implicit_if_002(self):
+    #     code = self._make_code(
+    #         '''
+    #         def add_docstring(code, row, style='', mode='replace'):
+    #             %s
+    #             code = list(code)
+    #             docstring = create_docstring(code=code, row=row, style=style)
+
+    #             if mode == 'replace':
+    #                 raise NotImplementedError('Need to write this')
+    #                 # code[row:] = docstring
+
+    #             mode = False
+    #             if mode == 'insert':
+    #                 code.insert(row, docstring)
+    #             else:
+    #                 options = ('replace', 'insert')
+    #                 raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
+    #                                 ''.format(mode=mode, options=options))
+
+    #             return code
+
+    #         ''')
+
+    #     expected_output = \
+    #         '''\
+    #         {1!f}.
+
+    #         Args:
+    #             code ({2!f}): {3!f}.
+    #             row ({4!f}): {5!f}.
+    #             style ({6:str!f}, optional): {7!f}.
+    #             mode ({8:str!f}, optional): {9!f}.
+    #                 "replace" - {10!f}.
+
+    #         Raises:
+    #             NotImplementedError:
+    #             ValueError: Mode: "{mode}" is unsupported. Options were, "{options}".'
+
+    #         Returns:
+    #             list:
+
+    #         '''
+
+    #     self.compare(expected_output, code)
+
 
 class FunctionDefaultArgTestCase(common.CommonTestCase):
 

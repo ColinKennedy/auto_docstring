@@ -172,6 +172,9 @@ class SpecialType(Type):
 
     @staticmethod
     def _process_as_thirdparty_attribute(obj, wrap=False):
+        # This third-party attribute may be an object that is either imported or
+        # is actually defined (i.e. accessible) in the current module. Find it.
+        #
         def get_import_name(obj):
             try:
                 return obj.name
@@ -198,12 +201,40 @@ class SpecialType(Type):
 
             return '.'.join(reversed(bases))
 
+        def get_local_function_types(module, obj):
+            search_name = get_import_name(obj)
+            object_line_number = obj.lineno
+
+            # First, try to see if the object is defined in this module
+            for function in module.nodes_of_class(astroid.FunctionDef):
+                if function.lineno >= object_line_number:
+                    break
+
+                if function.name == search_name:
+                    full_info = visit.get_info(function)['functions'][function]['returns']
+                    # TODO : Note to self. This is very bad. I should not be calling
+                    # MultiTypeBlock here. Pull out these functions
+                    #
+                    obj_types = MultiTypeBlock._expand_types(full_info)
+                    type_info_as_str = MultiTypeBlock._change_type_to_str(*obj_types)
+                    return type_info_as_str
+
+            return ''
+
         module = obj.root()
+
+        function_signature = get_local_function_types(module, obj)
+        if function_signature:
+            return function_signature
+
+        # If we reached this point, it means that the object we were looking for
+        # isn't defined in the same module as the docstring we are building.
+        # Search imports to find the full path
+        #
+        import_path = ''
         search_name = get_import_name(obj)
         attribute_name = get_attribute_name(obj)
-
         object_line_number = obj.lineno
-        import_path = ''
 
         for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
             if item.lineno >= object_line_number:
