@@ -217,9 +217,6 @@ class SpecialType(Type):
 
             # First, try to see if the object is defined in this module
             for function in module.nodes_of_class(astroid.FunctionDef):
-                if function.lineno >= object_line_number:
-                    break
-
                 if function.name == search_name:
                     full_info = visit.get_info(function)['functions'][function]['returns']
                     # TODO : Note to self. This is very bad. I should not be calling
