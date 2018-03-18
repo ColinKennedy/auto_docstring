@@ -12,6 +12,9 @@ import __builtin__
 # IMPORT THIRD-PARTY LIBRARIES
 import six
 
+# IMPORT AUTO-DOCSTING LIBRARIES
+import auto_docstring
+
 # IMPORT LOCAL LIBRARIES
 from ... import visit
 from ...core import check
@@ -67,14 +70,9 @@ class SpecialType(Type):
         #   for, then our last possible-effort would be to try to use astroid to
         #   "infer" what that object's type would be, and return it
         #
-        builtin_type = self._process_as_builtin_func(self.obj)
-        if builtin_type:
-            return get_type_name(builtin_type)
-
-        if isinstance(self.obj, astroid.Attribute):
-            return self._process_as_thirdparty_attribute(self.obj, wrap=True)
-        elif isinstance(self.obj, astroid.Call):
-            return self._process_as_thirdparty_func(self.obj)
+        found_type = process_types(self.obj)
+        if found_type is not None:
+            return found_type
 
         try:
             inferred_object = list(self.obj.infer())[0]
@@ -155,145 +153,6 @@ class SpecialType(Type):
         outer_scope = obj.scope()
         found_type = assign_search.find_node_type(outer_scope, name=obj.name)
         return get_type_name(found_type)
-
-    @staticmethod
-    def _process_as_builtin_func(obj):
-        # These are functions that we know the Python output to
-        try:
-            obj = obj.func
-        except AttributeError:
-            pass
-
-        function_name_to_astroid_type = {
-            'bool': bool,
-            'dict': dict,
-            'float': float,
-            'int': int,
-            'list': list,
-            'set': set,
-            'str': str,
-            'tuple': tuple,
-        }
-
-        try:
-            return function_name_to_astroid_type[obj.name]
-        except (AttributeError, KeyError):
-            return None
-
-    @staticmethod
-    def _process_as_thirdparty_attribute(obj, wrap=False):
-        # This third-party attribute may be an object that is either imported or
-        # is actually defined (i.e. accessible) in the current module. Find it.
-        #
-        def get_import_name(obj):
-            try:
-                return obj.name
-            except AttributeError:
-                return get_import_name(obj.expr)
-
-        def get_attribute_name(obj):
-            try:
-                return obj.attrname
-            except AttributeError:
-                return ''
-
-        def get_local_attribute_path(obj):
-            base = obj.expr
-            bases = []
-
-            while base:
-                if hasattr(base, 'name'):
-                    bases.append(base.name)
-                    break
-
-                bases.append(base.attrname)
-                base = base.expr
-
-            return '.'.join(reversed(bases))
-
-        def get_local_function_types(module, obj):
-            search_name = get_import_name(obj)
-            object_line_number = obj.lineno
-
-            # First, try to see if the object is defined in this module
-            for function in module.nodes_of_class(astroid.FunctionDef):
-                if function.name == search_name:
-                    full_info = visit.get_info(function)['functions'][function]['returns']
-                    # TODO : Note to self. This is very bad. I should not be calling
-                    # MultiTypeBlock here. Pull out these functions
-                    #
-                    obj_types = MultiTypeBlock._expand_types(full_info)
-                    type_info_as_str = MultiTypeBlock._change_type_to_str(*obj_types)
-                    return type_info_as_str
-
-            return ''
-
-        def get_local_method_types(module, obj):
-            for classobj in module.nodes_of_class(astroid.ClassDef):
-                raise ValueError(classobj)
-
-        module = obj.root()
-
-        if environment.allow_type_follow():
-            function_signature = get_local_function_types(module, obj)
-            if function_signature:
-                return function_signature
-
-            method_signature = get_local_method_types(module, obj)
-            if method_signature:
-                return method_signature
-
-        # If we reached this point, it means that the object we were looking for
-        # isn't defined in the same module as the docstring we are building.
-
-        # TODO : In the future, add a way to traverse up the import and then get
-        #        ITS docstring. Right now, this code will just return the name
-        #        of the import as a "third-party" name, like <textwrap.dedent>
-        #        (and not "str", like it should be)
-        #
-        import_path = ''
-        search_name = get_import_name(obj)
-        attribute_name = get_attribute_name(obj)
-        object_line_number = obj.lineno
-
-        for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
-            if item.lineno >= object_line_number:
-                break
-
-            if isinstance(item, astroid.Import):
-                for name, alias in item.names:
-                    if not alias:
-                        alias = name
-
-                    if alias == search_name:
-                        import_path = name
-                        break
-
-            # If it was imported using "from X import Y"
-            if isinstance(item, astroid.ImportFrom):
-                for name, _ in item.names:
-                    if name == search_name:
-                        import_path = item.modname + '.' + search_name
-                        break
-
-        if not import_path:
-            import_path = get_local_attribute_path(obj)
-
-        if wrap:
-            if attribute_name:
-                import_path += '.' + attribute_name
-            return make_third_party_label(import_path)
-
-        return import_path
-
-    @classmethod
-    def _process_as_thirdparty_func(cls, obj):
-        try:
-            obj = obj.func
-        except AttributeError:
-            pass
-
-        return cls._process_as_thirdparty_attribute(obj, wrap=True)
 
 
 class ContainerType(Type):
@@ -580,6 +439,190 @@ class MultiTypeBlock(CommonBlock):
         )
 
 
+def _get_parents(node):
+    '''Find every parent of the given AST node.
+
+    This function is useful for Name Nodes, that have a scoped namespace
+
+    Example:
+        >>> from collections import OrderedDict
+        >>> def foo(bar=OrderedDict):
+        >>>     pass
+        >>>
+        >>> _get_parents(Name.OrderedDict)
+        ... # Result: [Module.collections]
+
+    Args:
+        node (<astroid Node>): The node to get the parents of.
+
+    Returns:
+        list[<asteroid Node>]: The found parents, if any.
+
+    '''
+    parents = []
+    parent = node.parent
+    while parent is not None:
+        parents.append(parent)
+        parent = parent.parent
+
+    return parents
+
+
+def _process_as_thirdparty_attribute(obj, wrap=False):
+    # This third-party attribute may be an object that is either imported or
+    # is actually defined (i.e. accessible) in the current module. Find it.
+    #
+    def get_import_name(obj):
+        try:
+            return obj.name
+        except AttributeError:
+            return get_import_name(obj.expr)
+
+    def get_attribute_name(obj):
+        try:
+            return obj.attrname
+        except AttributeError:
+            return ''
+
+    def get_local_function_types(module, obj):
+        search_name = get_import_name(obj)
+        object_line_number = obj.lineno
+
+        # First, try to see if the object is defined in this module
+        for function in module.nodes_of_class(astroid.FunctionDef):
+            if function.name == search_name:
+                full_info = visit.get_info(function)['functions'][function]['returns']
+                # TODO : Note to self. This is very bad. I should not be calling
+                # MultiTypeBlock here. Pull out these functions
+                #
+                obj_types = MultiTypeBlock._expand_types(full_info)
+                type_info_as_str = MultiTypeBlock._change_type_to_str(*obj_types)
+                return type_info_as_str
+
+        return ''
+
+    def get_local_method_types(module, obj):
+        for classobj in module.nodes_of_class(astroid.ClassDef):
+            # raise ValueError(classobj)
+            pass
+
+    module = obj.root()
+
+    if environment.allow_type_follow():
+        function_signature = get_local_function_types(module, obj)
+        if function_signature:
+            return function_signature
+
+        method_signature = get_local_method_types(module, obj)
+        if method_signature:
+            return method_signature
+
+    # If we reached this point, it means that the object we were looking for
+    # isn't defined in the same module as the docstring we are building.
+
+    # TODO : In the future, add a way to traverse up the import and then get
+    #        ITS docstring. Right now, this code will just return the name
+    #        of the import as a "third-party" name, like <textwrap.dedent>
+    #        (and not "str", like it should be)
+    #
+    import_path = ''
+    search_name = get_import_name(obj)
+    attribute_name = get_attribute_name(obj)
+    object_line_number = obj.lineno
+
+    for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
+        if item.lineno >= object_line_number:
+            break
+
+        if isinstance(item, astroid.Import):
+            for name, alias in item.names:
+                if not alias:
+                    alias = name
+
+                if alias == search_name:
+                    import_path = name
+                    break
+
+        # If it was imported using "from X import Y"
+        if isinstance(item, astroid.ImportFrom):
+            for name, _ in item.names:
+                if name == search_name:
+                    import_path = item.modname + '.' + search_name
+                    break
+
+    if not import_path:
+        import_path = get_local_attribute_path(obj)
+
+    if wrap:
+        if attribute_name:
+            import_path += '.' + attribute_name
+        return make_third_party_label(import_path)
+
+    return import_path
+
+
+def _process_as_thirdparty_func(obj):
+    try:
+        obj = obj.func
+    except AttributeError:
+        pass
+
+    return _process_as_thirdparty_attribute(obj, wrap=True)
+
+
+def _process_as_builtin_func(obj):
+    # These are functions that we know the Python output to
+    try:
+        obj = obj.func
+    except AttributeError:
+        pass
+
+    function_name_to_astroid_type = {
+        'bool': bool,
+        'dict': dict,
+        'float': float,
+        'int': int,
+        'list': list,
+        'set': set,
+        'str': str,
+        'tuple': tuple,
+    }
+
+    try:
+        return function_name_to_astroid_type[obj.name]
+    except (AttributeError, KeyError):
+        return None
+
+
+def _process_as_known_object(obj):
+    # Search literally by string
+    import_path = get_local_attribute_path(obj.func)
+    not_found = object()
+    default_function = auto_docstring.get_default(import_path, default=not_found)
+
+    if default_function != not_found:
+        return default_function(obj)
+
+    # Search by-module and object
+    _split = import_path.split('.')
+    module_path = '.'.join(_split[:-1])
+    obj_name = _split[-1]
+
+    if not module_path:
+        return
+
+    try:
+        module = __import__(module_path, fromlist=[obj_name])
+    except ImportError:
+        return
+
+    real_obj = getattr(module, obj_name)
+    default_function = auto_docstring.get_default(real_obj, not_found)
+
+    if default_function != not_found:
+        return default_function(obj)
+
+
 def get_type(obj):
     return obj.__class__
 
@@ -640,30 +683,36 @@ def make_third_party_label(text):
     return '<{text}>'.format(text=text)
 
 
-def _get_parents(node):
-    '''Find every parent of the given AST node.
+def get_local_attribute_path(obj):
+    if hasattr(obj, 'name'):
+        return obj.name
 
-    This function is useful for Name Nodes, that have a scoped namespace
+    base = obj.expr
+    bases = [obj.attrname]
 
-    Example:
-        >>> from collections import OrderedDict
-        >>> def foo(bar=OrderedDict):
-        >>>     pass
-        >>>
-        >>> _get_parents(Name.OrderedDict)
-        ... # Result: [Module.collections]
+    while base:
+        if hasattr(base, 'attrname'):
+            bases.append(base.attrname)
 
-    Args:
-        node (<astroid Node>): The node to get the parents of.
+        if hasattr(base, 'name'):
+            bases.append(base.name)
+            break
 
-    Returns:
-        list[<asteroid Node>]: The found parents, if any.
+        base = base.expr
 
-    '''
-    parents = []
-    parent = node.parent
-    while parent is not None:
-        parents.append(parent)
-        parent = parent.parent
+    return '.'.join(reversed(bases))
 
-    return parents
+
+def process_types(obj):
+    builtin_type = _process_as_builtin_func(obj)
+    if builtin_type:
+        return get_type_name(builtin_type)
+
+    known = _process_as_known_object(obj)
+    if known:
+        return known
+
+    if isinstance(obj, astroid.Attribute):
+        return _process_as_thirdparty_attribute(obj, wrap=True)
+    elif isinstance(obj, astroid.Call):
+        return _process_as_thirdparty_func(obj)

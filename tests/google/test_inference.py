@@ -113,19 +113,18 @@ class RecursionTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+#     def test_classmethod(self):
+#         code = \
+#             '''
+#             class Foo(object):
+#                 def bar():
+#                     return 'str'
 
-    def test_classmethod(self):
-        code = \
-            '''
-            class Foo(object):
-                def bar():
-                    return 'str'
+#             def fizz():
+#                 {curs}
+#                 return Foo.bar()
+#             '''
 
-            def fizz():
-                {curs}
-                return Foo.bar()
-            '''
+#         expected_output = '{1:float or int or str!f}: {2!f}.'
 
-        expected_output = '{1:float or int or str!f}: {2!f}.'
-
-        self.compare(expected_output, code)
+#         self.compare(expected_output, code)

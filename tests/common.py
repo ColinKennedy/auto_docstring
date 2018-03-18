@@ -7,8 +7,9 @@
 import textwrap
 import unittest
 
-# IMPORT THIRD-PARTY LIBRARIES
+# IMPORT AUTO-DOCSTING LIBRARIES
 from auto_docstring import docstring_builder_two as docstring_builder
+import auto_docstring
 
 
 def get_position(cursor, lines):
@@ -40,6 +41,9 @@ def get_position(cursor, lines):
 class CommonTestCase(unittest.TestCase):
 
     '''A unittest.TestCase that makes creating and comparing docstrings easy.'''
+
+    def setUp(self):
+        auto_docstring.deregister_all()
 
     def compare(self, expected_output, code):
         '''Format and test the given source `code` and `expected_output`.

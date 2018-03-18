@@ -3,6 +3,9 @@
 
 '''A series of tests for Google-style function docstrings.'''
 
+# IMPORT AUTO-DOCSTING LIBRARIES
+import auto_docstring
+
 # IMPORT LOCAL LIBRARIES
 from .. import common
 
@@ -869,26 +872,6 @@ class StandardTestCase(common.CommonTestCase):
                 {4:<foo.bar.partial>!f}: {5!f}.
 
             '''
-
-        self.compare(expected_output, code)
-
-    def test_unknown_module_function(self):
-        # '''
-
-        # Currently we don't have a way of determining the return-type of these
-        # functions yet.
-
-        # '''
-        code = \
-            '''
-            import textwrap
-
-            def get_default_indent():
-                {curs}
-                return textwrap.dedent('asfasdfaf')
-            '''
-
-        expected_output = '{1:<textwrap.dedent>!f}: {2!f}.'
 
         self.compare(expected_output, code)
 
