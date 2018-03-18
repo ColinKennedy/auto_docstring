@@ -1087,3 +1087,92 @@ class CastTestCase(common.CommonTestCase):
         expected_output = '{1:set!f}: {2!f}.'
 
         self.compare(expected_output, code)
+
+
+class ComprehensionTestCase(common.CommonTestCase):
+    def test_list_comp_001(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return ['str' for _ in range(10)]
+            '''
+
+        expected_output = '{1:list[str]!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_list_comp_002(self):
+        code = \
+            '''
+            def bar(arg):
+                if arg:
+                    return 8
+
+                return 'fizz'
+
+            def foo():
+                {curs}
+                return [bar(True) for _ in range(10)]
+            '''
+
+        expected_output = '{1:list[int or str]!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+    def test_nested_list_comp(self):
+        code = \
+            '''
+            def bar(arg):
+                if arg:
+                    return 8
+
+                return 'fizz'
+
+            def foo():
+                {curs}
+                return [bar(True) for _ in range(10) for _ in range(20)]
+            '''
+
+        expected_output = '{1:list[int or str]!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
+#     def test_generator_comp(self):
+#         code = \
+#             '''
+#             def bar(arg):
+#                 if arg:
+#                     return 8
+
+#                 return 'fizz'
+
+#             def foo():
+#                 {curs}
+#                 return set((bar(True) for _ in range(10) for _ in range(20)))
+#             '''
+
+#         expected_output = '{1:set[int or str]!f}: {2!f}.'
+
+#         self.compare(expected_output, code)
+
+#     def test_generator_comp_with_function(self):
+#         code = \
+#             '''
+#             def bar(arg):
+#                 if arg:
+#                     return 8
+
+#                 return 'fizz'
+
+#             def fizz(item):
+#                 return tuple(item)
+
+#             def foo():
+#                 {curs}
+#                 return fizz((bar(True) for _ in range(10) for _ in range(20)))
+#             '''
+
+#         expected_output = '{1:tuple[int or str]!f}: {2!f}.'
+
+#         self.compare(expected_output, code)

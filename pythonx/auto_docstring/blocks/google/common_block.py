@@ -313,6 +313,10 @@ class ContainerType(Type):
                 self.items.append(MappingContainerType(subitem))
                 continue
 
+            if ComprehensionContainerType.is_valid(subitem):
+                self.items.append(ComprehensionContainerType(subitem))
+                continue
+
             # If the type is obvious (example: a Compare object will be a bool)
             # Then just get the Python type and use it
             #
@@ -466,6 +470,36 @@ class MappingContainerType(Type):
         return make_container_label(container_name, items_text)
 
 
+class ComprehensionContainerType(Type):
+
+    _comprehension_types = {
+        astroid.ListComp: list,
+    }
+
+    def __init__(self, obj):
+        super(ComprehensionContainerType, self).__init__(obj)
+
+    @staticmethod
+    def is_valid(node):
+        return isinstance(node, astroid.ListComp)
+
+    def as_str(self):
+        # Reference:
+        #     The first child is the return item in a list-comprehension
+        #
+        item = list(self.obj.get_children())[0]
+        if SpecialType.is_valid(item):
+            item_types = SpecialType(item).as_str()
+        else:
+            _type = get_type(visit.get_value(item))
+            item_types = get_type_name(_type)
+
+        container_type = self._comprehension_types[type(self.obj)]
+        container_type_name = get_type_name(container_type)
+
+        return make_container_label(container_type_name, item_types)
+
+
 @six.add_metaclass(abc.ABCMeta)
 class CommonBlock(object):
 
@@ -487,6 +521,9 @@ class CommonBlock(object):
     @staticmethod
     def _expand_types(obj, include_type=False):
         obj = visit.get_value(obj)
+
+        if ComprehensionContainerType.is_valid(obj):
+            return ComprehensionContainerType(obj, include_type=include_type)
 
         if MappingContainerType.is_valid(obj):
             return MappingContainerType(obj, include_type=include_type)
