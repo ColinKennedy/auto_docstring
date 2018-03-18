@@ -506,6 +506,30 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
             # raise ValueError(classobj)
             pass
 
+    def get_import_path_from_ast(module, obj):
+        search_name = get_import_name(obj)
+        object_line_number = obj.lineno
+
+        for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
+            if item.lineno >= object_line_number:
+                break
+
+            # If this is "import X"
+            if isinstance(item, astroid.Import):
+                for name, alias in item.names:
+                    if not alias:
+                        alias = name
+
+                    if alias == search_name:
+                        return name
+
+            # If it was imported using "from X import Y"
+            if isinstance(item, astroid.ImportFrom):
+                for name, _ in item.names:
+                    if name == search_name:
+                        return item.modname + '.' + search_name
+        return ''
+
     module = obj.root()
 
     if environment.allow_type_follow():
@@ -525,37 +549,19 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
     #        of the import as a "third-party" name, like <textwrap.dedent>
     #        (and not "str", like it should be)
     #
-    import_path = ''
-    search_name = get_import_name(obj)
     attribute_name = get_attribute_name(obj)
-    object_line_number = obj.lineno
 
-    for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
-        if item.lineno >= object_line_number:
-            break
-
-        if isinstance(item, astroid.Import):
-            for name, alias in item.names:
-                if not alias:
-                    alias = name
-
-                if alias == search_name:
-                    import_path = name
-                    break
-
-        # If it was imported using "from X import Y"
-        if isinstance(item, astroid.ImportFrom):
-            for name, _ in item.names:
-                if name == search_name:
-                    import_path = item.modname + '.' + search_name
-                    break
+    import_path = get_import_path_from_ast(module, obj)
+    if import_path and hasattr(obj, 'attrname'):
+        import_path += '.' + obj.attrname
 
     if not import_path:
+        # If we couldn't gather an import string from the module's imports, then
+        # try to get it from the current file, using the AST info we have
+        #
         import_path = get_local_attribute_path(obj)
 
     if wrap:
-        if attribute_name:
-            import_path += '.' + attribute_name
         return make_third_party_label(import_path)
 
     return import_path
@@ -595,8 +601,17 @@ def _process_as_builtin_func(obj):
 
 
 def _process_as_known_object(obj):
+    # TODO : Possibly make this condition statement better by moving the logic
+    #        outside of _process_as_known_object
+    #
     # Search literally by string
-    import_path = get_local_attribute_path(obj.func)
+    if hasattr(obj, 'func'):
+        path_obj = obj.func
+    else:
+        path_obj = obj
+
+    import_path = get_local_attribute_path(path_obj)
+
     not_found = object()
     default_function = auto_docstring.get_default(import_path, default=not_found)
 
@@ -608,12 +623,15 @@ def _process_as_known_object(obj):
     module_path = '.'.join(_split[:-1])
     obj_name = _split[-1]
 
-    if not module_path:
-        return
-
     try:
         module = __import__(module_path, fromlist=[obj_name])
-    except ImportError:
+    except (ImportError, ValueError):
+        # ImportError: If module_path is not importable
+        # ValueError: If module_path is empty
+        #
+        # If module_path has a value but is not importable, it is likely defined
+        # in __main__ or the current module
+        #
         return
 
     real_obj = getattr(module, obj_name)
