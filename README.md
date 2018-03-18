@@ -1,3 +1,10 @@
+Roadmap
+ - logistical returns
+ - cross-typing (between args and returns, for example)
+ - 
+
+
+
 - raises
  - it should work even if the raised object is actually a variable
  - also, it should be able to grab the message even if the message is a

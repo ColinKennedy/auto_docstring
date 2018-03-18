@@ -114,6 +114,18 @@ def encode(obj):
         return []
 
 
+#### Cross-attribute links
+i.e. when you fill out the argument for "container", it will also fill out the
+return-type with the same information (because we know that the two are LINKED)
+
+def make_container_label(container, items_text):
+    if items_text:
+        return '{container}[{items_text}]'.format(
+            container=container, items_text=items_text)
+
+    return container
+
+
 #### Recursive return-finding
 
 def bar(thing=False):
