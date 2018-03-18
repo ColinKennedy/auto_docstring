@@ -875,6 +875,33 @@ class StandardTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_unknown_type_004(self):
+        code = self._make_code(
+            '''
+            def make_container_label(container, items_text):
+                %s
+                if items_text:
+                    return '{container}[{items_text}]'.format(
+                        container=container, items_text=items_text)
+
+                return container
+            ''')
+
+        expected_output = \
+            '''\
+            {1!f}.
+
+            Args:
+                container ({2!f}): {3!f}.
+                items_text ({4!f}): {5!f}.
+
+            Returns:
+                {6:<str.format> or container!f}: {7!f}.
+
+            '''
+
+        self.compare(expected_output, code)
+
     # TODO : Make this return list[str]
     def test_known_global_variable(self):
         code = \

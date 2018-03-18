@@ -39,7 +39,6 @@ def get_assign_names(node):
 
 
 def find_node_type(node, name):
-    '''The main execution of the current script.'''
     visitor = AssignmentVisitor()
     visitor.visit(node)
 
@@ -51,3 +50,6 @@ def find_node_type(node, name):
     # TODO : Pay attention to the docstring on this one. It's kind of special
     for assign in reversed(matches):
         return get_ast_type(assign.value)
+
+    raise RuntimeError('Node/Name: "{node}/{name}" was not found.'.format(
+        node=node, name=name))

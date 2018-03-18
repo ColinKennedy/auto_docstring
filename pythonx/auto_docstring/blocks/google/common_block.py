@@ -82,10 +82,15 @@ class SpecialType(Type):
             #
             return self.obj.name
 
-
         if inferred_object == astroid.Uninferable:
             # We could not find a type so search for it (this is a blind search)
-            return self.search(self.obj)
+            try:
+                return self.search(self.obj)
+            except ValueError:
+                try:
+                    return self.obj.name
+                except AttributeError:
+                    return
 
         try:
             # If this was a Named node like foo = [], try to get a type that way
@@ -151,7 +156,10 @@ class SpecialType(Type):
     @staticmethod
     def search(obj):
         outer_scope = obj.scope()
-        found_type = assign_search.find_node_type(outer_scope, name=obj.name)
+        try:
+            found_type = assign_search.find_node_type(outer_scope, name=obj.name)
+        except RuntimeError:
+            raise ValueError('Obj: "{obj}" was not assigned.'.format(obj=obj))
         return get_type_name(found_type)
 
 
