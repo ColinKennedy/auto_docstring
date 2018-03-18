@@ -1,0 +1,6 @@
+graft pythonx
+graft docs
+
+include CHANGELOG.rst
+
+include tox.ini .travis.yml appveyor.yml
