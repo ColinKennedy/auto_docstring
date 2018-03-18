@@ -9,8 +9,8 @@ import pyparsing
 import six
 
 # IMPORT LOCAL LIBRARIES
-from . import common
 from .core import check
+from .config import common
 
 
 class RecursiveParser(object):

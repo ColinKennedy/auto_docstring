@@ -7,11 +7,11 @@
 import astroid
 
 # IMPORT LOCAL LIBRARIES
-from . import visit
-from . import common
-from . import numberify
-from . import environment
+from .config import common
+from .parsing import visit
 from . import ultisnips_build
+from .parsing import numberify
+from .config import environment
 
 
 def create_docstring(code, row, style=''):

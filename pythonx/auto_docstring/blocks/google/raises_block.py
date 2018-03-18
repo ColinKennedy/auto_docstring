@@ -8,11 +8,11 @@ import os
 import astroid
 
 # IMPORT LOCAL LIBRARIES
-from ... import visit
-from ... import common
 from . import common_block
-from ... import environment
+from ...config import common
+from ...parsing import visit
 from ... import ultisnips_build
+from ...config import environment
 
 
 class Raises(common_block.CommonBlock):
