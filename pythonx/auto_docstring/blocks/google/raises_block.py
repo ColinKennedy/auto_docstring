@@ -10,11 +10,12 @@ import astroid
 # IMPORT LOCAL LIBRARIES
 from ... import visit
 from ... import common
+from . import common_block
 from ... import environment
 from ... import ultisnips_build
 
 
-class Raises(object):
+class Raises(common_block.CommonBlock):
 
     label = 'Raises'
     name = 'raises'
