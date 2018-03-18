@@ -2,14 +2,16 @@
 # -*- coding: utf-8 -*-
 
 # IMPORT STANDARD LIBRARIES
-import functools
-
-# IMPORT THIRD-PARTY LIBRARIES
-import six
+import imp
+import os
 
 # IMPORT LOCAL LIBRARIES
 from . import environment
 from .styles import google
+from .defaults import registry
+from .defaults.registry import register
+from .defaults.registry import get_default
+from .defaults.registry import deregister_all
 
 
 environment.register_code_style(
@@ -17,35 +19,22 @@ environment.register_code_style(
     obj=google.GoogleStyle,
 )
 
-_KNOWN_TYPES = dict()
+# TODO : Split this out into another repo so that the core can be separate from
+#        the preset functions/return objects
+#
+__CURRENT_DIR = os.path.dirname(os.path.realpath(__file__))
+__PRESETS_DIR = os.path.join(__CURRENT_DIR, 'defaults', 'presets')
+for item in os.listdir(__PRESETS_DIR):
+    if item == '__init__.py' or item.endswith(('.pyc', '.pyd')):
+        continue
+
+    name = os.path.splitext(item)[0]
+    full_path = os.path.join(__PRESETS_DIR, item)
+    imp.load_source(name, full_path)
 
 
-def get_default(obj, default=None):
-    def return_obj(obj, *args, **kwargs):
-        return obj
-
-    try:
-        value = _KNOWN_TYPES[obj]
-    except KeyError:
-        return default
-
-    if isinstance(value, six.string_types):
-        return functools.partial(return_obj, value)
-
-    return value
-
-
-def deregister_all():
-    _KNOWN_TYPES.clear()
-
-
-def register(obj, returns):
-    _KNOWN_TYPES[obj] = returns
-
-
-def register_function(obj, returns):
-    _KNOWN_TYPES[obj] = returns
-
-
-# register('str.format', returns='str')
-# register('textwrap.dedent', returns='str')
+__all__ = [
+    'register',
+    'get_default',
+    'deregister_all',
+]
