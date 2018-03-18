@@ -1,8 +1,9 @@
 Roadmap
  - logistical returns
  - cross-typing (between args and returns, for example)
- - 
-
+ - generators
+ - list/dict comprehensions
+ - attribute options
 
 
 - raises
