@@ -5,7 +5,7 @@
 import textwrap
 
 # IMPORT THIRD-PARTY LIBRARIES
-from auto_docstring import docstring_builder_two as docstring_builder
+from auto_docstring import docstring_builder
 
 # IMPORT LOCAL LIBRARIES
 from .. import common

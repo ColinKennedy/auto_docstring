@@ -16,11 +16,11 @@ import six
 import auto_docstring
 
 # IMPORT LOCAL LIBRARIES
-from ... import visit
 from ...core import check
-from ... import environment
 from ...core import grouping
-from ... import assign_search
+from ...parsing import visit
+from ...config import environment
+from ...parsing import assign_search
 
 
 class Type(object):

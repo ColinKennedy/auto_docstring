@@ -8,7 +8,7 @@ import textwrap
 import unittest
 
 # IMPORT AUTO-DOCSTING LIBRARIES
-from auto_docstring import docstring_builder_two as docstring_builder
+from auto_docstring import docstring_builder
 import auto_docstring
 
 

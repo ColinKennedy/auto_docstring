@@ -6,9 +6,9 @@ import imp
 import os
 
 # IMPORT LOCAL LIBRARIES
-from . import environment
 from .styles import google
 from .defaults import registry
+from .config import environment
 from .defaults.registry import register
 from .defaults.registry import get_default
 from .defaults.registry import deregister_all

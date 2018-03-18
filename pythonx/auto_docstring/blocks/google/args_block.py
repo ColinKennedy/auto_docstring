@@ -3,10 +3,10 @@
 
 
 # IMPORT LOCAL LIBRARIES
-from ... import visit
-from ... import common
 from . import common_block
-from ... import environment
+from ...config import common
+from ...parsing import visit
+from ...config import environment
 
 
 class Args(common_block.CommonBlock):
