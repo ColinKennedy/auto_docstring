@@ -45,11 +45,8 @@ class Args(common_block.CommonBlock):
             lines.append(line)
 
         for arg, value in defaults:
-            if common_block.SpecialType.is_valid(value):
-                value = common_block.SpecialType(value).as_str(info)
-            else:
-                obj_types = cls._expand_types(value, include_type=True)
-                value = cls._change_type_to_str(obj_types)
+            obj_types = cls._expand_types(value, include_type=True)
+            value = cls._change_type_to_str(obj_types)
 
             line = cls._make_line(arg=arg, value=value)
             lines.append(line)

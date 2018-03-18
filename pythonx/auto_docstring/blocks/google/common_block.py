@@ -387,6 +387,9 @@ class CommonBlock(object):
 
     @staticmethod
     def _expand_types(obj, include_type=False):
+        if SpecialType.is_valid(obj):
+            return SpecialType(obj)
+
         obj = visit.get_value(obj)
 
         if ComprehensionContainerType.is_valid(obj):
