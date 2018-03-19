@@ -55,6 +55,13 @@ class GoogleStyle(BaseStyle):
 
     @classmethod
     def draw(cls, info):
+        # '''Create a list of docstring lines to create, given some `info`.
+
+        # Args:
+
+        # Returns:
+        #     list[str]:
+        # '''
         spacing = cls._get_spacing()
         lines = []
 
@@ -75,13 +82,14 @@ class GoogleStyle(BaseStyle):
 
             lines.extend(block_lines)
 
-        cls._add_header(lines)
-        cls._add_footer(lines)
+        lines = cls._get_header(lines) + lines
+        lines += cls._get_footer(lines)
 
         return lines
 
     @staticmethod
     def get_default_block_order():
+        '''tuple[str]: The default order of blocks for Google-style.'''
         return (
             'args',
             'raises',
@@ -91,27 +99,51 @@ class GoogleStyle(BaseStyle):
 
     @staticmethod
     def _is_multiline(lines):
+        '''bool: If the given lines needs extra spacing.'''
         return len(lines) > 1
 
+    # TODO : Move this to "environment.py"
     @staticmethod
     def _get_spacing():
+        '''int: Get the number of newlines to separate each docstring block.'''
         try:
             return int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
         except TypeError:
             return 1
 
     @classmethod
-    def _add_header(cls, lines):
+    def _get_header(cls, lines):
+        '''Recommend the lines to describe the top of the given lines.
+
+        Args:
+            lines (list[str]):
+                If this arg is not empty, newlines will be added to the bottom
+                of the docsrting.
+
+        Returns:
+            list[str]: The header for the docstring.
+
+        '''
         if cls._is_multiline(lines):
-            lines.insert(0, '{!f}.\n')
-        elif not lines:
-            lines.insert(0, '{!f}.')
+            return ['{!f}.\n']
+
+        if not lines:
+            return ['{!f}.']
+        return []
 
     @classmethod
-    def _add_footer(cls, lines):
-        if cls._is_multiline(lines):
-            # Add extra newlines, as the footer
-            lines.append('')
-            lines.append('')
+    def _get_footer(cls, lines):
+        '''Create a list of lines to describe the bottom of this docstring.
 
-        return lines
+        Args:
+            lines (list[str]):
+                If this arg is not empty, newlines will be added to the bottom
+                of the docsrting.
+
+        Returns:
+            list[str]: The footer of this docstring.
+
+        '''
+        if cls._is_multiline(lines):
+            return ['', '']
+        return []

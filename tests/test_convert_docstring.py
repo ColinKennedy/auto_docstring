@@ -17,6 +17,9 @@ from auto_docstring import docstring_builder
 
 
 class UnnumberedToNumberedTestCase(unittest.TestCase):
+
+    '''Convert un-numbered strings into "auto_docstring-recognizable" strings.'''
+
     def compare(self, docstring, expected_output):
         '''Convert `docstring` and then test if it matches `expected_output`.'''
         formatter = ultisnips_build.RecursiveNumberifyParser()
@@ -134,7 +137,6 @@ class NumberedToUltiSnipsTestCase(unittest.TestCase):
 
             '''
         self.compare(docstring, expected_output)
-
 
     def test_multi_args(self):
         '''Convert a docstring with more than one arg.'''

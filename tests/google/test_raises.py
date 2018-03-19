@@ -212,7 +212,7 @@ class NameTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_variable_unformatted_message(self):
+    def test_unformatted_variable(self):
         '''Test an unformatted string and that {}s is added to it.'''
         code = self._make_code(
             '''
@@ -298,7 +298,7 @@ class CallTestCase(common.CommonTestCase):
                     code.insert(row, docstring)
                 else:
                     options = ('replace', 'insert')
-                    raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
+                    raise ValueError('Mode: "{mode}" is unsupported. Options, "{options}".'
                                      ''.format(mode=mode, options=options))
 
                 return code
@@ -316,7 +316,7 @@ class CallTestCase(common.CommonTestCase):
 
             Raises:
                 NotImplementedError: {10:Need to write this!f}.
-                ValueError: {13:Mode: "{11:mode!f}" is unsupported. Options were, "{12:options!f}"!f}.
+                ValueError: {13:Mode: "{11:mode!f}" is unsupported. Options, "{12:options!f}"!f}.
 
             Returns:
                 {14:list!f}: {15!f}.
