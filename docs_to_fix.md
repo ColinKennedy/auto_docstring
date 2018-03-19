@@ -1,3 +1,30 @@
+####
+
+    def visit_return(self, node):
+        def is_yield_return(node):
+            sibling = node.next_sibling()
+            node_column_offset = node.col_offset
+
+            while sibling is not None:
+                is_in_same_statement = node_column_offset == sibling.col_offset
+                if isinstance(sibling.value, astroid.Yield) and is_in_same_statement:
+                    return True
+
+                if not is_in_same_statement:
+                    return False
+
+                sibling = sibling.next_sibling()
+
+            return False
+
+        if is_yield_return(node):
+            return
+
+        function = node.scope()
+        self.functions[function].setdefault('returns', [])
+        self.functions[function]['returns'].append(node.value)
+
+
 
 #### 
 def split_into_parts(obj, split, as_type=tuple):

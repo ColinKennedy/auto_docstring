@@ -1,10 +1,17 @@
 Roadmap
- - logistical returns
  - cross-typing (between args and returns, for example)
- - generators
  - list/dict comprehensions
+ - generators
+ - logistical returns
  - attribute options
 
+Config info
+ - allow the user to start docstrings on the next line + indentation, not the current line
+ - support other documentation types (sphinx, numpy, scipy, epytext)
+
+- make sure that this works even with relative imports!
+
+- Remove "self._make_code" from unittests, since it's gross.
 
 - raises
  - it should work even if the raised object is actually a variable
