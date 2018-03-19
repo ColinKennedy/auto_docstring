@@ -1,6 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''A series of tests for "registered" objects.
+
+auto_docstring type inspection is fairly good a picking up object types but,
+when it fails, sometimes it is good to just directly specify the return type.
+
+'''
+
 # IMPORT STANDARD LIBRARIES
 import os
 
@@ -13,7 +20,11 @@ from .. import common
 
 
 class BasicTestCase(common.CommonTestCase):
+
+    '''Test simple registered functions, methods, and other objects.'''
+
     def test_unknown_module_function(self):
+        '''Return the name of a function whose return types are uninferable.'''
         code = \
             '''
             import textwrap
@@ -29,6 +40,7 @@ class BasicTestCase(common.CommonTestCase):
 
     # TODO : Finish this one
     def test_registered_method(self):
+        '''Register an explicit method's return type(s).'''
         code = \
             '''
             def get_default_indent():
@@ -43,6 +55,7 @@ class BasicTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_registered_module_function(self):
+        '''Register an explicit function's return type(s).'''
         import textwrap
 
         code = \
@@ -62,7 +75,11 @@ class BasicTestCase(common.CommonTestCase):
 
 
 class ParseTestCase(common.CommonTestCase):
+
+    '''A series of unittests for registered objects with dynamic return types.'''
+
     def test_getenv_001(self):
+        '''Parse the return types of a function.'''
         def get_getenv_return_types(obj):
             from auto_docstring.blocks.google import common_block
             all_types = []

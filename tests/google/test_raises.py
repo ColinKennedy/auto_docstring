@@ -1,12 +1,23 @@
 #!/usr/bin/env python
-#
+# -*- coding: utf-8 -*-
+
+'''A collection of unittests for the "Raises" docstring block.'''
 
 # IMPORT LOCAL LIBRARIES
 from .. import common
 
 
 class GenericTestCase(common.CommonTestCase):
+
+    '''Test a number of very simple exception cases.'''
+
     def test_002(self):
+        '''Make sure that the contents of a raised exception does not error.
+
+        There was originally an issue where any string ending in "}" would break
+        the parser whenever it became time to convert it into numbered strings.
+
+        '''
         # Test that a message that starts with {, another that ends in }, and
         # one more that does both
         #
@@ -53,6 +64,7 @@ class GenericTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_no_message(self):
+        '''Raise an exception but do not call it.'''
         code = \
             '''
             def foo():
@@ -72,6 +84,7 @@ class GenericTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_blank_message(self):
+        '''Raise an exception and call it, with no message.'''
         code = \
             '''
             def foo():
@@ -91,6 +104,7 @@ class GenericTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_raises(self):
+        '''Raise an exception that contains some message.'''
         code = \
             '''
             def foo(bar):
@@ -117,6 +131,7 @@ class GenericTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_empty(self):
+        '''Implicitly raise an exception.'''
         code = \
             '''
             def foo():
@@ -132,12 +147,12 @@ class GenericTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_percent(self):
-        '''Convert %d/%s/%etc to inner tabstops.'''
+        '''Convert %d/%s/%r to inner tabstops.'''
         code = \
             '''
             def foo():
                 {curs}
-                raise ValueError('Something "%s" here')
+                raise ValueError('Something "%s" "%d" "%r" "%f" here')
             '''
 
         expected_output = \
@@ -145,9 +160,9 @@ class GenericTestCase(common.CommonTestCase):
             {1!f}.
 
             Raises:
-                ValueError: {3:Something "{2:!f}" here!f}.
+                ValueError: {6:Something "{2:!f}" "{3:!f}" "{4:!f}" "{5:!f}" here!f}.
 
-             '''
+            '''
 
         self.compare(expected_output, code)
 
@@ -173,7 +188,11 @@ class GenericTestCase(common.CommonTestCase):
 
 
 class NameTestCase(common.CommonTestCase):
+
+    '''Test different scenarios for Name objects.'''
+
     def test_variable_message(self):
+        '''Test a message that is assigned as a variable.'''
         code = \
             '''
             def foo():
@@ -194,6 +213,7 @@ class NameTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_variable_unformatted_message(self):
+        '''Test an unformatted string and that {}s is added to it.'''
         code = self._make_code(
             '''
             def foo():
@@ -236,7 +256,11 @@ class NameTestCase(common.CommonTestCase):
 
 
 class CallTestCase(common.CommonTestCase):
+
+    '''Test different exceptions that use callable objects.'''
+
     def test_001(self):
+        '''Test str.format and make sure it returns strings correctly.'''
         code = self._make_code(
             '''
             def add_docstring():
@@ -259,6 +283,7 @@ class CallTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_002(self):
+        '''Test str.format and make sure it returns strings correctly.'''
         code = self._make_code(
             '''
             def add_docstring(code, row, style='', mode='replace'):
