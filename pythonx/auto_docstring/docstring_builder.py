@@ -42,7 +42,7 @@ def create_docstring(code, row, style=''):
     docstring_info = full_info[group][node_that_needs_a_docstring]
 
     # draw the docstring!
-    style_object = common.create_code_style(style, full_info)
+    style_object = common.create_code_style(style)
     initial_docstring = '\n'.join(style_object.draw(docstring_info))
 
     # Now the most important part, we need to convert the docstring that was

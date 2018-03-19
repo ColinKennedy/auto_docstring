@@ -39,7 +39,7 @@ class NumberifyWordFormatter(string.Formatter):
 
     '''
 
-    _field_name_compile = re.compile('(?:(?P<number>\d+)\|)?(?P<name>[^\|]+)?')
+    _field_name_compile = re.compile(r'(?:(?P<number>\d+)\|)?(?P<name>[^\|]+)?')
 
     def __init__(self):
         '''Create empty containers for used names and numbers.'''
@@ -47,15 +47,12 @@ class NumberifyWordFormatter(string.Formatter):
         self._used_names = dict()
         self._used_numbers = set()
 
-    def format(self, *args, **kwargs):
+    def format(self, format_string, *args, **kwargs):
         '''Clear the last used-numbers and used-names and format the text.'''
         self._used_numbers = self._used_numbers.__class__()
         self._used_names = self._used_names.__class__()
 
-        return super(NumberifyWordFormatter, self).format(*args, **kwargs)
-
-    def format_field(self, obj, format_spec):
-        return super(NumberifyWordFormatter, self).format_field(obj, format_spec)
+        return super(NumberifyWordFormatter, self).format(format_string, *args, **kwargs)
 
     def get_field(self, field_name, args, kwargs):
         '''Create a numbered text from the given field.
@@ -121,10 +118,10 @@ class NumberifyWordFormatter(string.Formatter):
             tuple[object, str]: The full, found object.
 
         '''
-        first, rest = field_name._formatter_field_name_split()
+        first, _ = field_name._formatter_field_name_split()  # pylint: disable=protected-access
 
         try:
-            obj = self.get_value(first, args, kwargs)
+            self.get_value(first, args, kwargs)
         except KeyError:
             # If field_name is a nested string, like "list[str]", then just
             # pass it through without processing it

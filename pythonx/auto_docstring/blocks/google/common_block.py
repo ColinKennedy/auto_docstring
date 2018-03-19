@@ -3,13 +3,13 @@
 
 # IMPORT STANDARD LIBRARIES
 import abc
-import astroid
 import inspect
 import importlib
 import collections
 import __builtin__
 
 # IMPORT THIRD-PARTY LIBRARIES
+import astroid
 import six
 
 # IMPORT AUTO-DOCSTING LIBRARIES

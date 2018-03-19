@@ -9,6 +9,7 @@ when it fails, sometimes it is good to just directly specify the return type.
 '''
 
 # IMPORT STANDARD LIBRARIES
+import textwrap
 import os
 
 # IMPORT AUTO-DOCSTRING LIBRARIES
@@ -56,8 +57,6 @@ class BasicTestCase(common.CommonTestCase):
 
     def test_registered_module_function(self):
         '''Register an explicit function's return type(s).'''
-        import textwrap
-
         code = \
             '''
             import textwrap
@@ -78,16 +77,16 @@ class ParseTestCase(common.CommonTestCase):
 
     '''A series of unittests for registered objects with dynamic return types.'''
 
+    @staticmethod
+    def _get_getenv_return_types(obj):
+        all_types = []
+        for arg in obj.args:
+            all_types.append(common_block.process_types(arg))
+        return common_block.make_items_text(all_types)
+
     def test_getenv_001(self):
         '''Parse the return types of a function.'''
-        def get_getenv_return_types(obj):
-            from auto_docstring.blocks.google import common_block
-            all_types = []
-            for arg in obj.args:
-                all_types.append(common_block.process_types(arg))
-            return common_block.make_items_text(all_types)
-
-        auto_docstring.register(obj=os.getenv, returns=get_getenv_return_types)
+        auto_docstring.register(obj=os.getenv, returns=self._get_getenv_return_types)
 
         code = \
             '''
@@ -103,14 +102,8 @@ class ParseTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_getenv_002(self):
-        def get_getenv_return_types(obj):
-            from auto_docstring.blocks.google import common_block
-            all_types = []
-            for arg in obj.args:
-                all_types.append(common_block.process_types(arg))
-            return common_block.make_items_text(all_types)
-
-        auto_docstring.register(obj=os.getenv, returns=get_getenv_return_types)
+        '''Parse a function and get the return objects from another function.'''
+        auto_docstring.register(obj=os.getenv, returns=self._get_getenv_return_types)
 
         code = \
             '''
@@ -126,8 +119,33 @@ class ParseTestCase(common.CommonTestCase):
                 return os.getenv('something', bar())
             '''
 
-        auto_docstring.register(obj=os.getenv, returns=get_getenv_return_types)
-
         expected_output = '{1:str or float or bool!f}: {2!f}.'
 
         self.compare(expected_output, code)
+
+    # TODO : Fix this
+    # def test_multi_type(self):
+    #     auto_docstring.register(obj=os.getenv, returns=self._get_getenv_return_types)
+
+    #     code = \
+    #         '''
+    #         def fizz():
+    #             return collections.OrderedDict()
+
+
+    #         def thing(arg):
+    #             if arg:
+    #                 return 10.8
+    #             return fizz()
+
+    #         def bar():
+    #             {curs}
+    #             if condition:
+    #                 return os.getenv('asdfasdf', 10.8)
+    #             return thing()
+
+    #         '''
+
+    #     expected_output = '{1:str or float or <collections.OrderedDict>!f}: {2!f}.'
+
+    #     self.compare(expected_output, code)

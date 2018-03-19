@@ -8,7 +8,6 @@ The source-code is parsed to find information needed to build docstrings.
 '''
 
 # IMPORT STANDARD LIBRARIES
-import importlib
 import collections
 
 # IMPORT THIRD-PARTY LIBRARIES
@@ -64,6 +63,7 @@ class Visitor(object):
                 self.visit(child)
 
     def visit_raise(self, node):
+        '''Add raise statements to this instance's function information.'''
         function = node.scope()
         self.functions[function].setdefault('raises', [])
         self.functions[function]['raises'].append(node)
@@ -76,6 +76,17 @@ class Visitor(object):
 
         '''
         def is_yield_return(node):
+            '''If `node` is a return/yield statement.
+
+            Args:
+                node (:class:`astroid.Return`): The node to check.
+
+            Example:
+                >>> def foo():
+                ...     return
+                ...     yield
+
+            '''
             sibling = node.next_sibling()
             node_column_offset = node.col_offset
 
@@ -106,6 +117,17 @@ class Visitor(object):
 
         '''
         def is_blank_yield(node):
+            '''If `node` is a return/yield statement.
+
+            Args:
+                node (:class:`astroid.Yield`): The node to check.
+
+            Example:
+                >>> def foo():
+                ...     return
+                ...     yield
+
+            '''
             sibling = node.previous_sibling()
             node_column_offset = node.col_offset
 
@@ -262,6 +284,7 @@ def get_closest_docstring_node(row, info):
 
 
 def get_container_types():
+    '''dict[type, type]: Convert an iterable type with a Python iterable type.'''
     return \
         {
             list: list,
@@ -272,12 +295,24 @@ def get_container_types():
 
 
 def get_container(node):
+    '''Create an iterable object from the given `node`.'''
     iterable_types = get_container_types()
     # Build an instance of the container for the given node
     return iterable_types[type(node)]()
 
 
 def get_value_binop(node):
+    '''Get the value of a binary operator.
+
+    Binary operators take on a few forms in Python but the most common is for
+    old-style strings, like "%s" % ('foo', ). That would be an example of
+    a binary operator using a str and tuple.
+
+    Returns:
+        The found value or NoneType.
+
+    '''
+    # TODO : Remove this if-condition
     if not isinstance(node, astroid.BinOp):
         return
 
@@ -288,6 +323,18 @@ def get_value_binop(node):
 
 
 def get_type(node):
+    '''Convert the given statement `node` to a Python type.
+
+    For example, :class:`astroid.Compare` will always be bool, and
+    :class:`astroid.Dict` will always be dict.
+
+    Raises:
+        ValueError: If the given node has no valid type.
+
+    Returns:
+        The found type.
+
+    '''
     all_types = {
         astroid.Compare: bool,
         astroid.BoolOp: bool,
@@ -337,6 +384,15 @@ def get_value(node):
 
 
 def iterate(obj):
+    '''Iterate over the given object's items.
+
+    Args:
+        obj (iter or <astroid.NodeNG>): The object to iterate.
+
+    Returns:
+        iter or generator: The iterable object.
+
+    '''
     try:
         return obj.get_children()
     except AttributeError:
@@ -348,8 +404,8 @@ def recursive_default_dict():
     return collections.defaultdict(recursive_default_dict)
 
 
-def default_to_regular(d):
+def default_to_regular(obj):
     '''Convert a nested defaultdict into a regular dict.'''
-    if isinstance(d, collections.defaultdict):
-        d = {k: default_to_regular(v) for k, v in six.iteritems(d)}
-    return d
+    if isinstance(obj, collections.defaultdict):
+        obj = {key: default_to_regular(value) for key, value in six.iteritems(obj)}
+    return obj
