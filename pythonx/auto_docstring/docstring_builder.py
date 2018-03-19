@@ -10,7 +10,6 @@ import astroid
 from .config import common
 from .parsing import visit
 from . import ultisnips_build
-from .parsing import numberify
 from .config import environment
 
 

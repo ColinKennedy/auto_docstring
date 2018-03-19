@@ -1,6 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''A set of unittests for docstrings that raised exceptions.
+
+These tests are presented in no particular order.
+
+'''
+
 # IMPORT STANDARD LIBRARIES
 import textwrap
 
@@ -13,6 +19,13 @@ from .. import common
 
 class AdvancedTestCase(common.CommonTestCase):
     def compare(self, expected_output, code):
+        '''Create `code` docstring and test it against `expected_output`.
+
+        Args:
+            expected_output (str): The docstring that should be built.
+            code (str): The code that is used to create a docstring.
+
+        '''
         code = textwrap.dedent(code)
         row, _ = common.get_position('{curs}', code.split('\n'))
         code = code.format(curs='')
@@ -28,6 +41,7 @@ class AdvancedTestCase(common.CommonTestCase):
         self.assertEqual(expected_output, generated_docstring)
 
     def test_function_0001(self):
+        '''Create a correct docstring for a function with a nested function.'''
         code = \
             """
             def get_max_index(combo, idfun=None):
@@ -66,7 +80,8 @@ class AdvancedTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_list_comp(self):
+    def test_list_assignment(self):
+        '''Create a docstring for a variable-list.'''
         code = \
             '''\
             import re
@@ -106,6 +121,7 @@ class AdvancedTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_nested_function_parent_001(self):
+        '''Create a docstring for the outter function of a wrapper function.'''
         code = \
             """\
             def delete_ui_if_exists(*uis):
@@ -145,6 +161,7 @@ class AdvancedTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_nested_function_parent_002(self):
+        '''Create a docstring for the outter function of a wrapper function.'''
         code = \
             """
             import os
@@ -199,6 +216,7 @@ class AdvancedTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_nested_function(self):
+        '''Create a docstring for the inner function of a wrapper function.'''
         code = \
             """
             import os
@@ -252,6 +270,7 @@ class AdvancedTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_complex_type_0001(self):
+        '''Check that a known default arg still returns the correct type.'''
         code = \
             '''\
             def get_clean_comma_sep_text(text, sep=', '):
@@ -300,6 +319,12 @@ class AdvancedTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_002(self):
+        '''Make sure that the contents of a raised exception does not error.
+
+        There was originally an issue where any string ending in "}" would break
+        the parser whenever it became time to convert it into numbered strings.
+
+        '''
         # Test that a message that starts with {, another that ends in }, and
         # one more that does both
         #

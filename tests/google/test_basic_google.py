@@ -291,6 +291,7 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_kwarg(self):
+        '''Create a docstring using a function that contains `**kwargs`.'''
         code = \
             '''
             def foo(*fizz, **bar):
@@ -311,6 +312,7 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_none(self):
+        '''Omit the 'Returns' block if nothing is specified to return.'''
         code = \
             '''
             def foo(bar=None):
@@ -579,6 +581,12 @@ class ReturnYieldTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_yield_with_return(self):
+        '''Check that return/yield works correctly.
+
+        Basically, if "return" is before "yield", then the function is still a
+        generator because "return" is just exitting the generator early.
+
+        '''
         code = \
             '''
             def generator(value):
@@ -751,6 +759,7 @@ class StandardTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_double_line(self):
+        '''Check that "," assignment works correctly.'''
         code = \
             '''
             def foo():
@@ -764,6 +773,7 @@ class StandardTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_callable_type(self):
+        '''Make sure built-in, callable functions return the correct type.'''
         code = \
             '''
             def get_info():
@@ -800,7 +810,8 @@ class StandardTestCase(common.CommonTestCase):
             '''
         self.compare(expected_output, code)
 
-    def test_unknown_type_001(self):
+    def test_imported_function_001(self):
+        '''Create a docstring for an imported function.'''
         code = \
             '''
             from functools import partial
@@ -825,7 +836,8 @@ class StandardTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_unknown_type_002(self):
+    def test_imported_function_002(self):
+        '''Create a docstring for an imported module with an alias.'''
         code = \
             '''
             import functools as func
@@ -852,6 +864,7 @@ class StandardTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_unknown_type_003(self):
+        '''Create a docstring for some unknown object, which is not defined.'''
         code = \
             '''
             def wraps(wrapped):
@@ -876,6 +889,7 @@ class StandardTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_unknown_type_004(self):
+        '''Create a docstring for some unknown object, which is not defined.'''
         code = self._make_code(
             '''
             def make_container_label(container, items_text):
@@ -904,6 +918,7 @@ class StandardTestCase(common.CommonTestCase):
 
     # TODO : Make this return list[str]
     def test_known_global_variable(self):
+        '''Get a global variables type and use it in a docstring.'''
         code = \
             '''
             _STYLES = ['asdfsdf']
@@ -932,7 +947,11 @@ class StandardTestCase(common.CommonTestCase):
 
 
 class DictTestCase(common.CommonTestCase):
+
+    '''Test docstrings that have to print a dictionary's keys/values.'''
+
     def test_basic(self):
+        '''Create a basic dict docstring.'''
         code = self._make_code(
             '''
             def foo(bar):
@@ -954,6 +973,7 @@ class DictTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_basic_multi_type(self):
+        '''Create a dict docstring that has multiple value types.'''
         code = self._make_code(
             '''
             def foo(bar):
@@ -975,6 +995,7 @@ class DictTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_layered_type(self):
+        '''Create a dict docstring with many nested container-types.'''
         code = self._make_code(
             '''
             def foo(bar):
@@ -997,7 +1018,11 @@ class DictTestCase(common.CommonTestCase):
 
 
 class TypesTestCase(common.CommonTestCase):
+
+    '''Test different built-in ast node types.'''
+
     def test_compare(self):
+        '''Test that Compare objects return bool.'''
         code = \
             """
             def is_valid():
@@ -1010,6 +1035,7 @@ class TypesTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_boolop_001(self):
+        '''Test that BoolOp objects return bool.'''
         code = \
             '''
             def foo():
@@ -1022,6 +1048,7 @@ class TypesTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_in_statement(self):
+        '''Test that __contain__ returns bool.'''
         code = \
             '''
             def foo():
@@ -1048,7 +1075,11 @@ class TypesTestCase(common.CommonTestCase):
 
 
 class CastTestCase(common.CommonTestCase):
+
+    '''A series of tests for casting objects with built-in type functions.'''
+
     def test_basic(self):
+        '''Test that str() returns str.'''
         code = \
             '''
             def foo():
@@ -1075,6 +1106,7 @@ class CastTestCase(common.CommonTestCase):
     #     self.compare(expected_output, code)
 
     def test_object_with_int(self):
+        '''Test that int() returns int.'''
         code = \
             '''
             def foo():
@@ -1087,6 +1119,7 @@ class CastTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_object_with_set(self):
+        '''Test that set() returns set.'''
         code = \
             '''
             def foo():
@@ -1100,7 +1133,16 @@ class CastTestCase(common.CommonTestCase):
 
 
 class ComprehensionTestCase(common.CommonTestCase):
+
+    '''A series of tests for comprehension-syntax, in Python.
+
+    This includes list comprehensions, generator comprehensions, and
+    dict comprehensions.
+
+    '''
+
     def test_list_comp_001(self):
+        '''Create a list comphrension docstring.'''
         code = \
             '''
             def foo():
@@ -1113,6 +1155,7 @@ class ComprehensionTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_list_comp_002(self):
+        '''Create a list comphrension docstring based on another function.'''
         code = \
             '''
             def bar(arg):
@@ -1131,6 +1174,7 @@ class ComprehensionTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     def test_nested_list_comp(self):
+        '''Create a nested list comphrension docstring.'''
         code = \
             '''
             def bar(arg):

@@ -41,8 +41,9 @@ class Raises(common_block.CommonBlock):
 
             message = environment.drop_trailing_characters(message)
             # TODO : Add '%d' and all the other ones, too
+            # TODO : Clean this up
             # Also, add significance for this block of text. Why is it needed? etc
-            message = message.replace('%s', '{}')
+            message = message.replace('%s', '{}').replace('%d', '{}').replace('%r', '{}').replace('%f', '{}')
             message = parser.add_conversion(message)
 
             # TODO : Write message about importance
