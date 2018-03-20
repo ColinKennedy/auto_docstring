@@ -1,5 +1,6 @@
 Roadmap
  - cross-typing (between args and returns, for example)
+ - Follow module function(s)
  - list/dict comprehensions
  - generators
  - logistical returns
