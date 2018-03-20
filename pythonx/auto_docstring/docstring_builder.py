@@ -9,8 +9,9 @@ import astroid
 # IMPORT LOCAL LIBRARIES
 from .config import common
 from .parsing import visit
-from . import ultisnips_build
+from .parsing import numberify
 from .config import environment
+from .parsing import ultisnips_build
 
 
 def create_docstring(code, row, style=''):
@@ -68,7 +69,7 @@ def create_docstring(code, row, style=''):
     #
     #     '''
     #
-    parser = ultisnips_build.RecursiveNumberifyParser()
+    parser = numberify.RecursiveNumberifyParser()
     return parser.parse(initial_docstring)
 
 

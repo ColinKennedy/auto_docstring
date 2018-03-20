@@ -12,7 +12,8 @@ import textwrap
 import unittest
 
 # IMPORT THIRD-PARTY LIBRARIES
-from auto_docstring import ultisnips_build
+from auto_docstring.parsing import ultisnips_build
+from auto_docstring.parsing import numberify
 from auto_docstring import docstring_builder
 
 
@@ -22,7 +23,7 @@ class UnnumberedToNumberedTestCase(unittest.TestCase):
 
     def compare(self, docstring, expected_output):
         '''Convert `docstring` and then test if it matches `expected_output`.'''
-        formatter = ultisnips_build.RecursiveNumberifyParser()
+        formatter = numberify.RecursiveNumberifyParser()
         converted_docstring = formatter.parse(docstring)
         self.assertEqual(converted_docstring, expected_output)
 

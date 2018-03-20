@@ -11,8 +11,9 @@ import astroid
 from . import common_block
 from ...config import common
 from ...parsing import visit
-from ... import ultisnips_build
+from ...parsing import numberify
 from ...config import environment
+from ...parsing import ultisnips_build
 
 
 class Raises(common_block.CommonBlock):
@@ -31,7 +32,7 @@ class Raises(common_block.CommonBlock):
         starting_line = '{}:'.format(cls.label)
         lines = [starting_line]
 
-        parser = ultisnips_build.RecursiveNumberifyParser()
+        parser = numberify.RecursiveNumberifyParser()
         for raise_object in raise_info:
             type_name = cls._get_exception_name(raise_object)
 
