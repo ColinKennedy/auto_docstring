@@ -13,7 +13,6 @@ from ...config import common
 from ...parsing import visit
 from ...parsing import numberify
 from ...config import environment
-from ...parsing import ultisnips_build
 
 
 class Raises(common_block.CommonBlock):

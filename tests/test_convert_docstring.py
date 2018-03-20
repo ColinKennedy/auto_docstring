@@ -12,7 +12,6 @@ import textwrap
 import unittest
 
 # IMPORT THIRD-PARTY LIBRARIES
-from auto_docstring.parsing import ultisnips_build
 from auto_docstring.parsing import numberify
 from auto_docstring import docstring_builder
 
