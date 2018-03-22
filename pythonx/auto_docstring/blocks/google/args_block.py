@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''The block class and functions needed to print a Google-style "Args:" block.'''
 
 # IMPORT LOCAL LIBRARIES
 from . import common_block
@@ -11,11 +12,26 @@ from ...config import environment
 
 class Args(common_block.CommonBlock):
 
+    '''The "Args:" block main class.'''
+
     label = 'Args'
     name = 'args'
 
     @staticmethod
     def _make_line(arg, value=''):
+        '''Get the docstring representation of the given `arg`.
+
+        Args:
+            arg (str):
+                The name of the arg.
+            value (:obj:`str`, optional):
+                The default value for this arg. If no value is given,
+                an unidentified "!f" marker is added, instead.
+
+        Returns:
+            str: The output line to create.
+
+        '''
         indent = environment.get_default_indent()
         if value:
             return '{indent}{arg} ({{{id_}:{value}!f}}, optional): {{!f}}.'.format(
@@ -29,6 +45,17 @@ class Args(common_block.CommonBlock):
     # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod
     def draw(cls, info):
+        '''Create the docstring lines to represent the given `info`.
+
+        Args:
+            info (dict[str, list or str]):
+                The args, default-args, `*`, and `**` parameters to process.
+                If nothing is given, this method will return an empty list.
+
+        Returns:
+            list[str]: The lines to create.
+
+        '''
         args = info.get('args', [])
         defaults = info.get('defaults', [])
         vararg = info.get('vararg', '')

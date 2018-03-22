@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+'''The class and functions needed to print a Google-style "Raises:" block.'''
+
 # IMPORT STANDARD LIBRARIES
 import os
 
@@ -17,11 +19,23 @@ from ...config import environment
 
 class Raises(common_block.CommonBlock):
 
+    '''The "Raises:" block main class.'''
+
     label = 'Raises'
     name = 'raises'
 
     @classmethod
     def draw(cls, info):
+        '''Create the docstring lines to represent the given `info`.
+
+        Args:
+            info (dict[str, list]):
+                Each of the different "raise" statements and their values.
+
+        Returns:
+            list[str]: The lines to create.
+
+        '''
         raise_info = info.get('raises', [])
         raise_info = cls._filter_unnamed(raise_info)
 
@@ -55,6 +69,19 @@ class Raises(common_block.CommonBlock):
 
     @staticmethod
     def _make_line(raise_type, message=''):
+        '''Get the docstring representation of the given `raise_type`.
+
+        Args:
+            raise_type (str):
+                The name of the Exception object that was raised in the code.
+            message (:obj:`str`, optional):
+                If the Exception was raised with a string message, include it.
+                If not, just add in an empty "!f" marker.
+
+        Returns:
+            str: The output line to create.
+
+        '''
         indent = environment.get_default_indent()
         if message:
             return '{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
@@ -67,8 +94,10 @@ class Raises(common_block.CommonBlock):
             return '{indent}{raise_type}: {{!f}}.'.format(
                 indent=indent, raise_type=raise_type)
 
+    # TODO : Move this to environment.py
     @staticmethod
     def _include_message():
+        '''bool: Whether to add raised messages to their docstrings or not.'''
         try:
             return bool(int(os.getenv('AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE', '1')))
         except TypeError:
@@ -76,6 +105,16 @@ class Raises(common_block.CommonBlock):
 
     @staticmethod
     def _get_exception_name(node):
+        '''Get the name of the given `node`.
+
+        Args:
+            node (`astroid.Call` or `astroid.Name`):
+                The raised object to get the name of.
+
+        Returns:
+            str: The name of the given `node`.
+
+        '''
         try:
             # If the user wrote the exception like `raise ValueError()`
             return node.exc.func.name
@@ -90,6 +129,20 @@ class Raises(common_block.CommonBlock):
 
     @staticmethod
     def _get_message(node):
+        '''Find the message of the given `node`, if any.
+
+        Not all raised exceptions are given messages, for example
+        raise ValueError() and raise ValueError are just as valid as
+        raise ValueError('foo'). But if it does have a message, find it.
+
+        Args:
+            node (`astroid.Call` or `astroid.Name`):
+                The raised object to get the message of.
+
+        Returns:
+            str: The found message, if any.
+
+        '''
         # The first arg of an exception is always the message, unless
         # the exception is some custom object
         #
@@ -113,4 +166,27 @@ class Raises(common_block.CommonBlock):
 
     @classmethod
     def _filter_unnamed(cls, raise_info):
+        '''Remove all bare raise statements.
+
+        Example:
+            # This "raise" will be removed
+            >>> try:
+            ...    None['foo']
+            >>> except TypeError:
+            ...    raise
+
+            # This "raise" will not be removed
+            >>> try:
+            ...    None['foo']
+            >>> except TypeError:
+            ...    raise TypeError
+
+        Args:
+            raise_info (list[`astroid.Call` or `astroid.Name`]):
+                The raised objects that may or may not contain bare exceptions.
+
+        Returns:
+            list[`astroid.Call` or `astroid.Name`]: The raised, named objects.
+
+        '''
         return [info for info in raise_info if cls._get_exception_name(info)]
