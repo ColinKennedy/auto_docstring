@@ -6,7 +6,6 @@
 # IMPORT LOCAL LIBRARIES
 from . import common_block
 from ...config import common
-from ...parsing import visit
 from ...config import environment
 
 
@@ -39,8 +38,8 @@ class Args(common_block.CommonBlock):
                 arg=arg,
                 id_=common.get_unique_number(),
                 value=value)
-        else:
-            return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)
+
+        return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)
 
     # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod

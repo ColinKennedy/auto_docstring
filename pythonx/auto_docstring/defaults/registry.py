@@ -27,7 +27,7 @@ def get_default(obj, default=None):
         callable:
 
     '''
-    def return_obj(obj, *args, **kwargs):
+    def return_obj(obj, *args, **kwargs):  # pylint: disable=unused-argument
         '''Return the given object and ignore all other input.'''
         return obj
 

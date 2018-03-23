@@ -1,6 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# TODO : Just had an idea. Why not change the gross "if X.is_valid(obj): return X(obj)
+#        into a single classmethod? That'd look way better and potentially be
+#        easier to loop over
+#
+'''The classes and functions needed to parse the types of all astroid nodes.
+
+This module does most of the heavy-lifting for args return-types. It can
+parse functions within functions, infer an object's type, and even recursively
+traverse imported modules to get an object's type.
+
+'''
+
 # IMPORT STANDARD LIBRARIES
 import abc
 import inspect
@@ -24,26 +36,44 @@ from ...parsing import assign_search
 
 
 class Type(object):
+
+    '''A generic object that is meant to print a Type of Python object.'''
+
     def __init__(self, obj):
+        '''Store the given object.'''
         super(Type, self).__init__()
         self.obj = obj
 
     def type_contained_in(self, seq):
+        '''If this object's type is inside of the given sequence-type.
+
+        Args:
+            seq (:class:`auto_docstring.blocks.google.common_block.ContainerType`):
+                The sequence to check for this object.
+
+        Returns:
+            bool: If this object is in the given `seq`.
+
+        '''
         return self.get_type() in [item.get_type() for item in seq]
 
     def get_type(self):
+        '''type: Get the class of the stored object on this instance.'''
         return get_type(self.obj)
 
     def __eq__(self, other):
+        '''bool: If an item has the same stored object as this instance.'''
         try:
             return other.obj == self.obj
         except AttributeError:
             return False
 
     def as_str(self):
+        '''str: Get the string representation of the stored object.'''
         return get_type_name(self.obj)
 
     def __repr__(self):
+        '''str: Show the input needed to re-create this class.'''
         return '{cls_}({obj!r})'.format(
             cls_=self.__class__.__name__,
             obj=self.obj,
@@ -51,11 +81,25 @@ class Type(object):
 
 
 class SpecialType(Type):
+
+    '''A Type that contains a node that needs to be "resolved" or "found".
+
+    For example, an `astroid.Call` object may be referring to another function
+    in the same module. We use this class to infer the types that the other
+    function returns and then use that as its return type(s).
+
+    This class works with `astroid.Call`, `astroid.Name` and `astroid.Attribute`
+    objects.
+
+    '''
+
     def __init__(self, obj):
+        '''Create the object and do nothing else.'''
         super(SpecialType, self).__init__(obj)
 
     @staticmethod
     def is_valid(node):
+        '''If the given `node` is able to be parsed by this class.'''
         return isinstance(node, (astroid.Call, astroid.Attribute, astroid.Name))
 
     # TODO : Check if info is necessary. If not, remove it
@@ -164,12 +208,34 @@ class SpecialType(Type):
 
 
 class ContainerType(Type):
-    def __init__(self, obj, include_type=True):
-        super(ContainerType, self).__init__(obj)
+
+    '''A type of Type that contains other Types.
+
+    Normally, this object is used to parse iterable objects, like list or tuple.
+    However, it can be generally useful to other class objects, too.
+    See :class:`auto_docstring.blocks.google.common_block.MappingContainerType`
+    for details.
+
+    '''
+
+    def __init__(self, node, include_type=True):
+        '''Create the object and cast `obj`'s subitems into Type objects.
+
+        Args:
+            node (`astroid.NodeNG`):
+                Some iterable node to break into pieces, recursively.
+            include_type (`bool`, optional):
+                If True then the type of `node` will be included in the
+                string representation of this object, any time as_str is called.
+                If False, then this instance will only print its subitem's types
+                and `node` type will be ignored. Default is True.
+
+        '''
+        super(ContainerType, self).__init__(node)
         self.items = []
         self.include_type = include_type
 
-        for subitem in visit.iterate(obj):
+        for subitem in visit.iterate(node):
             # If it's a Name or Call object and its type needs to be inferred
             if SpecialType.is_valid(subitem):
                 self.items.append(SpecialType(subitem))
@@ -209,6 +275,16 @@ class ContainerType(Type):
             self.items.append(Type(value))
 
     def type_contained_in(self, seq):
+        '''If this each of the types is contained in the given sequence-type.
+
+        Args:
+            seq (:class:`auto_docstring.blocks.google.common_block.ContainerType`):
+                The sequence to check for this object and its subitems.
+
+        Returns:
+            bool: If this object is in the given `seq`.
+
+        '''
         result = super(ContainerType, self).type_contained_in(seq)
         if not result:
             return False
@@ -226,6 +302,7 @@ class ContainerType(Type):
         return False
 
     def as_str(self):
+        '''str: Create a string-representation for this instance.'''
         def _get_container_type_name(container):
             container_type = visit.get_container_types()[container]
             return get_type_name(container_type)
@@ -262,8 +339,29 @@ class ContainerType(Type):
 
         return output_text
 
+    # TODO : Rename this method. Obviously it is not named well
+    # TODO : Is it possible to use short-hand?
     def _reduce(self, items):
+        '''Remove redundant subitems in `items` so only unique types remain.
+
+        Note:
+            This method preserves type order.
+
+        Returns:
+            list[:class:`auto_docstring.blocks.google.common_block.Type`]: The unique objects.
+
+        '''
         def get_recursive_type(obj):
+            '''Recursively get all of the types of the given `obj`.
+
+            Warning:
+                Changes to this function are discouraged.
+                Be careful of cyclic loops.
+
+            Yields:
+                Type: The found subitems of `obj`.
+
+            '''
             if not check.is_itertype(obj):
                 yield obj
                 return
@@ -281,11 +379,22 @@ class ContainerType(Type):
 
         return list(get_recursive_type(items))[0]
 
-    # TODO : Right now I'm saving literal subitem, not subitem_type. Maybe this
-    # could be removed in the future? I won't do it just yet because the
-    # unittests aren't bulletproof. But revisit this later
-    #
+    # TODO : Provide example input/output in the docstring
     def _group(self, items):
+        '''Collect the unique types of each of the given items into a dict.
+
+        Other methods are responsible for either getting types of objects or
+        filtering their types. This method is responsible for making sure
+        that each container-type only lists its child types once.
+
+        Args:
+            items (iter[:class:`auto_docstring.blocks.google.common_block.Type`]):
+                The items to group.
+
+        Returns:
+            `collections.OrderedDict`: The grouped items.
+
+        '''
         output = collections.OrderedDict()
         for item in items:
             item_type = item.get_type()
@@ -303,12 +412,31 @@ class ContainerType(Type):
         return output
 
     def __iter__(self):
+        '''Type: Get every sub-item in this instance.'''
         for item in self.items:
             yield item
 
 
 class MappingContainerType(Type):
+
+    '''A special type, specifically for hash-table Types, like dict.
+
+    This class works by treating keys and values as if they are two
+    ContainerType objects and storing both, at the same time.
+
+    It's very incorrect to assume that a dict is actually just two lists
+    but, since we only are concerned with displaying the types of keys
+    and values once, it actually turned out to be a great way to re-use code.
+
+    '''
+
     def __init__(self, obj):
+        '''Create the object and store two Containers, for the keys and values.
+
+        Args:
+            obj (`astroid.Dict`): The mapping object to split into types.
+
+        '''
         super(MappingContainerType, self).__init__(obj)
         self.keys = []
         self.values = []
@@ -318,11 +446,21 @@ class MappingContainerType(Type):
 
     @staticmethod
     def is_valid(node):
+        '''bool: Check if the given node is a dict or mapping object.'''
         return isinstance(node, astroid.Dict)
 
     def as_str(self):
-        # A Container (i.e. dict) is processed as two lists would be
-        # and then stitched together to make the final result
+        '''str: Create a string-representation for this instance.
+
+        Raises:
+            NotImplementedError: If the stored type on this instance is invalid.
+
+        Returns:
+            str: The string-representation of this instance.
+
+        '''
+        # A Container (i.e. dict) is processed as two lists and
+        # then stitched together to make the final result
         #
         keys = ContainerType(self.keys, include_type=False)
         values = ContainerType(self.values, include_type=False)
@@ -339,18 +477,36 @@ class MappingContainerType(Type):
 
 class ComprehensionContainerType(Type):
 
+    '''A Type class which is used to express a Python list-comprehension.'''
+
     _comprehension_types = {
         astroid.ListComp: list,
     }
 
     def __init__(self, obj):
+        '''Create this object and store the given `obj`.
+
+        Args:
+            obj (`astroid.ListComp`): The node to store.
+
+        '''
         super(ComprehensionContainerType, self).__init__(obj)
 
     @staticmethod
     def is_valid(node):
+        '''Check if the given node can be processed by this class.
+
+        Args:
+            node (`astroid.ListComp`): The node to check.
+
+        Returns:
+            bool: If the node is some kind of list-comprehension object.
+
+        '''
         return isinstance(node, astroid.ListComp)
 
     def as_str(self):
+        '''str: Get the stored list-comprehension node as a type-docstring.'''
         # Reference:
         #     The first child is the return item in a list-comprehension
         #
@@ -370,23 +526,62 @@ class ComprehensionContainerType(Type):
 @six.add_metaclass(abc.ABCMeta)
 class CommonBlock(object):
 
+    '''An abstract class used to implement a Google-style block.
+
+    Attributes:
+        label (str): The block display text.
+
+    '''
+
     label = 'Header label'
 
     @staticmethod
     @abc.abstractmethod
     def draw(info):
+        '''Create the docstring lines to represent the given `info`.
+
+        Args:
+            info (dict[str]):
+                The parsed AST node whose type needs to be found and then
+                converted into a string.
+
+        Returns:
+            list[str]: The lines to create.
+
+        '''
         return []
 
     @abc.abstractproperty
     def name():
+        '''str: A unique name to use to identify this block-type.'''
         return '_unique_id'
 
     @classmethod
     def get_starting_line(cls):
+        '''str: Get the label that will be used for the top of this block.'''
         return '{}:'.format(cls.label)
 
     @staticmethod
     def _expand_types(obj, include_type=False):
+        '''Wrap the given `obj` with a specific docstring-class wrapper.
+
+        Args:
+            obj (`astroid.NodeNG`):
+                Some node to wrap.
+            include_type (bool, optional):
+                If True and `obj` is a container of some kind, for example
+                a list of strs, then `obj` will be printed like "list[str]".
+                If False, `obj` would be printed as just "str".
+                This parameter is used primarily mainly for keeping return-types
+                from accidentally printing its container-type twice when
+                the container is nested.
+                Default is False.
+
+        Returns:
+            `SpecialType` or `ComprehensionContainerType` or `MappingContainerType` or `ContainerType` or `Type`: .
+                The wrapped type.
+
+        '''
         if SpecialType.is_valid(obj):
             return SpecialType(obj)
 
@@ -405,6 +600,17 @@ class CommonBlock(object):
 
     @staticmethod
     def _change_type_to_str(*objs):
+        '''Create the full string of all return-types for the given `objs`.
+
+        Args:
+            *objs (list[:class:`auto_docstring.blocks.google.common_block.Type`]):
+                The types to change into strings.
+
+        Returns:
+            str: The final set of return types for the given objects. This string
+                 will be added to the auto-generated docstrings, directly.
+
+        '''
         items = []
         for item in [obj.as_str() for obj in objs]:
             if item not in items:
@@ -415,8 +621,28 @@ class CommonBlock(object):
 
 @six.add_metaclass(abc.ABCMeta)
 class MultiTypeBlock(CommonBlock):
+
+    '''The base-class used to create "Returns" and "Yields" blocks.'''
+
+    _info_key = '_some_key'
+
     @classmethod
     def draw(cls, info):
+        '''Create the docstring lines to represent the given `info`.
+
+        Note:
+            If no data is found for cls._info_key, this method will return
+            an empty list.
+
+        Args:
+            info (dict[str, list[`astroid.NodeNG`]]):
+                The parsed AST node whose type needs to be found and then
+                converted into a string.
+
+        Returns:
+            list[str]: The lines to create.
+
+        '''
         expected_object = info.get(cls._info_key)
 
         if not expected_object:
@@ -438,12 +664,18 @@ class MultiTypeBlock(CommonBlock):
 
         return lines
 
-    @abc.abstractproperty
-    def _info_key():
-        return '_some_key'
-
     @staticmethod
     def _make_line(obj_type, indent):
+        '''Create the docstring line for the given input.
+
+        Args:
+            indent (str): The amount of space to add to the docstring block.
+            obj_type (str): The type of the object. Example: "tuple[str]", "bool".
+
+        Returns:
+            str: The created docstring line.
+
+        '''
         return '{indent}{{:{obj_type}!f}}: {{!f}}.'.format(
             indent=indent,
             obj_type=obj_type,
@@ -479,7 +711,12 @@ def _get_parents(node):
     return parents
 
 
-def _process_as_thirdparty_attribute(obj, wrap=False):
+def _process_as_thirdparty_attribute(node, wrap=False):
+    '''Get the string representation of some `node`.
+
+    Args:
+
+    '''
     # This third-party attribute may be an object that is either imported or
     # is actually defined (i.e. accessible) in the current module. Find it.
     #
@@ -489,15 +726,8 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
         except AttributeError:
             return get_import_name(obj.expr)
 
-    def get_attribute_name(obj):
-        try:
-            return obj.attrname
-        except AttributeError:
-            return ''
-
     def get_local_function_types(module, obj):
         search_name = get_import_name(obj)
-        object_line_number = obj.lineno
 
         # First, try to see if the object is defined in this module
         for function in module.nodes_of_class(astroid.FunctionDef):
@@ -513,9 +743,10 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
         return ''
 
     def get_local_method_types(module, obj):
-        for classobj in module.nodes_of_class(astroid.ClassDef):
-            # raise ValueError(classobj)
-            pass
+        # for classobj in module.nodes_of_class(astroid.ClassDef):
+        #     # raise ValueError(classobj)
+        #     pass
+        pass
 
     def get_import_path_from_ast(module, obj):
         search_name = get_import_name(obj)
@@ -541,14 +772,14 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
                         return item.modname + '.' + search_name
         return ''
 
-    module = obj.root()
+    module = node.root()
 
     if environment.allow_type_follow():
-        function_signature = get_local_function_types(module, obj)
+        function_signature = get_local_function_types(module, node)
         if function_signature:
             return function_signature
 
-        method_signature = get_local_method_types(module, obj)
+        method_signature = get_local_method_types(module, node)
         if method_signature:
             return method_signature
 
@@ -560,17 +791,15 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
     #        of the import as a "third-party" name, like <textwrap.dedent>
     #        (and not "str", like it should be)
     #
-    attribute_name = get_attribute_name(obj)
-
-    import_path = get_import_path_from_ast(module, obj)
-    if import_path and hasattr(obj, 'attrname'):
-        import_path += '.' + obj.attrname
+    import_path = get_import_path_from_ast(module, node)
+    if import_path and hasattr(node, 'attrname'):
+        import_path += '.' + node.attrname
 
     if not import_path:
         # If we couldn't gather an import string from the module's imports, then
         # try to get it from the current file, using the AST info we have
         #
-        import_path = get_local_attribute_path(obj)
+        import_path = get_local_attribute_path(node)
 
     if wrap:
         return make_third_party_label(import_path)
@@ -579,6 +808,15 @@ def _process_as_thirdparty_attribute(obj, wrap=False):
 
 
 def _process_as_thirdparty_func(obj):
+    '''Find the return type(s) from a callable object.
+
+    Args:
+        obj (`astroid.NodeNG`): The callable object to parse.
+
+    Returns:
+        str: The type(s) of the callable object.
+
+    '''
     try:
         obj = obj.func
     except AttributeError:
@@ -588,6 +826,18 @@ def _process_as_thirdparty_func(obj):
 
 
 def _process_as_builtin_func(obj):
+    '''Get the type of a builtin attribute or callable function.
+
+    This function assumes that `obj` is an `astroid.Name` or `astroid.Call`
+    node which represents a built-in Python type.
+
+    Args:
+        obj (`astroid.NodeNG`): The node which represents a built-in type.
+
+    Returns:
+        str: The string representation of the given node's Python type.
+
+    '''
     # These are functions that we know the Python output to
     try:
         obj = obj.func
@@ -611,7 +861,25 @@ def _process_as_builtin_func(obj):
         return None
 
 
+# TODO : Check that this docstring is actually correct
 def _process_as_known_object(obj):
+    '''Get the type of an object that the user has pre-defined type(s) of.
+
+    Example:
+        >>> auto_docstring.register('some_name', returns='foo')
+        >>> def foo():
+        ...     return some_name
+
+        Will generate the docstring, """{1:foo!f}: {2!f}."""
+
+    Args:
+        obj (`astroid.NodeNG`): The node to parse.
+
+    Returns:
+        str or NoneType: The found type-name for the node,
+                         if the node was pre-registered.
+
+    '''
     # TODO : Possibly make this condition statement better by moving the logic
     #        outside of _process_as_known_object
     #
@@ -653,12 +921,14 @@ def _process_as_known_object(obj):
 
 
 def get_type(obj):
+    '''type: Get the class object for the given `obj`.'''
     return obj.__class__
 
 
 def get_type_name(obj):
+    '''str: Get the name of the class of the given `obj`.'''
     if not inspect.isclass(obj):
-        obj = obj.__class__
+        obj = get_type(obj)
 
     return obj.__name__
 
@@ -692,7 +962,23 @@ def get_object(node):
         return node.name
 
 
-def make_container_label(container, items_text):
+def make_container_label(container, items_text=''):
+    '''Get a string representation of the given container, assuming it has items.
+
+    Example:
+        >>> make_container_label(container='list', items_text='str')
+        # Result: "list[str]" #
+
+    Args:
+        container (str): The name of the container to use.
+        items_text (`str`, optional):
+            The items that make up the given container. If nothing is given,
+            just the name of the container will returned, instead.
+
+    Returns:
+        str: The string representation of the given `container` and `items_text`.
+
+    '''
     if items_text:
         return '{container}[{items_text}]'.format(
             container=container, items_text=items_text)
@@ -700,24 +986,39 @@ def make_container_label(container, items_text):
     return container
 
 
+# TODO : Make this configure-able
 def make_join_text(items):
+    '''str: Combine the given `items` with the user's prefered join-text.'''
     return ', '.join(items)
 
 
+# TODO : Make this configure-able
 def make_items_text(items):
+    '''str: Combine the given `items` with the user's prefered choice-text.'''
     return ' or '.join(items)
 
 
+# TODO : Make this configure-able
 def make_third_party_label(text):
+    '''str: Wrap `text` in a label that means "this is a third-party object".'''
     return '<{text}>'.format(text=text)
 
 
-def get_local_attribute_path(obj):
-    if hasattr(obj, 'name'):
-        return obj.name
+def get_local_attribute_path(node):
+    '''Infer the attribute dot (".") of the given `node`.
 
-    base = obj.expr
-    bases = [obj.attrname]
+    Args:
+        node (`astroid.Attribute`): The node to get a dot string of.
+
+    Returns:
+        str: The found dot string.
+
+    '''
+    if hasattr(node, 'name'):
+        return node.name
+
+    base = node.expr
+    bases = [node.attrname]
 
     while base:
         if hasattr(base, 'attrname'):
@@ -732,16 +1033,34 @@ def get_local_attribute_path(obj):
     return '.'.join(reversed(bases))
 
 
-def process_types(obj):
-    builtin_type = _process_as_builtin_func(obj)
+# TODO : Possibly change this to just return "" if nothing is found. Check unittests
+def process_types(node):
+    '''Get the type of the given `node` as a string.
+
+    This function checks if `node` is a built-in Python object, then it will
+    check if the user registered an explicit value for it.
+
+    If it can't find either, it will try to find the type of `node` by searching
+    through other functions and methods recursively in the same file. If the
+    object is imported, it will import the module that `node` is contained
+    within recursively until a type is found.
+
+    Args:
+        node (`astroid.Node`): The node to convert to a string.
+
+    Returns:
+        str or NoneType: The found type, if any.
+
+    '''
+    builtin_type = _process_as_builtin_func(node)
     if builtin_type:
         return get_type_name(builtin_type)
 
-    known = _process_as_known_object(obj)
+    known = _process_as_known_object(node)
     if known:
         return known
 
-    if isinstance(obj, astroid.Attribute):
-        return _process_as_thirdparty_attribute(obj, wrap=True)
-    elif isinstance(obj, astroid.Call):
-        return _process_as_thirdparty_func(obj)
+    if isinstance(node, astroid.Attribute):
+        return _process_as_thirdparty_attribute(node, wrap=True)
+    elif isinstance(node, astroid.Call):
+        return _process_as_thirdparty_func(node)

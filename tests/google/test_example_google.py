@@ -18,6 +18,9 @@ from .. import common
 
 
 class AdvancedTestCase(common.CommonTestCase):
+
+    '''A series of unittests for docstrings that required bugfixes.'''
+
     def compare(self, expected_output, code):
         '''Create `code` docstring and test it against `expected_output`.
 
@@ -31,7 +34,8 @@ class AdvancedTestCase(common.CommonTestCase):
         code = code.format(curs='')
 
         expected_output = textwrap.dedent(expected_output)
-        generated_docstring = docstring_builder.create_ultisnips_docstring(code, row=row, style='google')
+        generated_docstring = docstring_builder.create_ultisnips_docstring(
+            code, row=row, style='google')
 
         # for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
         #     if char1 != char2:
@@ -200,7 +204,6 @@ class AdvancedTestCase(common.CommonTestCase):
                             return '%s%s' % (exe_file, pathExt[0])
                 return ''
             """
-
 
         expected_output = \
             '''\

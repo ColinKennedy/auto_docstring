@@ -54,10 +54,8 @@ class Raises(common_block.CommonBlock):
                 message = cls._get_message(raise_object)
 
             message = environment.drop_trailing_characters(message)
-            # TODO : Add '%d' and all the other ones, too
-            # TODO : Clean this up
             # Also, add significance for this block of text. Why is it needed? etc
-            message = message.replace('%s', '{}').replace('%d', '{}').replace('%r', '{}').replace('%f', '{}')
+            message = cls._replace_format_markers(message)
             message = parser.add_conversion(message)
 
             # TODO : Write message about importance
@@ -90,9 +88,9 @@ class Raises(common_block.CommonBlock):
                 number=common.get_unique_number(),
                 message=message,
             )
-        else:
-            return '{indent}{raise_type}: {{!f}}.'.format(
-                indent=indent, raise_type=raise_type)
+
+        return '{indent}{raise_type}: {{!f}}.'.format(
+            indent=indent, raise_type=raise_type)
 
     # TODO : Move this to environment.py
     @staticmethod
@@ -190,3 +188,7 @@ class Raises(common_block.CommonBlock):
 
         '''
         return [info for info in raise_info if cls._get_exception_name(info)]
+
+    @staticmethod
+    def _replace_format_markers(text):
+        return text.replace('%s', '{}').replace('%d', '{}').replace('%r', '{}').replace('%f', '{}')
