@@ -13,7 +13,7 @@ import textwrap
 import os
 
 # IMPORT AUTO-DOCSTRING LIBRARIES
-from auto_docstring.blocks.google import common_block
+from auto_docstring.blocks.google import common_type
 import auto_docstring
 
 # IMPORT LOCAL LIBRARIES
@@ -81,8 +81,8 @@ class ParseTestCase(common.CommonTestCase):
     def _get_getenv_return_types(obj):
         all_types = []
         for arg in obj.args:
-            all_types.append(common_block.process_types(arg))
-        return common_block.make_items_text(all_types)
+            all_types.append(common_type.process_types(arg))
+        return common_type.make_items_text(all_types)
 
     def test_getenv_001(self):
         '''Parse the return types of a function.'''
