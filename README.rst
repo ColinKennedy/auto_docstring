@@ -1,32 +1,41 @@
+Config info
+- Remove "self._make_code" from unittests, since it's gross.
+- rename the classes in common_block to be "Iterable" and "Container" since
+  those terms describe those two much better
+
+- support other documentation types (sphinx, numpy, scipy, epytext)
+- allow the user to start docstrings on the next line + indentation, not the current line
+ - this should work even in other documentation types
+
+- Offer some kind of mechanism to allow default values to be displayed in the
+  actual default parameter(s)
+
+- Create a list of stdlib functions and objects to define the type of
+
 Roadmap
  - cross-typing (between args and returns, for example)
  - Follow module function(s)
+  - make sure that this works even with relative imports!
  - list/dict comprehensions
  - generators
  - logistical returns
  - attribute options
 
-Config info
- - allow the user to start docstrings on the next line + indentation, not the current line
- - support other documentation types (sphinx, numpy, scipy, epytext)
 
-- make sure that this works even with relative imports!
 
-- Remove "self._make_code" from unittests, since it's gross.
 
-- raises
- - it should work even if the raised object is actually a variable
- - also, it should be able to grab the message even if the message is a
-   variable
- - maybe imported stuff, as well
+- ard - replaces the docstring in the function
+- acd - only updates if args/raise statements are removed/added
+  - otherwise, keeps the info of the docstring intact
+- Make a function to create a specific docstring block type, instead of the
+  entire docstring
+  - make "acd"-esque variants for each, so that it can reuse parts of the block
+- make sure these commands will work in VISUAL mode, too
 
-- rename the classes in common_block to be "Iterable" and "Container" since
-  those terms describe those two much better
 
-- Make tests for nested arg types 
-- Make tests for dicts - because it looks like dicts are currently a problem
---- Need to also support `**kwargs`
-- Make docstring block function
+
+
+
 
 
 ## The new plan
@@ -65,10 +74,10 @@ display
 			 + raises.py
 	 |
      +---- sphinx
-	         | 
+	         |
 			 + params.py
 			 + rtype.py
-	
+
 
 - Gather as much as possible from the code
  - Returns
@@ -118,7 +127,7 @@ list[str]
 list of str
 
 AUTO_DOCSTRING_ITER_PREFIX
- - google default: '[' 
+ - google default: '['
  - sphinx default: ' of '
 AUTO_DOCSTRING_ITER_SUFFIX
  - google default: ']'
