@@ -30,6 +30,12 @@ class AdvancedTestCase(common.CommonTestCase):
 
         '''
         code = textwrap.dedent(code)
+        try:
+            code = self._make_code(code)
+        except TypeError:
+            # If no %s was in the string, ignore it
+            pass
+
         row, _ = common.get_position('{curs}', code.split('\n'))
         code = code.format(curs='')
 
@@ -331,7 +337,7 @@ class AdvancedTestCase(common.CommonTestCase):
         # Test that a message that starts with {, another that ends in }, and
         # one more that does both
         #
-        code = self._make_code(
+        code = \
             '''
             def foo(arg1, arg2, thing=(('asfd', 'asdfsfd'), )):
                 %s
@@ -349,7 +355,7 @@ class AdvancedTestCase(common.CommonTestCase):
                     raise NotImplementedError('bar{tttt}'.format(tttt=9123))
 
                 return ['asdfsdf', 'adsfafds']
-            ''')
+            '''
 
         expected_output = \
             '''\

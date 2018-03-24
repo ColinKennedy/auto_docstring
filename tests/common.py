@@ -63,6 +63,11 @@ class CommonTestCase(unittest.TestCase):
         '''
         expected_output = textwrap.dedent(expected_output)
         code = textwrap.dedent(code)
+        try:
+            code = self._make_code(code)
+        except TypeError:
+            # If no %s was in the string, ignore it
+            pass
 
         cursor = '{curs}'
         row, _ = get_position(cursor, code.split('\n'))

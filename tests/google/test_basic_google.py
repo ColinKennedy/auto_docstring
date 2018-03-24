@@ -126,7 +126,7 @@ class FunctionTestCase(common.CommonTestCase):
         self.compare(expected_output, code)
 
     # def test_implicit_if_001(self):
-    #     code = self._make_code(
+    #     code = \
     #         '''
     #         def add_docstring(code, row, style='', mode='replace'):
     #             %s
@@ -145,7 +145,7 @@ class FunctionTestCase(common.CommonTestCase):
 
     #             return code
 
-    #         ''')
+    #         '''
 
     #     expected_output = \
     #         '''\
@@ -171,7 +171,7 @@ class FunctionTestCase(common.CommonTestCase):
     #     self.compare(expected_output, code)
 
     # def test_implicit_if_002(self):
-    #     code = self._make_code(
+    #     code = \
     #         '''
     #         def add_docstring(code, row, style='', mode='replace'):
     #             %s
@@ -887,7 +887,7 @@ class StandardTestCase(common.CommonTestCase):
 
     def test_unknown_type_004(self):
         '''Create a docstring for some unknown object, which is not defined.'''
-        code = self._make_code(
+        code = \
             '''
             def make_container_label(container, items_text):
                 %s
@@ -896,7 +896,7 @@ class StandardTestCase(common.CommonTestCase):
                         container=container, items_text=items_text)
 
                 return container
-            ''')
+            '''
 
         expected_output = \
             '''\

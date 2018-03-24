@@ -13,12 +13,12 @@ class DictTestCase(common.CommonTestCase):
 
     def test_basic(self):
         '''Create a basic dict docstring.'''
-        code = self._make_code(
+        code = \
             '''
             def foo(bar):
                 %s
                 return {'asfdsf': 8, 'tttt': 123}
-            ''')
+            '''
 
         expected_output = \
             '''\
@@ -35,12 +35,12 @@ class DictTestCase(common.CommonTestCase):
 
     def test_basic_multi_type(self):
         '''Create a dict docstring that has multiple value types.'''
-        code = self._make_code(
+        code = \
             '''
             def foo(bar):
                 %s
                 return {'asfdsf': 8, False: 123.456}
-            ''')
+            '''
 
         expected_output = \
             '''\
@@ -57,12 +57,12 @@ class DictTestCase(common.CommonTestCase):
 
     def test_layered_type(self):
         '''Create a dict docstring with many nested container-types.'''
-        code = self._make_code(
+        code = \
             '''
             def foo(bar):
                 %s
                 return {('tasdf', 'astsdf', {False: True}): 8, False: 123.456}
-            ''')
+            '''
 
         expected_output = \
             '''\

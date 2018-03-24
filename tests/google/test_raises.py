@@ -21,7 +21,7 @@ class GenericTestCase(common.CommonTestCase):
         # Test that a message that starts with {, another that ends in }, and
         # one more that does both
         #
-        code = self._make_code(
+        code = \
             '''
             def foo(arg1, arg2, thing=(('asfd', 'asdfsfd'), )):
                 %s
@@ -39,7 +39,7 @@ class GenericTestCase(common.CommonTestCase):
                     raise NotImplementedError('bar{tttt}'.format(tttt=9123))
 
                 return ['asdfsdf', 'adsfafds']
-            ''')
+            '''
 
         expected_output = \
             '''\
@@ -214,13 +214,13 @@ class NameTestCase(common.CommonTestCase):
 
     def test_unformatted_variable(self):
         '''Test an unformatted string and that {}s is added to it.'''
-        code = self._make_code(
+        code = \
             '''
             def foo():
                 %s
                 message = 'example {bar} message'
                 raise ValueError(message)
-            ''')
+            '''
 
         expected_output = \
             '''\
@@ -235,13 +235,13 @@ class NameTestCase(common.CommonTestCase):
 
     # TODO : Come back to with one
     # def test_variable_formatted_message(self):
-    #     code = self._make_code(
+    #     code = \
     #         '''
     #         def foo():
     #             %s
     #             message = 'example {bar} message'.format(bar=8)
     #             raise ValueError(message)
-    #         ''')
+    #         '''
 
     #     expected_output = \
     #         '''\
@@ -261,14 +261,14 @@ class CallTestCase(common.CommonTestCase):
 
     def test_001(self):
         '''Test str.format and make sure it returns strings correctly.'''
-        code = self._make_code(
+        code = \
             '''
             def add_docstring():
                 %s
                 raise NotImplementedError('Need to write this')
                 raise ValueError('Mode: "{mode}" is unsupported. Options were, "{options}".'
                                  ''.format(mode=mode, options=options))
-            ''')
+            '''
 
         expected_output = \
             '''\
@@ -284,7 +284,7 @@ class CallTestCase(common.CommonTestCase):
 
     def test_002(self):
         '''Test str.format and make sure it returns strings correctly.'''
-        code = self._make_code(
+        code = \
             '''
             def add_docstring(code, row, style='', mode='replace'):
                 %s
@@ -302,7 +302,7 @@ class CallTestCase(common.CommonTestCase):
                                      ''.format(mode=mode, options=options))
 
                 return code
-            ''')
+            '''
 
         expected_output = \
             '''\
