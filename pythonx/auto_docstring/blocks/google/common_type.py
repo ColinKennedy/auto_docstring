@@ -775,15 +775,26 @@ def _process_as_builtin_func(obj):
         pass
 
     function_name_to_astroid_type = {
+        'all': bool,
+        'any': bool,
         'bool': bool,
+        'callable': bool,
         'dict': dict,
         'float': float,
+        'hasattr': bool,
         'int': int,
+        'isinstance': bool,
+        'issubclass': bool,
+        'len': int,
         'list': list,
+        'repr': str,
+        'round': int,
         'set': set,
+        'sorted': list,
         'str': str,
         'tuple': tuple,
-        'isinstance': bool,
+        'type': type,
+        'unicode': unicode,
     }
 
     try:

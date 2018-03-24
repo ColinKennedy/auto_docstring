@@ -12,17 +12,13 @@ import auto_docstring
 from auto_docstring.blocks.google import common_type
 
 
-auto_docstring.register('str.format', returns='str')
-auto_docstring.register('str.join', returns='str')
-auto_docstring.register('textwrap.dedent', returns='str')
-
 def get_getenv_return_types(obj):
     '''Parse os.getenv to get its return types.
 
-    os.getenv can return multiple types.
-
-    os.getenv('foo') returns str or NoneType
-    os.getenv('foo', False) returns str or bool.
+    Note:
+        os.getenv can potentially return multiple types.
+        os.getenv('foo') returns str or NoneType
+        os.getenv('foo', False) returns str or bool.
 
     Args:
         obj (`astroid.Call`): The os.getenv call to parse.
@@ -31,15 +27,18 @@ def get_getenv_return_types(obj):
         str: The return types of this function.
 
     '''
-    all_types = []
-    args = obj.args
-    for arg in args:
-        all_types.append(common_type.process_types(arg))
-
-    if len(args) == 1:
-        all_types.append('str')
+    all_types = ['str']
+    try:
+        arg = obj.args[1]
+    except IndexError:
         all_types.append('NoneType')
+    else:
+        all_types.append(common_type.process_types(arg) or 'NoneType')
 
     return common_type.make_items_text(all_types)
 
+
 auto_docstring.register(os.getenv, returns=get_getenv_return_types)
+auto_docstring.register('str.format', returns='str')
+auto_docstring.register('str.join', returns='str')
+auto_docstring.register('textwrap.dedent', returns='str')
