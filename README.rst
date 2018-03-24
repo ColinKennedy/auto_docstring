@@ -1,4 +1,9 @@
 - support other documentation types (sphinx, numpy, scipy, epytext)
+    - sphinx
+        - add AUTO_DOCSTING_SPHINX_PARAM_SINGLE_LINE 1 / 0
+          - https://www.jetbrains.com/help/pycharm/using-docstrings-to-specify-types.html
+          - which lets you put it on one or two lines
+
 - allow the user to start docstrings on the next line + indentation, not the current line
  - this should work even in other documentation types
 
