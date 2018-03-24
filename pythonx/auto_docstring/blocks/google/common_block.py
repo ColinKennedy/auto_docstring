@@ -81,8 +81,8 @@ class CommonBlock(object):
                 Default is False.
 
         Returns:
-            `SpecialType` or `ComprehensionContainerType` or `MappingContainerType` \
-                    or `ContainerType` or `Type`: .
+            `SpecialType` or `ComprehensionContainerType` or `ContainerType` \
+                    or `IterableType` or `Type`: .
                 The wrapped type.
 
         '''
@@ -94,11 +94,11 @@ class CommonBlock(object):
         if common_type.ComprehensionContainerType.is_valid(obj):
             return common_type.ComprehensionContainerType(obj)
 
-        if common_type.MappingContainerType.is_valid(obj):
-            return common_type.MappingContainerType(obj)
+        if common_type.ContainerType.is_valid(obj):
+            return common_type.ContainerType(obj)
 
         if check.is_itertype(obj):
-            return common_type.ContainerType(obj, include_type=include_type)
+            return common_type.IterableType(obj, include_type=include_type)
 
         return common_type.Type(obj)
 

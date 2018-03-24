@@ -44,7 +44,7 @@ class Type(object):
         '''If this object's type is inside of the given sequence-type.
 
         Args:
-            seq (:class:`auto_docstring.blocks.google.common_block.ContainerType`):
+            seq (:class:`auto_docstring.blocks.google.common_block.IterableType`):
                 The sequence to check for this object.
 
         Returns:
@@ -243,13 +243,13 @@ class SpecialType(Type):
         return get_type_name(found_type)
 
 
-class ContainerType(Type):
+class IterableType(Type):
 
     '''A type of Type that contains other Types.
 
     Normally, this object is used to parse iterable objects, like list or tuple.
     However, it can be generally useful to other class objects, too.
-    See :class:`auto_docstring.blocks.google.common_block.MappingContainerType`
+    See :class:`auto_docstring.blocks.google.common_block.ContainerType`
     for details.
 
     '''
@@ -267,7 +267,7 @@ class ContainerType(Type):
                 and `node` type will be ignored. Default is True.
 
         '''
-        super(ContainerType, self).__init__(node)
+        super(IterableType, self).__init__(node)
         self.items = []
         self.include_type = include_type
 
@@ -278,8 +278,8 @@ class ContainerType(Type):
                 continue
 
             # If it's a pairwise container, like a dict
-            if MappingContainerType.is_valid(subitem):
-                self.items.append(MappingContainerType(subitem))
+            if ContainerType.is_valid(subitem):
+                self.items.append(ContainerType(subitem))
                 continue
 
             if ComprehensionContainerType.is_valid(subitem):
@@ -314,14 +314,14 @@ class ContainerType(Type):
         '''If this each of the types is contained in the given sequence-type.
 
         Args:
-            seq (:class:`auto_docstring.blocks.google.common_block.ContainerType`):
+            seq (:class:`auto_docstring.blocks.google.common_block.IterableType`):
                 The sequence to check for this object and its subitems.
 
         Returns:
             bool: If this object is in the given `seq`.
 
         '''
-        result = super(ContainerType, self).type_contained_in(seq)
+        result = super(IterableType, self).type_contained_in(seq)
         if not result:
             return False
 
@@ -453,12 +453,12 @@ class ContainerType(Type):
             yield item
 
 
-class MappingContainerType(Type):
+class ContainerType(Type):
 
     '''A special type, specifically for hash-table Types, like dict.
 
     This class works by treating keys and values as if they are two
-    ContainerType objects and storing both, at the same time.
+    IterableType objects and storing both, at the same time.
 
     It's very incorrect to assume that a dict is actually just two lists
     but, since we only are concerned with displaying the types of keys
@@ -473,7 +473,7 @@ class MappingContainerType(Type):
             obj (`astroid.Dict`): The mapping object to split into types.
 
         '''
-        super(MappingContainerType, self).__init__(obj)
+        super(ContainerType, self).__init__(obj)
         self.keys = []
         self.values = []
         for key, value in grouping.chunkwise_iter(obj.get_children(), 2):
@@ -498,8 +498,8 @@ class MappingContainerType(Type):
         # A Container (i.e. dict) is processed as two lists and
         # then stitched together to make the final result
         #
-        keys = ContainerType(self.keys, include_type=False)
-        values = ContainerType(self.values, include_type=False)
+        keys = IterableType(self.keys, include_type=False)
+        values = IterableType(self.values, include_type=False)
 
         # TODO : Possibly use visit.py to get this, instead.
         if isinstance(self.obj, astroid.Dict):

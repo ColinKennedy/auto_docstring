@@ -1,8 +1,3 @@
-Config info
-- Remove "self._make_code" from unittests, since it's gross.
-- rename the classes in common_block to be "Iterable" and "Container" since
-  those terms describe those two much better
-
 - support other documentation types (sphinx, numpy, scipy, epytext)
 - allow the user to start docstrings on the next line + indentation, not the current line
  - this should work even in other documentation types
