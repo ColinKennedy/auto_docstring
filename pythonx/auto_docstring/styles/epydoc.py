@@ -3,8 +3,6 @@
 
 # IMPORT LOCAL LIBRARIES
 from ..blocks.epydoc import returns_block
-# from ..blocks.epydoc import raises_block
-# from ..blocks.epydoc import yields_block
 from ..blocks.epydoc import args_block
 from . import sphinx
 
@@ -13,9 +11,7 @@ class EpydocStyle(sphinx.SphinxStyle):
 
     _blocks = {
         args_block.Args.name: args_block.Args,
-        # raises_block.Raises.name: raises_block.Raises,
         returns_block.Returns.name: returns_block.Returns,
-        # yields_block.Yields.name: yields_block.Yields,
     }
     name = 'epydoc'
 
@@ -33,7 +29,5 @@ class EpydocStyle(sphinx.SphinxStyle):
         '''
         return (
             'args',
-            # 'raises',
             'returns',
-            # 'yields',
         )
