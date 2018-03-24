@@ -378,3 +378,31 @@ class AdvancedTestCase(common.CommonTestCase):
             '''
 
         self.compare(expected_output, code)
+
+    def test_003(self):
+        code = \
+            """
+            def create_ultisnips_docstring(code, row, style=''):
+                {curs}
+                docstring = create_docstring(code, row, style=style)
+                return convert_to_ultisnips(docstring)
+
+            def convert_to_ultisnips(code):
+                return ultisnips_build.RecursiveParser().parse(code)
+            """
+
+        expected_output = \
+            '''\
+            $1.
+
+            Args:
+                code ($2): $3.
+                row ($4): $5.
+                style (${6:str}, optional): $7.
+
+            Returns:
+                ${8:<ultisnips_build.RecursiveParser.parse>}: $9.
+
+            '''
+
+        self.compare(expected_output, code)

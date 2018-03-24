@@ -619,6 +619,14 @@ def _process_as_thirdparty_attribute(node, wrap=False):
         try:
             return obj.name
         except AttributeError:
+            try:
+                # If the attribute path contains an `astroid.Call` object then
+                # we need to get the `func`. Otherwise, `expr` will fail
+                #
+                obj = obj.func
+            except AttributeError:
+                pass
+
             return get_import_name(obj.expr)
 
     # TODO : Couldn't I just if function == obj?
@@ -920,7 +928,16 @@ def get_local_attribute_path(node):
     base = node.expr
     bases = [node.attrname]
 
+    # Get the whole path, going from right to left
     while base:
+        try:
+            # If the attribute path contains an `astroid.Call` object then
+            # we need to get the `func`. Otherwise, `expr` will fail
+            #
+            base = base.func
+        except AttributeError:
+            pass
+
         if hasattr(base, 'attrname'):
             bases.append(base.attrname)
 
@@ -930,6 +947,9 @@ def get_local_attribute_path(node):
 
         base = base.expr
 
+    # We retrieved the attribute path backwards since we went right to left
+    # so reverse it and return it
+    #
     return '.'.join(reversed(bases))
 
 
