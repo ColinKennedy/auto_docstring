@@ -1,8 +1,16 @@
+- go back and double-check the docstrings and comments for all of the
+  sphinx-related modules. They could have "Google-specifc" notes in them
+  that are no longer relevant
+
 - support other documentation types (sphinx, numpy, scipy, epytext)
+    - scipy
+    - numpy
+    - epytext
     - sphinx
         - add AUTO_DOCSTING_SPHINX_PARAM_SINGLE_LINE 1 / 0
           - https://www.jetbrains.com/help/pycharm/using-docstrings-to-specify-types.html
           - which lets you put it on one or two lines
+        - what about yields? What do you do for those?
 
 - allow the user to start docstrings on the next line + indentation, not the current line
  - this should work even in other documentation types
@@ -11,6 +19,9 @@
   actual default parameter(s)
 
 - Create a list of stdlib functions and objects to define the type of
+- Create a way to customize the way that ", optional)" is shown in google
+  style (and other styles)
+- Create another way to customize how default arg values are shown
 
 Roadmap
  - cross-typing (between args and returns, for example)
