@@ -19,7 +19,10 @@ class FunctionTestCase(NumpyTestCase):
                 pass
             '''
 
-        expected_output = '{1!f}.'
+        expected_output = \
+            '''{1!f}.
+
+            '''
 
         self.compare(expected_output, code)
 

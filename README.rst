@@ -3,14 +3,27 @@
   that are no longer relevant
 
 - support other documentation types (sphinx, numpy, scipy, epytext)
-    - scipy
     - numpy
+      - Single-line summaries aren't single-lined
+      - They use "x or y of z" syntax
+      - optional is written as "x: int, optional"
+
+        When a parameter can only assume one of a fixed set of values, those values can be listed in braces, with the default appearing first:
+
+        order : {'C', 'F', 'A'}
+            Description of `order`.
+      - combinable types
+        x1, x2 : array_like
+            Input arrays, description of `x1`, `x2`.
     - epytext
     - sphinx
         - add AUTO_DOCSTING_SPHINX_PARAM_SINGLE_LINE 1 / 0
           - https://www.jetbrains.com/help/pycharm/using-docstrings-to-specify-types.html
           - which lets you put it on one or two lines
         - what about yields? What do you do for those?
+          - https://stackoverflow.com/questions/24461529/is-there-a-sphinx-rest-python-docstring-field-for-yields?utm_medium=organic&utm_source=google_rich_qa&utm_campaign=google_rich_qa
+
+- create a new repo to use for the vim-plugin version
 
 - allow the user to start docstrings on the next line + indentation, not the current line
  - this should work even in other documentation types
@@ -22,6 +35,14 @@
 - Create a way to customize the way that ", optional)" is shown in google
   style (and other styles)
 - Create another way to customize how default arg values are shown
+
+- Go through one-line summaries and remove variable names / function names
+  from the docstrings :(
+
+- Change all _make_line calls to "_make_lines" so that classes can be
+  more consistent
+- make a base-class for all blocks so that other styles don't have to inherit from
+  google-style classes
 
 Roadmap
  - cross-typing (between args and returns, for example)
@@ -43,6 +64,7 @@ Roadmap
   - make "acd"-esque variants for each, so that it can reuse parts of the block
 - make sure these commands will work in VISUAL mode, too
 
+- allow NoneType to be remapped to "None"
 
 
 
