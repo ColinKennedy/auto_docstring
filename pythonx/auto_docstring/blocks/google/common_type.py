@@ -29,7 +29,14 @@ class Type(object):
     '''A generic object that is meant to print a Type of Python object.'''
 
     def __init__(self, obj):
-        '''Store the given object.'''
+        '''Store the given object.
+
+        Args:
+            obj (str or `astroid.NodeNG`):
+                The object to store. Can be anything. Usually though, it's
+                either some kind of AST node or a string.
+
+        '''
         super(Type, self).__init__()
         self.obj = obj
 
@@ -93,16 +100,35 @@ class SpecialType(Type):
 
     # TODO : Check if info is necessary. If not, remove it
     def as_str(self, info=None):
-        # See if the object is a built-in, callable object
-        # - if it is, return that type's name
-        # - if not and it is a callable object, like another function
-        #   then get its return-type signature
-        #     - If it cannot get the callable object's signature, return the
-        #       name of the callable object, in <>s
-        # - If the object is local to this module that we are making a docstring
-        #   for, then our last possible-effort would be to try to use astroid to
-        #   "infer" what that object's type would be, and return it
-        #
+        '''Create a string-representation for this instance.
+
+        The checks for this method are as follows:
+            - Check if the object is actually a built-in, callable object.
+            - If it isn't built-in but it is callable, get the callable's type
+            - If the object is an attribute of another object, try to get its
+              actual, fully-resolved path and use to get its type
+                - If we could not get the type signature of the callable object
+                  or the attribute then just return the name of the object as a
+                  "third-party" object. By default, this means "add <>s around
+                  the name of the object".
+            - If the object is local to the module that `self.obj` is part of,
+              try to get its signature
+            - If we cannot get the signature of the local object then, we will
+              try to rely on astroid to "infer" the object's type.
+                  - If that fails, it may be because astroid could not infer the
+                    type of the object because the object was assigned earlier
+                    in the module. In which case, try to get the `astroid.Assign`
+                    by "searching" for wherever this object was defined
+                    in the module. This has a pretty small chance of happening.
+
+        The entire check-process is recursive. If a check encounters another
+        Attribute, Name, Call, or Foo object that it doesn't understand, it will
+        keep digging until it can find a type.
+
+        Returns:
+            str: The created type string.
+
+        '''
         found_type = process_types(self.obj)
         if found_type is not None:
             return found_type
@@ -165,7 +191,17 @@ class SpecialType(Type):
 
     @staticmethod
     def get_import_path(obj):
+        '''Find the full '.' import path for the given object.
+
+        Args:
+            obj (type): Some built-in Python type, like list, tuple, etc.
+
+        Returns:
+            str: The name of the given `obj`.
+
+        '''
         def is_builtin_type(obj):
+            '''bool: If the given object is a built-in Python object.'''
             objects = []
             for attr in dir(__builtin__):
                 attr = getattr(__builtin__, attr)
@@ -181,18 +217,29 @@ class SpecialType(Type):
         if inspect.isbuiltin(obj) or is_builtin_type(class_type):
             return class_type.__name__
 
-        name = obj.__name__
-        parent = inspect.getmodule(obj).__name__
+        raise NotImplementedError('Need to write the rest of this')
+        # name = obj.__name__
+        # parent = inspect.getmodule(obj).__name__
 
-        return make_third_party_label('{parent}.{name}'.format(parent=parent, name=name))
+        # return make_third_party_label('{parent}.{name}'.format(parent=parent, name=name))
 
     @staticmethod
     def search(obj):
+        '''Find the type of the given `obj` by searching for where it was assigned.
+
+        Args:
+            obj (`astroid.Name`): Some variable whose type will be retrieved.
+
+        Returns:
+            str: The name of the found type.
+
+        '''
         outer_scope = obj.scope()
         try:
             found_type = assign_search.find_node_type(outer_scope, name=obj.name)
         except RuntimeError:
             raise ValueError('Obj: "{obj}" was not assigned.'.format(obj=obj))
+
         return get_type_name(found_type)
 
 
@@ -541,24 +588,55 @@ def _get_parents(node):
     return parents
 
 
+# TODO : Move this inner functions out
 def _process_as_thirdparty_attribute(node, wrap=False):
-    # '''Get the string representation of some `node`.
+    '''Get the string representation of some `node`.
 
-    # Args:
+    Args:
+        node (`astroid.Attribute`):
+            The node to get the type's name of.
+        wrap (`bool`, optional):
+            If True, a "third-party label" (by default, <>s) will be added
+            to the result of this function. If False, no <>s will be added.
+            Default is False.
 
-    # '''
-    # This third-party attribute may be an object that is either imported or
-    # is actually defined (i.e. accessible) in the current module. Find it.
-    #
+    Returns:
+        str: The found type for the given `node`.
+
+    '''
+    # TODO : This function is messed up. Double-Check it
     def get_import_name(obj):
+        '''Get the tail-name of the given `obj`.
+
+        Args:
+            obj (`astroid.Name` or `astroid.Attribute`):
+                The node to get the name of.
+
+        Returns:
+            str: The found name for the given `obj`.
+
+        '''
         try:
             return obj.name
         except AttributeError:
             return get_import_name(obj.expr)
 
-    def get_local_function_types(module, obj):
+    # TODO : Couldn't I just if function == obj?
+    def get_local_function_types(module, node):
+        '''Look at the given `module` defined functions and try to find `node`.
+
+        Args:
+            module (`astroid.Module`): The module that defines `node`.
+            node (`astroid.Name` or `astroid.Attribute`):
+                The node to try to find the function definition for.
+
+        Returns:
+            str: The found types for the local function that defines `node`.
+                 If no function types were found, return an empty string.
+
+        '''
         from . import common_block
-        search_name = get_import_name(obj)
+        search_name = get_import_name(node)
 
         # First, try to see if the object is defined in this module
         for function in module.nodes_of_class(astroid.FunctionDef):
@@ -578,9 +656,27 @@ def _process_as_thirdparty_attribute(node, wrap=False):
     #     #     # raise ValueError(classobj)
     #     #     pass
 
-    def get_import_path_from_ast(module, obj):
-        search_name = get_import_name(obj)
-        object_line_number = obj.lineno
+    # TODO : Maybe move "wrap" out and just add it wherever this is used?
+    def get_import_path_from_ast(module, node, wrap=False):
+        '''Find the dot "." import path, using the given `obj` AST node.
+
+        Args:
+            module (`astroid.Module`):
+                The module that defines `node`.
+            node (`astroid.Name` or `astroid.Attribute`):
+                The node to try to find the function definition for.
+            wrap (`bool`, optional):
+                If True, a "third-party label" (by default, <>s) will be added
+                to the result of this function. If False, no <>s will be added.
+                Default is False.
+
+        Returns:
+            str: The path somewhere on the user's PYTHONPATH that could be used
+                 to import `node`.
+
+        '''
+        search_name = get_import_name(node)
+        object_line_number = node.lineno
 
         for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
             if item.lineno >= object_line_number:
@@ -602,6 +698,9 @@ def _process_as_thirdparty_attribute(node, wrap=False):
                         return item.modname + '.' + search_name
         return ''
 
+    # This third-party attribute may be an object that is either imported or
+    # is actually defined (i.e. accessible) in the current module. Find it.
+    #
     module = node.root()
 
     if environment.allow_type_follow():
@@ -622,7 +721,7 @@ def _process_as_thirdparty_attribute(node, wrap=False):
     #        of the import as a "third-party" name, like <textwrap.dedent>
     #        (and not "str", like it should be)
     #
-    import_path = get_import_path_from_ast(module, node)
+    import_path = get_import_path_from_ast(module, node, wrap=wrap)
     if import_path and hasattr(node, 'attrname'):
         import_path += '.' + node.attrname
 
@@ -684,6 +783,7 @@ def _process_as_builtin_func(obj):
         'set': set,
         'str': str,
         'tuple': tuple,
+        'isinstance': bool,
     }
 
     try:

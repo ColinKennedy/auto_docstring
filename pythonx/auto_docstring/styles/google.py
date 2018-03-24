@@ -26,7 +26,7 @@ class BaseStyle(object):
     _blocks = dict()
 
     @abc.abstractproperty
-    def name():
+    def name(self):
         '''str: A unique name for this class.'''
         return ''
 
@@ -52,6 +52,16 @@ class BaseStyle(object):
 
     @classmethod
     def _get_block(cls, block):
+        '''Get the class used for the given `block` name.
+
+        Args:
+            block (str): The name of a registered block class.
+
+        Returns:
+            :class:`auto_docstring.blocks.google.common_block` or NoneType:
+                The found block.
+
+        '''
         try:
             return cls._blocks[block]
         except KeyError:
@@ -76,15 +86,35 @@ class GoogleStyle(BaseStyle):
         yields_block.Yields.name: yields_block.Yields,
     }
 
+    # TODO : Clean up vararg. It should only be str
+    # TODO : Clean up kwarg. It should only be str
+    # TODO : Possibly pass FunctionDef into info?
+    # TODO : Come back to this docstring and write about NotImplementedError
+    #        after there are some unittests for user-defined blocks
+    #
     @classmethod
     def draw(cls, info):
-        # '''Create a list of docstring lines to create, given some `info`.
+        '''Create a list of docstring lines to create, given some `info`.
 
-        # Args:
+        Args:
+            info (dict[str, list[str] or `astroid.NodeNG` or NoneType):
+                The information to draw.
 
-        # Returns:
-        #     list[str]:
-        # '''
+                'vararg' (str or NoneType):
+                    The name of the `*args` function parameter.
+                'returns' (list[`astroid.NodeNG`]):
+                    The object(s) that this function returns.
+                'kwarg': (NoneType or str):
+                    The name of the `**kwargs` function parameter.
+                'defaults' (list[tuple[str, `astroid.NodeNG`]]):
+                    The name and default value of the function parameters.
+                'in': (`astroid.Module` or NoneType):
+                    The root module that defined the `astroid.FunctionDef`.
+
+        Returns:
+            list[str]: The generated docstring lines.
+
+        '''
         spacing = cls._get_spacing()
         lines = []
 

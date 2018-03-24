@@ -55,7 +55,7 @@ class CommonBlock(object):
         return []
 
     @abc.abstractproperty
-    def name():
+    def name(self):
         '''str: A unique name to use to identify this block-type.'''
         return '_unique_id'
 

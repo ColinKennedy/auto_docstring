@@ -9,7 +9,7 @@ import os
 # IMPORT AUTO-DOCSTRING LIBRARIES
 import auto_docstring
 # TODO : Make this relative
-from auto_docstring.blocks.google import common_block
+from auto_docstring.blocks.google import common_type
 
 
 auto_docstring.register('str.format', returns='str')
@@ -34,12 +34,12 @@ def get_getenv_return_types(obj):
     all_types = []
     args = obj.args
     for arg in args:
-        all_types.append(common_block.process_types(arg))
+        all_types.append(common_type.process_types(arg))
 
     if len(args) == 1:
         all_types.append('str')
         all_types.append('NoneType')
 
-    return common_block.make_items_text(all_types)
+    return common_type.make_items_text(all_types)
 
 auto_docstring.register(os.getenv, returns=get_getenv_return_types)
