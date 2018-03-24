@@ -8,10 +8,6 @@ import os
 import re
 
 
-# TODO : Make OPTIONS useful
-OPTIONS = {
-    'style': os.getenv('AUTO_DOCSTRING_STYLE', 'google'),
-}
 _STYLES = dict()
 _STYLE_BLOCK_ORDER_COMPILE = re.compile(r'(?P<name>\w+):(?P<blocks>[\w+,]):')
 
@@ -30,6 +26,12 @@ def allow_type_follow():
         return bool(int(os.getenv('AUTO_DOCSTRING_TYPE_FOLLOW', '1')))
     except TypeError:
         return True
+
+
+# TODO : Add this to __init__.py
+def get_all_style_info():
+    '''dict[str, object]: The name of a docstring style and its Python object.'''
+    return _STYLES
 
 
 # TODO : Remove this function, later
@@ -119,10 +121,8 @@ def get_trailing_characters_to_drop():
     return os.getenv('AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS', '.')
 
 
-# TODO : Add this to __init__.py
-def get_all_style_info():
-    '''dict[str, object]: The name of a docstring style and its Python object.'''
-    return _STYLES
+def get_current_style():
+    return os.getenv('AUTO_DOCSTRING_STYLE', 'google')
 
 
 # TODO : Finish this docstring

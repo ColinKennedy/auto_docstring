@@ -6,6 +6,10 @@
 # IMPORT STANDARD LIBRARIES
 import textwrap
 import unittest
+import os
+
+# IMPORT THIRD-PARTY LIBRARIES
+import six
 
 # IMPORT AUTO-DOCSTING LIBRARIES
 from auto_docstring import docstring_builder
@@ -42,7 +46,13 @@ class CommonTestCase(unittest.TestCase):
 
     '''A unittest.TestCase that makes creating and comparing docstrings easy.'''
 
+    @staticmethod
+    def _make_code(code):
+        code = code.replace('{', '{{').replace('}', '}}')
+        return code % '{curs}'
+
     def setUp(self):
+        self.env_copy = dict(os.environ)
         auto_docstring.deregister_all()
 
     def compare(self, expected_output, code, style='google'):
@@ -88,13 +98,13 @@ class CommonTestCase(unittest.TestCase):
 
         generated_docstring = docstring_builder.create_docstring(code, row=row, style=style)
 
-#         for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
-#             if char1 != char2:
-#                 raise ValueError(('asdfdf', index, generated_docstring[:index]))
+        for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
+            if char1 != char2:
+                raise ValueError(('asdfdf', index, char1, char2, generated_docstring[:index]))
 
         self.assertEqual(expected_output, generated_docstring)
 
-    @staticmethod
-    def _make_code(code):
-        code = code.replace('{', '{{').replace('}', '}}')
-        return code % '{curs}'
+    def tearDown(self):
+        os.environ.clear()
+        for key, value in six.iteritems(self.env_copy):
+            os.environ[key] = value

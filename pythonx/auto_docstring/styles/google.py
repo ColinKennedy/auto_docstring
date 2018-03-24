@@ -25,6 +25,8 @@ class BaseStyle(object):
     '''An abstract class that is used to create a docstring style.'''
 
     _blocks = dict()
+    # TODO : Replace uses of {!f} with this attribute
+    marker = '{!f}'
 
     @abc.abstractproperty
     def name(self):
@@ -207,10 +209,10 @@ class GoogleStyle(BaseStyle):
 
         '''
         if cls._is_multiline(lines):
-            return ['{!f}.\n']
+            return ['{marker}.\n'.format(marker=cls.marker)]
 
         if not lines:
-            return ['{!f}.']
+            return ['{marker}.'.format(marker=cls.marker)]
         return []
 
     @classmethod

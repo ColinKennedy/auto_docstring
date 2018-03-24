@@ -25,6 +25,22 @@ class SphinxStyle(google.GoogleStyle):
         yields_block.Yields.name: yields_block.Yields,
     }
 
+    @classmethod
+    def _is_header_lines(cls, lines):
+        return len(lines) == 1 and lines[0] == cls.marker + '.'
+
+    @classmethod
+    def _is_multiline(cls, lines):
+        if cls._is_header_lines(lines):
+            return False
+
+        # TODO : explain significance (raises, as an example)
+        for line in lines:
+            if line.strip():
+                return True
+
+        return False
+
     # TODO : Override spacing rules
     @staticmethod
     def get_spacing():

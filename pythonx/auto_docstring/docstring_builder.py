@@ -31,7 +31,7 @@ def create_docstring(code, row, style=''):
 
     '''
     if not style:
-        style = environment.OPTIONS.get('style')
+        style = environment.get_current_style()
 
     # Parse the code
     node = astroid.parse(code)

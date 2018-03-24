@@ -154,7 +154,7 @@ class ReturnTestCase(SphinxTestCase):
         self.compare(expected_output, code)
 
 
-class RaisesTestCase(common.CommonTestCase):
+class RaisesTestCase(SphinxTestCase):
     def test_basic(self):
         code = \
             '''
@@ -165,7 +165,7 @@ class RaisesTestCase(common.CommonTestCase):
 
         expected_output = \
             '''\
-            {!f}.
+            {1!f}.
 
             :raises ValueError: {2:Some message!f}.
 
