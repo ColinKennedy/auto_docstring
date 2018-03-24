@@ -1,5 +1,15 @@
 ####
 
+def foo():
+    '''<os.join>: asdfasfd.'''
+    return os.path.join('asdfd')
+
+This is wrong.
+1. It should be os.path.join
+2. It should just be a string, not os.path.join!
+
+####
+
     def visit_return(self, node):
         def is_yield_return(node):
             sibling = node.next_sibling()
@@ -730,3 +740,21 @@ def update_wrapper(wrapper,
         getattr(wrapper, attr).update(getattr(wrapped, attr, {}))
     # Return the wrapper so this can be used as a decorator via partial()
     return wrapper
+
+
+
+#### Got a NoneTypeError
+
+This should be able to find the type from `_blocks`
+
+    @classmethod
+    def _get_block(cls, block):
+        try:
+            return cls._blocks[block]
+        except KeyError:
+            return
+
+Also, make sure this works with a regular dict, too, not just a
+classproperty
+
+Also, this should pass safely, even if `_blocks` is an empty dict
