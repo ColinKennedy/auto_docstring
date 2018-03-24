@@ -24,6 +24,11 @@ class Raises(common_block.CommonBlock):
     label = 'Raises'
     name = 'raises'
 
+    # TODO : Remove "get_starting_line" and replace it with "get_starting_lines"
+    @classmethod
+    def get_starting_lines(cls):
+        return ['{}:'.format(cls.label)]
+
     @classmethod
     def draw(cls, info):
         '''Create the docstring lines to represent the given `info`.
@@ -42,8 +47,7 @@ class Raises(common_block.CommonBlock):
         if not raise_info:
             return []
 
-        starting_line = '{}:'.format(cls.label)
-        lines = [starting_line]
+        lines = cls.get_starting_lines()
 
         parser = numberify.RecursiveNumberifyParser()
         for raise_object in raise_info:

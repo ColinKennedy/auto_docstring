@@ -4,9 +4,9 @@
 '''The block class and functions needed to print a Google-style "Args:" block.'''
 
 # IMPORT LOCAL LIBRARIES
-from . import common_block
-from ...config import common
 from ...config import environment
+from ...config import common
+from . import common_block
 
 
 class Args(common_block.CommonBlock):
@@ -41,6 +41,43 @@ class Args(common_block.CommonBlock):
 
         return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)
 
+    @classmethod
+    def _build_args(cls, info):
+        args = info.get('args', [])
+        defaults = info.get('defaults', [])
+        vararg = info.get('vararg', '')
+        kwarg = info.get('kwarg', '')
+
+        if not args and not defaults and not vararg:
+            return []
+
+        lines = []
+
+        for arg in args:
+            lines.append((arg, None))
+
+        for arg, value in defaults:
+            obj_types = cls._expand_types(value, include_type=True)
+            value = cls._change_type_to_str(obj_types)
+            lines.append((arg, value))
+
+        if vararg:
+            lines.append(('*' + vararg, 'tuple'))
+
+        if kwarg:
+            lines.append(('**' + kwarg, 'dict'))
+
+        return lines
+
+    @classmethod
+    def _build_docstring_lines(cls, lines):
+        output = []
+        for arg, value in lines:
+            line = cls._make_line(arg=arg, value=value)
+            output.append(line)
+
+        return output
+
     # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod
     def draw(cls, info):
@@ -55,32 +92,11 @@ class Args(common_block.CommonBlock):
             list[str]: The lines to create.
 
         '''
-        args = info.get('args', [])
-        defaults = info.get('defaults', [])
-        vararg = info.get('vararg', '')
-        kwarg = info.get('kwarg', '')
+        lines = cls._build_args(info)
 
-        if not args and not defaults and not vararg:
-            return []
+        if not lines:
+            return lines
 
-        starting_line = '{}:'.format(cls.label)
-        lines = [starting_line]
+        starting_line = ['{}:'.format(cls.label)]
 
-        for arg in args:
-            line = cls._make_line(arg)
-            lines.append(line)
-
-        for arg, value in defaults:
-            obj_types = cls._expand_types(value, include_type=True)
-            value = cls._change_type_to_str(obj_types)
-
-            line = cls._make_line(arg=arg, value=value)
-            lines.append(line)
-
-        if vararg:
-            lines.append(cls._make_line(arg='*' + vararg, value='tuple'))
-
-        if kwarg:
-            lines.append(cls._make_line(arg='**' + kwarg, value='dict'))
-
-        return lines
+        return starting_line + cls._build_docstring_lines(lines)
