@@ -15,6 +15,7 @@ import os
 
 # IMPORT LOCAL LIBRARIES
 from .styles import google
+from .styles import sphinx
 from .defaults import registry
 from .config import environment
 from .defaults.registry import register
@@ -23,8 +24,13 @@ from .defaults.registry import deregister_all
 
 
 environment.register_code_style(
-    name='google',
+    name=google.GoogleStyle.name,
     obj=google.GoogleStyle,
+)
+
+environment.register_code_style(
+    name=sphinx.SphinxStyle.name,
+    obj=sphinx.SphinxStyle,
 )
 
 # TODO : Split this out into another repo so that the core can be separate from
@@ -41,6 +47,7 @@ for item in os.listdir(__PRESETS_DIR):
     full_path = os.path.join(__PRESETS_DIR, item)
     imp.load_source(name, full_path)
 
+# TODO : Add get_all_styles() method
 
 __all__ = [
     'register',
