@@ -39,7 +39,6 @@ class NumpyStyle(google.GoogleStyle):
             return ['{marker}.\n\n'.format(marker=cls.marker)]
         return []
 
-
     # TODO : Make sure this works.
     @staticmethod
     def get_default_block_order():

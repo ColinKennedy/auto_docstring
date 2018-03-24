@@ -15,7 +15,6 @@
       - combinable types
         x1, x2 : array_like
             Input arrays, description of `x1`, `x2`.
-    - epytext
     - sphinx
         - add AUTO_DOCSTING_SPHINX_PARAM_SINGLE_LINE 1 / 0
           - https://www.jetbrains.com/help/pycharm/using-docstrings-to-specify-types.html

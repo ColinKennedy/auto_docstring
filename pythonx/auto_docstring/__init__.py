@@ -15,6 +15,7 @@ import os
 
 # IMPORT LOCAL LIBRARIES
 from .styles import numpy
+from .styles import epydoc
 from .styles import google
 from .styles import sphinx
 from .defaults import registry
@@ -24,20 +25,10 @@ from .defaults.registry import get_default
 from .defaults.registry import deregister_all
 
 
-environment.register_code_style(
-    name=numpy.NumpyStyle.name,
-    obj=numpy.NumpyStyle,
-)
-
-environment.register_code_style(
-    name=google.GoogleStyle.name,
-    obj=google.GoogleStyle,
-)
-
-environment.register_code_style(
-    name=sphinx.SphinxStyle.name,
-    obj=sphinx.SphinxStyle,
-)
+environment.register_code_style(name=epydoc.EpydocStyle.name, obj=epydoc.EpydocStyle)
+environment.register_code_style(name=google.GoogleStyle.name, obj=google.GoogleStyle)
+environment.register_code_style(name=numpy.NumpyStyle.name, obj=numpy.NumpyStyle)
+environment.register_code_style(name=sphinx.SphinxStyle.name, obj=sphinx.SphinxStyle)
 
 # TODO : Split this out into another repo so that the core can be separate from
 #        the preset functions/return objects

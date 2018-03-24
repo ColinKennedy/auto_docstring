@@ -9,20 +9,26 @@ from . import mixin
 
 
 class Args(mixin.SphinxBlockMixin, args_block.Args):
-    @staticmethod
-    def _make_arg_line(arg):
-        return ':param {arg}: {{!f}}.'.format(arg=arg)
 
-    @staticmethod
-    def _make_type_line(arg, value):
+    _parameter_label = ':param'
+    _type_label = ':type'
+
+    @classmethod
+    def _make_arg_line(cls, arg):
+        return '{parameter} {arg}: {{!f}}.'.format(
+            parameter=cls._parameter_label, arg=arg)
+
+    @classmethod
+    def _make_type_line(cls, arg, value):
         if value is not None:
-            return ':type {arg}: {{{id_}:{value}!f}}'.format(
+            return '{type_label} {arg}: {{{id_}:{value}!f}}'.format(
+                type_label=cls._type_label,
                 arg=arg,
                 id_=common.get_unique_number(),
                 value=value,
             )
 
-        return ':type {arg}: {{!f}}'.format(arg=arg)
+        return '{type_label} {arg}: {{!f}}'.format(type_label=cls._type_label, arg=arg)
 
     @classmethod
     def _build_docstring_lines(cls, lines):
