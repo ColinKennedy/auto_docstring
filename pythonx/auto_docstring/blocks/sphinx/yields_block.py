@@ -4,10 +4,9 @@
 '''The class and functions needed to print a Sphinx-style "Yields" block.'''
 
 # IMPORT LOCAL LIBRARIES
-from ..google import yields_block
-from . import mixin
+from .sphinx import returns_block
 
 
-class Yields(yields_block.Yields, mixin.SphinxBlockMixin):
+class Yields(returns_block.Returns):
 
     '''The "Yields" block main class.'''

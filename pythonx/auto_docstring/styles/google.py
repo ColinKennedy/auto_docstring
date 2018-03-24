@@ -6,6 +6,7 @@
 # IMPORT STANDARD LIBRARIES
 import os
 import abc
+import sys
 
 # IMPORT THIRD-PARTY LIBRARIES
 import six
@@ -86,11 +87,19 @@ class GoogleStyle(BaseStyle):
         yields_block.Yields.name: yields_block.Yields,
     }
 
+    @classmethod
+    def get_max_spacing(cls, lines):
+        if lines and cls._is_multiline(lines):
+            return sys.maxint
+        return 0
+
     # TODO : Clean up vararg. It should only be str
     # TODO : Clean up kwarg. It should only be str
     # TODO : Possibly pass FunctionDef into info?
     # TODO : Come back to this docstring and write about NotImplementedError
     #        after there are some unittests for user-defined blocks
+    #
+    # TODO : Make note about how info is mutated by this function
     #
     @classmethod
     def draw(cls, info):
@@ -111,16 +120,20 @@ class GoogleStyle(BaseStyle):
                 'in': (`astroid.Module` or NoneType):
                     The root module that defined the `astroid.FunctionDef`.
 
+        Raises:
+            NotImplementedError:
+                If a block that was selected to be drawn has no block-class.
+
         Returns:
             list[str]: The generated docstring lines.
 
         '''
-        spacing = cls._get_spacing()
-        lines = []
+        blocks = []
 
+        info.setdefault('lines', [])
+
+        # Collect the blocks to draw and their contents
         for block_name in cls.get_default_block_order():
-            info['lines'] = lines
-
             block = cls._get_block(block_name)
 
             if not block:
@@ -129,11 +142,27 @@ class GoogleStyle(BaseStyle):
                     ''.format(block_name=block_name, obj=cls))
 
             block_lines = block.draw(info)
-            if block_lines and cls._is_multiline(lines):
-                for _ in six.moves.range(spacing):
-                    lines.append('')
 
+            if block_lines:
+                info['lines'] += block_lines
+                blocks.append((block, block_lines))
+                continue
+
+        # Now add spacing for each of the drawn blocks
+        lines = []
+        blocks_len = len(blocks)
+        for index, (block, block_lines) in enumerate(blocks):
             lines.extend(block_lines)
+
+            is_last_block = index + 1 == len(blocks)
+
+            if is_last_block:
+                continue
+
+            spacing = min(cls.get_max_spacing(block_lines), block.get_spacing())
+
+            for _ in six.moves.range(spacing):
+                lines.append('')
 
         lines = cls._get_header(lines) + lines
         lines += cls._get_footer(lines)
@@ -163,15 +192,6 @@ class GoogleStyle(BaseStyle):
     def _is_multiline(lines):
         '''bool: If the given lines needs extra spacing.'''
         return len(lines) > 1
-
-    # TODO : Move this to "environment.py"
-    @staticmethod
-    def _get_spacing():
-        '''int: Get the number of newlines to separate each docstring block.'''
-        try:
-            return int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
-        except TypeError:
-            return 1
 
     @classmethod
     def _get_header(cls, lines):

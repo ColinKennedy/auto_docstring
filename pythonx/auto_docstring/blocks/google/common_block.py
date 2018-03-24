@@ -15,6 +15,7 @@ traverse imported modules to get an object's type.
 
 # IMPORT STANDARD LIBRARIES
 import abc
+import os
 
 # IMPORT THIRD-PARTY LIBRARIES
 import six
@@ -60,9 +61,21 @@ class CommonBlock(object):
         return '_unique_id'
 
     @classmethod
-    def get_starting_line(cls):
-        '''str: Get the label that will be used for the top of this block.'''
-        return '{}:'.format(cls.label)
+    def get_starting_lines(cls):
+        '''list[str]: Get the label used for the top of this block.'''
+        return ['{}:'.format(cls.label)]
+
+    @staticmethod
+    def get_spacing():
+        return
+
+    @staticmethod
+    def get_spacing():
+        '''int: Get the number of newlines to separate each docstring block.'''
+        try:
+            return int(os.getenv('AUTO_DOCSTRING_BLOCK_SPACING', '1'))
+        except TypeError:
+            return 1
 
     @staticmethod
     def _expand_types(obj, include_type=False):
@@ -132,42 +145,57 @@ class MultiTypeBlock(CommonBlock):
     name = 'multitype_base_block'
 
     @classmethod
-    def draw(cls, info):
-        '''Create the docstring lines to represent the given `info`.
-
-        Note:
-            If no data is found for cls._info_key, this method will return
-            an empty list.
-
-        Args:
-            info (dict[str, list[`astroid.NodeNG`]]):
-                The parsed AST node whose type needs to be found and then
-                converted into a string.
-
-        Returns:
-            list[str]: The lines to create.
-
-        '''
+    def _process_args(cls, info):
         expected_object = info.get(cls._info_key)
 
         if not expected_object:
             return []
 
-        lines = []
         indent = ''
 
         # Check if I need this if-statement
         if info.get('lines'):
-            lines = [cls.get_starting_line()]
             indent = environment.get_default_indent()
+
+        info['indent'] = indent
 
         obj_types = cls._expand_types(expected_object)
         type_info_as_str = cls._change_type_to_str(*obj_types)
 
-        line = cls._make_line(type_info_as_str, indent=indent)
-        lines.append(line)
+        return [type_info_as_str]
 
-        return lines
+    @classmethod
+    def _build_docstring_lines(cls, lines, indent=''):
+        return [cls._make_line(line, indent=indent) for line in lines]
+
+    @classmethod
+    def draw(cls, info):
+        # '''Create the docstring lines to represent the given `info`.
+
+        # Note:
+        #     If no data is found for cls._info_key, this method will return
+        #     an empty list.
+
+        # Args:
+        #     info (dict[str, list[`astroid.NodeNG`]]):
+        #         The parsed AST node whose type needs to be found and then
+        #         converted into a string.
+
+        # Returns:
+        #     list[str]: The lines to create.
+
+        # '''
+        lines = cls._process_args(info)
+
+        if not lines:
+            return []
+
+        starting_lines = []
+
+        if info.get('lines'):
+            starting_lines = cls.get_starting_lines()
+
+        return starting_lines + cls._build_docstring_lines(lines, info.get('indent', ''))
 
     @staticmethod
     def _make_line(obj_type, indent):

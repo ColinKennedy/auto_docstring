@@ -5,30 +5,24 @@
 from ...config import environment
 from ..google import args_block
 from ...config import common
+from . import mixin
 
 
-class Args(args_block.Args):
+class Args(mixin.SphinxBlockMixin, args_block.Args):
     @staticmethod
     def _make_arg_line(arg):
-        indent = environment.get_default_indent()
-        return '{indent}:param {arg}: {{!f}}.'.format(
-            indent=indent,
-            arg=arg,
-        )
+        return ':param {arg}: {{!f}}.'.format(arg=arg)
 
     @staticmethod
-    def _make_type_line(value):
-        indent = environment.get_default_indent()
+    def _make_type_line(arg, value):
         if value is not None:
-            return '{indent}:type {{{id_}:{value}!f}}: {{!f}}'.format(
-                indent=indent,
+            return ':type {arg}: {{{id_}:{value}!f}}'.format(
+                arg=arg,
                 id_=common.get_unique_number(),
                 value=value,
             )
 
-        return '{indent}:type {{!f}}: {{!f}}'.format(
-            indent=indent,
-        )
+        return ':type {arg}: {{!f}}'.format(arg=arg)
 
     @classmethod
     def _build_docstring_lines(cls, lines):
@@ -37,6 +31,6 @@ class Args(args_block.Args):
 
         for arg, value in lines:
             args.append(cls._make_arg_line(arg))
-            args_types.append(cls._make_type_line(value))
+            args_types.append(cls._make_type_line(arg, value))
 
         return args + args_types

@@ -78,6 +78,10 @@ class Args(common_block.CommonBlock):
 
         return output
 
+    @classmethod
+    def get_starting_lines(cls):
+        return ['{}:'.format(cls.label)]
+
     # TODO : Use the logic from common_block.MultiTypeBlock, instead
     @classmethod
     def draw(cls, info):
@@ -97,6 +101,5 @@ class Args(common_block.CommonBlock):
         if not lines:
             return lines
 
-        starting_line = ['{}:'.format(cls.label)]
-
+        starting_line = cls.get_starting_lines()
         return starting_line + cls._build_docstring_lines(lines)

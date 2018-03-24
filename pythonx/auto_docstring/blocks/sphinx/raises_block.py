@@ -6,5 +6,5 @@ from ..google import raises_block
 from . import mixin
 
 
-class Raises(raises_block.Raises, mixin.SphinxBlockMixin):
+class Raises(mixin.SphinxBlockMixin, raises_block.Raises):
     pass
