@@ -14,6 +14,7 @@ import imp
 import os
 
 # IMPORT LOCAL LIBRARIES
+from .styles import numpy
 from .styles import google
 from .styles import sphinx
 from .defaults import registry
@@ -22,6 +23,11 @@ from .defaults.registry import register
 from .defaults.registry import get_default
 from .defaults.registry import deregister_all
 
+
+environment.register_code_style(
+    name=numpy.NumpyStyle.name,
+    obj=numpy.NumpyStyle,
+)
 
 environment.register_code_style(
     name=google.GoogleStyle.name,

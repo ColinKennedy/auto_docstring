@@ -165,7 +165,7 @@ class MultiTypeBlock(CommonBlock):
         return [type_info_as_str]
 
     @classmethod
-    def _build_docstring_lines(cls, lines, indent=''):
+    def _build_indented_docstring_lines(cls, lines, indent=''):
         return [cls._make_line(line, indent=indent) for line in lines]
 
     @classmethod
@@ -195,7 +195,7 @@ class MultiTypeBlock(CommonBlock):
         if info.get('lines'):
             starting_lines = cls.get_starting_lines()
 
-        return starting_lines + cls._build_docstring_lines(lines, info.get('indent', ''))
+        return starting_lines + cls._build_indented_docstring_lines(lines, info.get('indent', ''))
 
     @staticmethod
     def _make_line(obj_type, indent):

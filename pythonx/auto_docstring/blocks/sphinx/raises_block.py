@@ -10,7 +10,7 @@ from . import mixin
 
 class Raises(mixin.SphinxBlockMixin, raises_block.Raises):
     @staticmethod
-    def _make_line(raise_type, message=''):
+    def _make_lines(raise_type, message=''):
         # '''Get the docstring representation of the given `raise_type`.
 
         # Args:
@@ -26,12 +26,12 @@ class Raises(mixin.SphinxBlockMixin, raises_block.Raises):
         # '''
         indent = environment.get_default_indent()
         if message:
-            return ':raises {raise_type}: {{{number}:{message}!f}}.'.format(
+            return [':raises {raise_type}: {{{number}:{message}!f}}.'.format(
                 indent=indent,
                 raise_type=raise_type,
                 number=common.get_unique_number(),
                 message=message,
-            )
+            )]
 
-        return ':raises {raise_type}: {{!f}}.'.format(
-            indent=indent, raise_type=raise_type)
+        return [':raises {raise_type}: {{!f}}.'.format(
+            indent=indent, raise_type=raise_type)]

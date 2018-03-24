@@ -65,12 +65,12 @@ class Raises(common_block.CommonBlock):
             # TODO : Write message about importance
             message = message[message.index(':') + 1:]
 
-            lines.append(cls._make_line(type_name, message=message))
+            lines.extend(cls._make_lines(type_name, message=message))
 
         return lines
 
     @staticmethod
-    def _make_line(raise_type, message=''):
+    def _make_lines(raise_type, message=''):
         '''Get the docstring representation of the given `raise_type`.
 
         Args:
@@ -86,15 +86,15 @@ class Raises(common_block.CommonBlock):
         '''
         indent = environment.get_default_indent()
         if message:
-            return '{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
+            return ['{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
                 indent=indent,
                 raise_type=raise_type,
                 number=common.get_unique_number(),
                 message=message,
-            )
+            )]
 
-        return '{indent}{raise_type}: {{!f}}.'.format(
-            indent=indent, raise_type=raise_type)
+        return ['{indent}{raise_type}: {{!f}}.'.format(
+            indent=indent, raise_type=raise_type)]
 
     # TODO : Move this to environment.py
     @staticmethod
