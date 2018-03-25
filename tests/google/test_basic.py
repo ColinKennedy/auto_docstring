@@ -265,28 +265,6 @@ class FunctionDefaultArgTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_custom_standard_object(self):
-        '''Build a standard-library object that needs to be imported.'''
-        code = \
-            '''
-            import collections
-
-            def foo(bar=collections.OrderedDict()):
-                {curs}
-                pass
-            '''
-
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                bar ({2:<collections.OrderedDict>!f}, optional): {3!f}.
-
-            '''
-
-        self.compare(expected_output, code)
-
     def test_kwarg(self):
         '''Create a docstring using a function that contains `**kwargs`.'''
         code = \
@@ -614,66 +592,6 @@ class ReturnYieldTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_imported_function(self):
-        '''Build a docstring that has to "find" the function object.'''
-        code = \
-            '''
-            from itertools import islice
-
-            def foo():
-                {curs}
-                return islice([4, 5, 6, 7, 8, 9], 3)
-            '''
-
-        expected_output = '{1:<itertools.islice>!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
-    def test_imported_class(self):
-        '''Build a docstring that has to "find" the class object.'''
-        code = \
-            '''
-            from collections import Counter
-
-            def foo():
-                {curs}
-                return Counter()
-            '''
-
-        expected_output = '{1:<collections.Counter>!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
-    def test_third_party_callable_001(self):
-        '''Get the full import path because the module is find-able.'''
-        code = \
-            '''
-            from PySide import QtGui
-
-            def make_parser_validator():
-                {curs}
-                name_regex = parser.get_token_parse(name, parse_type='regex')
-                return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
-            '''
-
-        expected_output = '{1:<PySide.QtGui.QRegExpValidator>!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
-    def test_third_party_callable_002(self):
-        '''Get the direct object because the module is not find-able.'''
-        code = \
-            '''
-            def make_parser_validator():
-                {curs}
-                name_regex = parser.get_token_parse(name, parse_type='regex')
-                return QtGui.QRegExpValidator(QtCore.QRegExp(name_regex), parent=parent)
-            '''
-
-        expected_output = '{1:<QtGui.QRegExpValidator>!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
     # TODO : Finish these
     # def test_imported_thirdparty_function(self):
     #     '''Build a docstring that has to "find" the function object.'''
@@ -779,84 +697,6 @@ class StandardTestCase(common.CommonTestCase):
             '''
 
         expected_output = '{1:dict!f}: {2!f}.'
-
-        self.compare(expected_output, code)
-
-    def test_unknown_function(self):
-        '''Return a function return type if its type was not found.'''
-        code = \
-            '''\
-            from itertools import izip
-
-            def pairwise(iterable):
-                {curs}
-                a, b = tee(iterable)
-                next(b, None)
-                return izip(a, b)
-            '''
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                iterable ({2!f}): {3!f}.
-
-            Returns:
-                {4:<itertools.izip>!f}: {5!f}.
-
-            '''
-        self.compare(expected_output, code)
-
-    def test_imported_function_001(self):
-        '''Create a docstring for an imported function.'''
-        code = \
-            '''
-            from functools import partial
-
-            def wraps(wrapped):
-                {curs}
-                return partial(update_wrapper, wrapped=wrapped,
-                            assigned=assigned, updated=updated)
-            '''
-
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                wrapped ({2!f}): {3!f}.
-
-            Returns:
-                {4:<functools.partial>!f}: {5!f}.
-
-            '''
-
-        self.compare(expected_output, code)
-
-    def test_imported_function_002(self):
-        '''Create a docstring for an imported module with an alias.'''
-        code = \
-            '''
-            import functools as func
-
-            def wraps(wrapped):
-                {curs}
-                return func.partial(
-                    update_wrapper, wrapped=wrapped,
-                    assigned=assigned, updated=updated)
-            '''
-
-        expected_output = \
-            '''\
-            {1!f}.
-
-            Args:
-                wrapped ({2!f}): {3!f}.
-
-            Returns:
-                {4:<functools.partial>!f}: {5!f}.
-
-            '''
 
         self.compare(expected_output, code)
 
