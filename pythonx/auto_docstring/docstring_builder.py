@@ -87,12 +87,6 @@ def create_docstring(code, row, style='', wrap=False):
 
     if wrap:
         delimiter = environment.get_docstring_delimiter()
-        # if environment.auto_raw_prefix() and _needs_prefix(generated_docstring):
-        #     prefix = 'r'
-        # else:
-        #     prefix = ''
-
-        # return prefix + delimiter + generated_docstring + delimiter
         return delimiter + generated_docstring + delimiter
 
     return generated_docstring
@@ -120,8 +114,16 @@ def create_ultisnips_docstring(code, row, style='', wrap=False):
         str: The auto-generated, UltiSnips docstring.
 
     '''
-    docstring = create_docstring(code, row, style=style, wrap=wrap)
-    return convert_to_ultisnips(docstring)
+    docstring = create_docstring(code, row, style=style)
+    docstring = convert_to_ultisnips(docstring)
+
+    # TODO : Once parsing has been fixed, remove this "if wrap:" condition
+    # and get create_docstring do it, instead.
+    #
+    if wrap:
+        delimiter = environment.get_docstring_delimiter()
+        return delimiter + docstring + delimiter
+    return docstring
 
 
 def convert_to_ultisnips(code):

@@ -41,7 +41,7 @@ class AdvancedTestCase(common.CommonTestCase):
 
         expected_output = textwrap.dedent(expected_output)
         generated_docstring = docstring_builder.create_ultisnips_docstring(
-            code, row=row, style='google')
+            code, row=row, style='google', wrap=wrap)
 
         # for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
         #     if char1 != char2:
@@ -49,6 +49,19 @@ class AdvancedTestCase(common.CommonTestCase):
         #         raise ValueError(('asdfsfd', index, char1, char2))
 
         self.assertEqual(expected_output, generated_docstring)
+
+    def test_single_line_wrap(self):
+        '''Create a docstring that is only one line long.'''
+        code = \
+            '''
+            def foo():
+                {curs}
+                return 0
+            '''
+
+        expected_output = '"""${1:int}: $2."""'
+
+        self.compare(expected_output, code, wrap=True)
 
     def test_function_0001(self):
         '''Create a correct docstring for a function with a nested function.'''
