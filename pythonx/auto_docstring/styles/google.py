@@ -16,6 +16,7 @@ from ..blocks.google import args_block
 from ..blocks.google import raises_block
 from ..blocks.google import yields_block
 from ..blocks.google import returns_block
+from ..config import environment
 
 
 # TODO : Double check that this has everything
@@ -135,7 +136,7 @@ class GoogleStyle(BaseStyle):
         info.setdefault('lines', [])
 
         # Collect the blocks to draw and their contents
-        for block_name in cls.get_default_block_order():
+        for block_name in environment.get_block_order(cls.name):
             block = cls._get_block(block_name)
 
             if not block:

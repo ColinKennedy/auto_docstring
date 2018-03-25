@@ -1005,9 +1005,16 @@ def make_container_label(container, items_text=''):
         str: The string representation of the given `container` and `items_text`.
 
     '''
+    prefix = environment.get_container_prefix()
+    suffix = environment.get_container_suffix()
+
     if items_text:
-        return '{container}[{items_text}]'.format(
-            container=container, items_text=items_text)
+        return '{container}{prefix}{items_text}{suffix}'.format(
+            container=container,
+            prefix=prefix,
+            items_text=items_text,
+            suffix=suffix
+        )
 
     return container
 
@@ -1021,7 +1028,8 @@ def make_join_text(items):
 # TODO : Make this configure-able
 def make_items_text(items):
     '''str: Combine the given `items` with the user's prefered choice-text.'''
-    return ' or '.join(items)
+    join_text = environment.get_option_separator()
+    return join_text.join(items)
 
 
 # TODO : Make this configure-able

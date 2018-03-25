@@ -160,14 +160,6 @@ a function for that.
 The text which is used to start and end the docstring
 
 
-`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR` Default: `' '`
-
-The text that gets placed between an argument + its type and the tabstop that
-is used for its message.
-
-AUTHOR-NOTE: Show what this looks like
-
-
 `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` Default: `1`
 
 If '1' and a string could be found a raised exception then add that to the
@@ -190,7 +182,7 @@ source-file, sorted by line number. If "descending" then the sort is reversed.
 If "alphabetical" then line number is ignored and it is sorted by-name.
 
 
-### Markup Config Settings
+### Syntax Config Settings
 
 `AUTO_DOCSTRING_THIRD_PARY_PREFIX` Default: `<`
 
@@ -198,8 +190,28 @@ If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the beginning to tell the user "this is
 undefined".
 
+
 `AUTO_DOCSTRING_THIRD_PARY_SUFFIX` Default: `>`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the end to tell the user "this is
 undefined".
+
+
+`AUTO_DOCSTRING_CONTAINER_PREFIX` Default: `[`
+
+The character or phrase that is used to
+
+`AUTO_DOCSTRING_CONTAINER_SUFFIX`
+
+
+`AUTO_DOCSTRING_OPTION_SEPARATOR` Default: `" or "`
+
+
+`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR` Default: `' '`
+
+The text that gets placed between an argument + its type and the tabstop that
+is used for its message.
+
+AUTHOR-NOTE: Show what this looks like
+

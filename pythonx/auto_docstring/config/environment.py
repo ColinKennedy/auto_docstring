@@ -9,7 +9,11 @@ import re
 
 
 _STYLES = dict()
-_STYLE_BLOCK_ORDER_COMPILE = re.compile(r'(?P<name>\w+):(?P<blocks>[\w+,]):')
+_STYLE_BLOCK_ORDER_COMPILE = re.compile(r'(?P<name>\w+):(?P<blocks>[\w,]+):')
+
+
+def auto_raw_prefix():
+    return os.getenv('AUTO_DOCSTRING_RAW_PREFIX', '1') == '1'
 
 
 def allow_type_follow():
@@ -22,10 +26,7 @@ def allow_type_follow():
               it has found all its return types. Default is True.
 
     '''
-    try:
-        return bool(int(os.getenv('AUTO_DOCSTRING_TYPE_FOLLOW', '1')))
-    except TypeError:
-        return True
+    return os.getenv('AUTO_DOCSTRING_TYPE_FOLLOW', '1') == '1'
 
 
 # TODO : Add this to __init__.py
@@ -55,9 +56,32 @@ def get_block_order(name):
         tuple[str]: The order of blocks.
 
     '''
+    def get_default_style_blocks(name):
+        try:
+            style_class = _STYLES[name]
+        except KeyError:
+            return tuple()
+
+        return style_class.get_default_block_order()
+
     order_info = os.getenv('AUTO_DOCSTRING_BLOCK_ORDER', '')
 
-    for style, blocks in _STYLE_BLOCK_ORDER_COMPILE.findall(order_info):
+    if not order_info:
+        # Fall-back to the class definition, if no env var for that style was defined
+        return get_default_style_blocks(name)
+
+    info = _STYLE_BLOCK_ORDER_COMPILE.findall(order_info)
+
+    if not info:
+        blocks = []
+        for block in order_info.split(','):
+            block = block.strip()
+            if block and block not in blocks:
+                blocks.append(block)
+
+        return tuple(blocks)
+
+    for style, blocks in info:
         if style != name:
             continue
 
@@ -69,13 +93,15 @@ def get_block_order(name):
 
         return tuple(output_blocks)
 
-    # Fall-back to the class definition, if no env var for that style was defined
-    try:
-        style_class = _STYLES[name]
-    except KeyError:
-        return tuple()
+    return get_default_style_blocks(name)
 
-    return style_class.get_default_block_order()
+
+def get_container_prefix():
+    return os.getenv('AUTO_DOCSTRING_CONTAINER_PREFIX', '[')
+
+
+def get_container_suffix():
+    return os.getenv('AUTO_DOCSTRING_CONTAINER_SUFFIX', ']')
 
 
 # TODO : Change name to get_indent
@@ -87,6 +113,10 @@ def get_default_indent():
 
     '''
     return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
+
+
+def get_docstring_delimiter():
+    return os.getenv('AUTO_DOCSTRING_DELIMITER', '"""')
 
 
 def get_trailing_characters_to_drop():
@@ -123,6 +153,10 @@ def get_trailing_characters_to_drop():
 
 def get_current_style():
     return os.getenv('AUTO_DOCSTRING_STYLE', 'google')
+
+
+def get_option_separator():
+    return os.getenv('AUTO_DOCSTRING_OPTION_SEPARATOR', ' or ')
 
 
 # TODO : Finish this docstring

@@ -59,7 +59,7 @@ class CommonTestCase(unittest.TestCase):
         self.files_folders = set()
         self.paths = list(sys.path)
 
-    def compare(self, expected_output, code, style='google'):
+    def compare(self, expected_output, code, style='google', wrap=False):
         '''Format and test the given source `code` and `expected_output`.
 
         Warning:
@@ -100,11 +100,12 @@ class CommonTestCase(unittest.TestCase):
         # Remove the cursor-text and then generate the docstring
         code = code.format(curs='')
 
-        generated_docstring = docstring_builder.create_docstring(code, row=row, style=style)
+        generated_docstring = docstring_builder.create_docstring(
+            code, row=row, style=style, wrap=wrap)
 
-        for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
-            if char1 != char2:
-                raise ValueError(('asdfdf', index, char1, char2, generated_docstring[:index]))
+#         for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
+#             if char1 != char2:
+#                 raise ValueError(('asdfdf', index, char1, char2, generated_docstring[:index]))
 
         self.assertEqual(expected_output, generated_docstring)
 

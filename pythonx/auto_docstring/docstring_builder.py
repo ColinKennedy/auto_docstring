@@ -14,7 +14,17 @@ from .config import environment
 from .parsing import ultisnips_build
 
 
-def create_docstring(code, row, style=''):
+def _needs_prefix(text):
+    options = ('\r', '\t', '\n', '\b')
+    for option in options:
+        if option in text:
+            return True
+
+    return False
+
+
+# TODO : Update 'wrap' in docstring
+def create_docstring(code, row, style='', wrap=False):
     '''Create a docstring for the given `code`, at the specified `row`.
 
     Args:
@@ -70,7 +80,18 @@ def create_docstring(code, row, style=''):
     #     '''
     #
     parser = numberify.RecursiveNumberifyParser()
-    return parser.parse(initial_docstring)
+    generated_docstring = parser.parse(initial_docstring)
+
+    if wrap:
+        delimiter = environment.get_docstring_delimiter()
+        if environment.auto_raw_prefix() and _needs_prefix(generated_docstring):
+            prefix = 'r'
+        else:
+            prefix = ''
+
+        return prefix + delimiter + generated_docstring + delimiter
+
+    return generated_docstring
 
 
 def create_ultisnips_docstring(code, row, style=''):
