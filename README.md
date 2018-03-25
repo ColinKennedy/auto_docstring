@@ -112,7 +112,9 @@ variables exist.
 
 ### Behavior Config Settings
 
-`AUTO_DOCSTRING_STYLE` Default: `google`
+env var: `AUTO_DOCSTRING_STYLE`
+vim var: `g:auto_docstring_style`
+Default: `google`
 
 Options: ("google", "sphinx", "numpy", "epydoc")
 
@@ -121,16 +123,22 @@ You can add your own styles and register them if you want (Seealso)
 TODO make the feature to let people register their own styles ...
 If you do make your own style, you can use it for this setting.
 
-`AUTO_DOCSTRING_FOLLOW` Default: `1`
+env var: `AUTO_DOCSTRING_TYPE_FOLLOW`
+vim var: `g:auto_docstring_type_follow`
+Default: `1`
 
 If '1', this will search through callable objects to get the actual type
 If '0', it will just return the object/variable name, directly
 
-`AUTO_DOCSTRING_AUTO_RAW_PREFIX` Default: `1`
+env var: `AUTO_DOCSTRING_AUTO_RAW_PREFIX`
+vim var: `g:auto_docstring_raw_prefix`
+Default: `1`
 
 Add 'r' to the docstring tag if the docstring contains '\'
 
-`AUTO_DOCSTRING_BLOCK_ORDER` Default: `args,raises,returns,yields`
+env var: `AUTO_DOCSTRING_BLOCK_ORDER`
+vim var: `g:auto_docstring_block_order`
+Default: `args,raises,returns,yields`
 
 The comma-separated list to use to display docstring blocks.
 You can specify block-order per-style, like this:
@@ -147,25 +155,33 @@ a function for that.
 
 ### Style Config Settings
 
-`AUTO_DOCSTRING_DELIMITER` Default: `"""`
+env var: `AUTO_DOCSTRING_DELIMITER`
+vim var: `g:auto_docstring_delimiter`
+Default: `"""`
 
 The text which is used to start and end the docstring
 
 
-`AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` Default: `1`
+env var: `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE`
+vim var: `g:auto_docstring_`
+Default: `1`
 
 If '1' and a string could be found a raised exception then add that to the
 auto-generated docstring.
 If '0', do not include the message, even if there is one
 
 
-`AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS` Default: `.`
+env var: `AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS`
+vim var: `g:auto_docstring_remove_trailing_characters`
+Default: `.`
 
 Character(s) to remove at the end of a raised exception's message. This
 setting does nothing when `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` is set to '0'.
 
 
-`AUTO_DOCSTING_TYPE_ORDER` Default: `descending`
+env var: `AUTO_DOCSTING_TYPE_ORDER`
+vim var: `g:auto_docsting_type_order`
+Default: `descending`
 
 Options: ("ascending", "descending", "alphabetical")
 
@@ -176,31 +192,43 @@ If "alphabetical" then line number is ignored and it is sorted by-name.
 
 ### Syntax Config Settings
 
-`AUTO_DOCSTRING_THIRD_PARY_PREFIX` Default: `<`
+env var: `AUTO_DOCSTRING_THIRD_PARY_PREFIX`
+vim var: `g:auto_docstring_third_pary_prefix`
+Default: `<`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the beginning to tell the user "this is
 undefined".
 
 
-`AUTO_DOCSTRING_THIRD_PARY_SUFFIX` Default: `>`
+env var: `AUTO_DOCSTRING_THIRD_PARY_SUFFIX`
+vim var: `g:auto_docstring_third_pary_suffix`
+Default: `>`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the end to tell the user "this is
 undefined".
 
 
-`AUTO_DOCSTRING_CONTAINER_PREFIX` Default: `[`
+env var: `AUTO_DOCSTRING_CONTAINER_PREFIX`
+vim var: `g:auto_docstring_container_prefix`
+Default: `[`
 
+TODO finish description
 The character or phrase that is used to
 
-`AUTO_DOCSTRING_CONTAINER_SUFFIX`
+env var: `AUTO_DOCSTRING_CONTAINER_SUFFIX`
+vim var: `g:auto_docstring_container_suffix`
+Default: `]`
+
+env var: `AUTO_DOCSTRING_OPTION_SEPARATOR`
+vim var: `g:auto_docstring_option_separator`
+Default: `" or "`
 
 
-`AUTO_DOCSTRING_OPTION_SEPARATOR` Default: `" or "`
-
-
-`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR` Default: `' '`
+env var: `AUTO_DOCSTRING_DESCRIPTION_SEPARATOR`
+vim var: `g:auto_docstring_description_separator`
+Default: `' '`
 
 The text that gets placed between an argument + its type and the tabstop that
 is used for its message.
@@ -241,7 +269,7 @@ should return a type of "set[int]"
 - Add type-inference for classmethods and instancemethods
 
 
-### 0.3
+### 1.0
 - Add better support for standard library functions, classes, and objects
 - Find a way to display individal docstring blocks, rather than generating
   an entire docstring all at once
@@ -250,14 +278,14 @@ should return a type of "set[int]"
 - Support generator syntax with cast types. For example
 
 
-### 0.4
+### 1.1
 - Add convenience snippets such as ...
 	- "ard" - Which replaces the docstring in the function
 	- "acd" - Which will re-use an exising docstring and only add/remove members
 	- These commands would work in VISUAL mode, too
 
 
-### 0.5
+### 1.2
 
 - unclosed return detection
 i.e.
