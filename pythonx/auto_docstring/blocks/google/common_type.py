@@ -273,6 +273,7 @@ class IterableType(Type):
 
         for subitem in visit.iterate(node):
             # If it's a Name or Call object and its type needs to be inferred
+            # TODO : Replace with classmethods
             if SpecialType.is_valid(subitem):
                 self.items.append(SpecialType(subitem))
                 continue

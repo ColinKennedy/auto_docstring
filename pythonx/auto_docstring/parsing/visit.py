@@ -308,6 +308,8 @@ def get_value_binop(node):
     old-style strings, like "%s" % ('foo', ). That would be an example of
     a binary operator using a str and tuple.
 
+    Another example is the "+" sign.
+
     Returns:
         The found value or NoneType.
 
