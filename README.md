@@ -44,6 +44,8 @@ the snippet to UltiSnips's list of Python snippets.
 Open a Python file, any is fine, and then run `:UltiSnipsEdit` to open your
 python.snippets file. Add this snippet defintion into it
 
+TODO Make sure these snippets work + installation instructions
+
 ```vim
 global !p
 from auto_docstring import docstring_builder
@@ -132,10 +134,9 @@ If you do make your own style, you can use it for this setting.
 If '1', this will search through callable objects to get the actual type
 If '0', it will just return the object/variable name, directly
 
-`AUTO_DOCSTRING_AUTO_RAW_PREFIX`
+`AUTO_DOCSTRING_AUTO_RAW_PREFIX` Default: `1`
 
 Add 'r' to the docstring tag if the docstring contains '\'
-Default: `1`
 
 `AUTO_DOCSTRING_BLOCK_ORDER` Default: `args,raises,returns,yields`
 
@@ -160,6 +161,7 @@ The text which is used to start and end the docstring
 
 
 `AUTO_DOCSTRING_DESCRIPTION_SEPARATOR` Default: `' '`
+
 The text that gets placed between an argument + its type and the tabstop that
 is used for its message.
 
