@@ -6,6 +6,8 @@
 # IMPORT STANDARD LIBRARIES
 import textwrap
 import unittest
+import shutil
+import sys
 import os
 
 # IMPORT THIRD-PARTY LIBRARIES
@@ -54,6 +56,8 @@ class CommonTestCase(unittest.TestCase):
     def setUp(self):
         self.env_copy = dict(os.environ)
         auto_docstring.deregister_all()
+        self.files_folders = set()
+        self.paths = list(sys.path)
 
     def compare(self, expected_output, code, style='google'):
         '''Format and test the given source `code` and `expected_output`.
@@ -105,6 +109,19 @@ class CommonTestCase(unittest.TestCase):
         self.assertEqual(expected_output, generated_docstring)
 
     def tearDown(self):
+        for item in self.files_folders:
+            if os.path.isdir(item):
+                shutil.rmtree(item)
+            elif os.path.isfile(item):
+                os.remove(item)
+
+        self.files_folders = self.files_folders.__class__()
+
+        sys.path[:] = []
+
+        for path in self.paths:
+            sys.path.append(path)
+
         os.environ.clear()
         for key, value in six.iteritems(self.env_copy):
             os.environ[key] = value
