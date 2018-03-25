@@ -90,16 +90,12 @@ This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
 
-Sphinx
 [![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.kng)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
-Numpy
 [![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
-Google
 [![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
-Epydoc
 [![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
 - classmethod/staticmethod recognition
@@ -153,37 +149,32 @@ Default: `args,raises,returns,yields`
 
 ### Style Config Settings
 
-`AUTO_DOCSTRING_DELIMITER`
+`AUTO_DOCSTRING_DELIMITER` Default: `"""`
 
 The text which is used to start and end the docstring
-Default: `"""`
 
 
-`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR`
-
+`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR` Default: `' '`
 The text that gets placed between an argument + its type and the tabstop that
 is used for its message.
 
 AUTHOR-NOTE: Show what this looks like
 
-Default: ` `
 
-
-`AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE`
+`AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` Default: `1`
 
 If '1' and a string could be found a raised exception then add that to the
 auto-generated docstring.
 If '0', do not include the message, even if there is one
-Default: `1`
 
 
-`AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS`
+`AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS` Default: `.`
 
 Character(s) to remove at the end of a raised exception's message. This
-setting does nothing when AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE is set to '0'.
+setting does nothing when `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` is set to '0'.
 
 
-`AUTO_DOCSTING_TYPE_ORDER`
+`AUTO_DOCSTING_TYPE_ORDER` Default: `ascending`
 
 Options: ("ascending", "descending", "alphabetical")
 
@@ -191,23 +182,17 @@ If "ascending" then the returned types are listed by where they occur in the
 source-file, sorted by line number. If "descending" then the sort is reversed.
 If "alphabetical" then line number is ignored and it is sorted by-name.
 
-Default: "ascending"
-
 
 ### Markup Config Settings
 
-`AUTO_DOCSTRING_THIRD_PARY_PREFIX`
+`AUTO_DOCSTRING_THIRD_PARY_PREFIX` Default: `<`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the beginning to tell the user "this is
 undefined".
 
-Default: `<`
-
-`AUTO_DOCSTRING_THIRD_PARY_SUFFIX`
+`AUTO_DOCSTRING_THIRD_PARY_SUFFIX` Default: `>`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the end to tell the user "this is
 undefined".
-
-Default: `>`
