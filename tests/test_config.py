@@ -121,32 +121,32 @@ class BehaviorTestCase(ConfigCommonTestCase):
     # def test_follow(self):
     #     pass
 
-    def test_raw_prefix(self):
-        os.environ['AUTO_DOCSTRING_RAW_PREFIX'] = '0'
+    # def test_raw_prefix(self):
+    #     os.environ['AUTO_DOCSTRING_RAW_PREFIX'] = '0'
 
-        code = \
-            r'''
-            def foo():
-                {curs}
-                raise ValueError('Some message\r')
-            '''
+    #     code = \
+    #         r'''
+    #         def foo():
+    #             {curs}
+    #             raise ValueError('Some message\r')
+    #         '''
 
-        expected_output = textwrap.dedent(
-'''\
-"""{1!f}.
+    #     expected_output = textwrap.dedent(
+# '''\
+# """{1!f}.
 
-Raises:
-    ValueError: {2:Some message\r!f}.
+# Raises:
+    # ValueError: {2:Some message\r!f}.
 
-"""\
-''')
+# """\
+# ''')
 
-        self.compare(expected_output, code, wrap=True)
+    #     self.compare(expected_output, code, wrap=True)
 
-        expected_output = 'r' + expected_output
-        os.environ['AUTO_DOCSTRING_RAW_PREFIX'] = '1'
+    #     expected_output = 'r' + expected_output
+    #     os.environ['AUTO_DOCSTRING_RAW_PREFIX'] = '1'
 
-        self.compare(expected_output, code, wrap=True)
+    #     self.compare(expected_output, code, wrap=True)
 
     def test_block_order_001(self):
         os.environ['AUTO_DOCSTRING_BLOCK_ORDER'] = 'args,returns,raises'

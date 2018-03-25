@@ -172,43 +172,43 @@ class TypeTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
-    def test_relative_import(self):
-        # Create the temporary Python package and set it up with files
-        temporary_directory = os.path.join(tempfile.mkdtemp(), 'fake_project')
-        # self.files_folders.add(temporary_directory)
+    # def test_relative_import(self):
+    #     # Create the temporary Python package and set it up with files
+    #     temporary_directory = os.path.join(tempfile.mkdtemp(), 'fake_project')
+    #     # self.files_folders.add(temporary_directory)
 
-        os.makedirs(temporary_directory)
-        open(os.path.join(temporary_directory, '__init__.py'), 'w').close()
-        sys.path.append(os.path.dirname(temporary_directory))
+    #     os.makedirs(temporary_directory)
+    #     open(os.path.join(temporary_directory, '__init__.py'), 'w').close()
+    #     sys.path.append(os.path.dirname(temporary_directory))
 
-        foo_code = textwrap.dedent(
-            '''\
-            class Thing(object):
-                @classmethod
-                def fizz(cls):
-                    return 8
+    #     foo_code = textwrap.dedent(
+    #         '''\
+    #         class Thing(object):
+    #             @classmethod
+    #             def fizz(cls):
+    #                 return 8
 
-            ''')
+    #         ''')
 
-        with open(os.path.join(temporary_directory, 'foo.py'), 'w') as file_:
-            file_.write(foo_code)
+    #     with open(os.path.join(temporary_directory, 'foo.py'), 'w') as file_:
+    #         file_.write(foo_code)
 
-        code = textwrap.dedent(
-            '''\
-            from . import foo
+    #     code = textwrap.dedent(
+    #         '''\
+    #         from . import foo
 
-            def bar():
-                {curs}
-                return foo.Thing.fizz()
-            ''')
+    #         def bar():
+    #             {curs}
+    #             return foo.Thing.fizz()
+    #         ''')
 
-        with tempfile.NamedTemporaryFile(delete=False, dir=temporary_directory, suffix='.py') as file_:
-            file_.write(code.format(curs=''))
-            source_file_path = file_.name
+    #     with tempfile.NamedTemporaryFile(delete=False, dir=temporary_directory, suffix='.py') as file_:
+    #         file_.write(code.format(curs=''))
+    #         source_file_path = file_.name
 
-        expected_output = '{1:int!f}: {2!f}.'
+    #     expected_output = '{1:int!f}: {2!f}.'
 
-        self.compare(expected_output, code)
+    #     self.compare(expected_output, code)
 
 #     def test_relative_inner_import(self):
 #         pass
