@@ -1,3 +1,6 @@
+TODO Make a table of contents for the docs
+Make the first demo asciinema into a GIF
+
 Welcome to vim-auto_docstring, and interactive Python-docstring auto-generator.
 
 The tool supports sphinx-style docstrings as well as Google, numpy, and epydoc
@@ -90,12 +93,18 @@ This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
 
+TODO sphinx doesn't work. Why?
+
+Sphinx
 [![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.kng)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
+Numpy
 [![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
+Google
 [![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
+Epydoc
 [![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
 - classmethod/staticmethod recognition
@@ -109,7 +118,7 @@ This tool is WIP but already has plenty of features
 
 ### Behavior Config Settings
 
-`AUTO_DOCSTRING_STYLE`
+`AUTO_DOCSTRING_STYLE` Default: `google`
 
 Options: ("google", "sphinx", "numpy", "epydoc")
 
@@ -118,20 +127,17 @@ You can add your own styles and register them if you want (Seealso)
 TODO make the feature to let people register their own styles ...
 If you do make your own style, you can use it for this setting.
 
-Default: `google`
-
-`AUTO_DOCSTRING_FOLLOW`
+`AUTO_DOCSTRING_FOLLOW` Default: `1`
 
 If '1', this will search through callable objects to get the actual type
 If '0', it will just return the object/variable name, directly
-Default: `1`
 
 `AUTO_DOCSTRING_AUTO_RAW_PREFIX`
 
 Add 'r' to the docstring tag if the docstring contains '\'
 Default: `1`
 
-`AUTO_DOCSTRING_BLOCK_ORDER`
+`AUTO_DOCSTRING_BLOCK_ORDER` Default: `args,raises,returns,yields`
 
 The comma-separated list to use to display docstring blocks.
 You can specify block-order per-style, like this:
@@ -145,7 +151,6 @@ Or just define the list once and it will be applied for every style
 TODO Make a list of all the other allowed blocks for each style and also make
 a function for that.
 
-Default: `args,raises,returns,yields`
 
 ### Style Config Settings
 
