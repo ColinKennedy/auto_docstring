@@ -34,18 +34,12 @@ Plug 'ColinKennedy/vim-auto_docstring'
 Plugin 'ColinKennedy/vim-auto_docstring'
 ```
 
-## dein.vim
-
-```vim
-call dein#add('ColinKennedy/vim-auto_docstring', {})
-```
-
 
 Finally, because auto_docstring is a regular UltiSnips snippet, we need to add
 the snippet to UltiSnips's list of Python snippets.
 
-Open a Python file, any is fine, and then run `:UltiSnipsEdit` open your
-python.snippets file. Add this block into it
+Open a Python file, any is fine, and then run `:UltiSnipsEdit` to open your
+python.snippets file. Add this snippet defintion into it
 
 ```vim
 global !p
@@ -87,7 +81,7 @@ endsnippet
 ```
 
 And that's it, you should be able to get started immediately.
-Of course, "snippet ad" can be named whatever you'd like. It's just a recommendation.
+Of course, you can rename "snippet ad" to be whatever you'd like.
 
 
 # Features
@@ -108,8 +102,6 @@ Google
 Epydoc
 [![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
-<script src="https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.js" id="asciicast-Jpebcqy20XDTRf6pZlFmkLrzu" async></script>
-
 - classmethod/staticmethod recognition
 - optional-arg parsing
 - return-type grouping
@@ -121,7 +113,7 @@ Epydoc
 
 ### Behavior Config Settings
 
-AUTO_DOCSTRING_STYLE
+`AUTO_DOCSTRING_STYLE`
 
 Options: ("google", "sphinx", "numpy", "epydoc")
 
@@ -130,53 +122,68 @@ You can add your own styles and register them if you want (Seealso)
 TODO make the feature to let people register their own styles ...
 If you do make your own style, you can use it for this setting.
 
-Default: "google"
+Default: `google`
 
-AUTO_DOCSTRING_FOLLOW
+`AUTO_DOCSTRING_FOLLOW`
 
 If '1', this will search through callable objects to get the actual type
 If '0', it will just return the object/variable name, directly
-Default: '1'
+Default: `1`
 
-AUTO_DOCSTRING_AUTO_RAW_PREFIX
+`AUTO_DOCSTRING_AUTO_RAW_PREFIX`
 
 Add 'r' to the docstring tag if the docstring contains '\'
-Default: '1'
+Default: `1`
 
+`AUTO_DOCSTRING_BLOCK_ORDER`
+
+The comma-separated list to use to display docstring blocks.
+You can specify block-order per-style, like this:
+
+`google:args,raises,returns,yields:sphinx:args,returns,raises`
+
+Or just define the list once and it will be applied for every style
+
+`args,raises,returns,yields`
+
+TODO Make a list of all the other allowed blocks for each style and also make
+a function for that.
+
+Default: `args,raises,returns,yields`
 
 ### Style Config Settings
 
-AUTO_DOCSTRING_DELIMITER
+`AUTO_DOCSTRING_DELIMITER`
 
 The text which is used to start and end the docstring
-Default: '"""'
+Default: `"""`
 
 
-AUTO_DOCSTRING_DESCRIPTION_SEPARATOR
+`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR`
 
 The text that gets placed between an argument + its type and the tabstop that
 is used for its message.
 
 AUTHOR-NOTE: Show what this looks like
 
-Default: " "
+Default: ` `
 
 
-AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE
+`AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE`
 
 If '1' and a string could be found a raised exception then add that to the
 auto-generated docstring.
 If '0', do not include the message, even if there is one
-Default: '1'
+Default: `1`
 
 
-AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS
+`AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS`
 
 Character(s) to remove at the end of a raised exception's message. This
 setting does nothing when AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE is set to '0'.
 
 
-AUTO_DOCSTING_TYPE_ORDER
+`AUTO_DOCSTING_TYPE_ORDER`
 
 Options: ("ascending", "descending", "alphabetical")
 
@@ -185,3 +192,22 @@ source-file, sorted by line number. If "descending" then the sort is reversed.
 If "alphabetical" then line number is ignored and it is sorted by-name.
 
 Default: "ascending"
+
+
+### Markup Config Settings
+
+`AUTO_DOCSTRING_THIRD_PARY_PREFIX`
+
+If a docstring is generated and the type of an object cannot be inferred,
+this character will be placed at the beginning to tell the user "this is
+undefined".
+
+Default: `<`
+
+`AUTO_DOCSTRING_THIRD_PARY_SUFFIX`
+
+If a docstring is generated and the type of an object cannot be inferred,
+this character will be placed at the end to tell the user "this is
+undefined".
+
+Default: `>`
