@@ -307,8 +307,20 @@ class IterableType(Type):
             # If it's not an object type or a container, then try to find that
             # value of subitem, directly
             #
-            value = visit.get_value(subitem)
-            self.items.append(Type(value))
+            try:
+                value = visit.get_value(subitem)
+            except KeyError:
+                # This happens if no value could be found. If that's the case
+                # then just ignore it. It's probably a scenario whose type
+                # cannot be easily inferred.
+                #
+                # Example: "a + b" is not easily inferred because a could be
+                # an instance of a class that overrides __add__
+                # to something totally arbitrary.
+                #
+                pass
+            else:
+                self.items.append(Type(value))
 
     def type_contained_in(self, seq):
         '''If this each of the types is contained in the given sequence-type.

@@ -423,3 +423,17 @@ class AdvancedTestCase(common.CommonTestCase):
             '''
 
         self.compare(expected_output, code)
+
+    def test_004(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                bar = 9
+                thing = 10
+                return bar + thing
+            '''
+
+        expected_output = '$1: $2.'
+
+        self.compare(expected_output, code)

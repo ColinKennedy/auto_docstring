@@ -209,7 +209,11 @@ class MultiTypeBlock(CommonBlock):
             str: The created docstring line.
 
         '''
-        return '{indent}{{:{obj_type}!f}}: {{!f}}.'.format(
+        if obj_type:
+            # This ":" is needed for parsing by auto_docstring
+            obj_type = ':' + obj_type
+
+        return '{indent}{{{obj_type}!f}}: {{!f}}.'.format(
             indent=indent,
             obj_type=obj_type,
         )
