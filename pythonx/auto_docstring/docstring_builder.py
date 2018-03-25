@@ -60,12 +60,12 @@ def create_docstring(code, row, style=''):
     #
     #     must be change into ...
     #
-    #     '''{1}.
+    #     '''{1!f}.
     #
-    #     {2|name}
+    #     {2:name!f}
     #
     #     Args:
-    #         foo ({3}): {2|name}.
+    #         foo ({3!f}): {2:name!f}.
     #
     #     '''
     #
