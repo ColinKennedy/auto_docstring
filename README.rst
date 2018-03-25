@@ -6,6 +6,8 @@ styles.
 To use the auto-generator, just place your cursor in the function that you want
 to create documentation for and run the auto_docstring command.
 
+[![demo](https://asciinema.org/a/113463.png)](https://asciinema.org/a/113463?autoplay=1)
+
 [![asciicast](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
 
@@ -18,7 +20,7 @@ generates text-snippets. Visit [the UltiSnips GitHub page](https://github.com/Si
 Once that is installed, install auto_docstring's dependencies, with [pip](https://pypi.python.org/pypi/pip).
 
 ```bash
-pip install astroid
+$ pip install astroid
 ```
 
 Now add auto_docstring to your Vim configuration using a package manager.
@@ -26,17 +28,24 @@ Now add auto_docstring to your Vim configuration using a package manager.
 Vim-Plug
 ++++++++
 
+```vim
 Plug 'ColinKennedy/vim-auto_docstring'
+```
 
 Vundle
 ++++++
 
+```vim
 Plugin 'ColinKennedy/vim-auto_docstring'
+```
 
 dein.vim
 ++++++++
 
+```vim
 call dein#add('ColinKennedy/vim-auto_docstring', {})
+```
+
 
 Finally, because auto_docstring is a regular UltiSnips snippet, we need to add
 the snippet to UltiSnips's list of Python snippets.
@@ -44,7 +53,7 @@ the snippet to UltiSnips's list of Python snippets.
 Open a Python file, any is fine, and then run `:UltiSnipsEdit` open your
 python.snippets file. Add this block into it
 
-```
+```vim
 global !p
 from auto_docstring import docstring_builder
 
@@ -93,13 +102,13 @@ Features
 This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
-[![asciicast](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
+[sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
-[![asciicast](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
+[numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
-[![asciicast](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
+[Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
-[![asciicast](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
+[epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
 
 - classmethod/staticmethod recognition
