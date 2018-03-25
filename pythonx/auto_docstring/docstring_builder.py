@@ -23,7 +23,6 @@ def _needs_prefix(text):
     return False
 
 
-# TODO : Update 'wrap' in docstring
 def create_docstring(code, row, style='', wrap=False):
     '''Create a docstring for the given `code`, at the specified `row`.
 
@@ -35,6 +34,10 @@ def create_docstring(code, row, style='', wrap=False):
             a default style is used from the `AUTO_DOCSTRING_STYLE`
             environment variable. If that variable isn't set,
             the code-style defaults to "google".
+        wrap (:obj:`bool`, optional):
+            If True, add `"""` around the generated docstring.
+            If False, do not add any delimiter around the generated docstring.
+            Default is False.
 
     Returns:
         str: The auto-generated docstring.
@@ -108,6 +111,10 @@ def create_ultisnips_docstring(code, row, style='', wrap=False):
             a default style is used from the `AUTO_DOCSTRING_STYLE`
             environment variable. If that variable isn't set,
             the code-style defaults to "google".
+        wrap (:obj:`bool`, optional):
+            If True, add `"""` around the generated docstring.
+            If False, do not add any delimiter around the generated docstring.
+            Default is False.
 
     Returns:
         str: The auto-generated, UltiSnips docstring.
