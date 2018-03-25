@@ -605,7 +605,7 @@ def _process_as_thirdparty_attribute(node, wrap=False):
 
     '''
     # TODO : This function is messed up. Double-Check it
-    def get_import_name(obj):
+    def get_end_name_of_node(obj):
         '''Get the tail-name of the given `obj`.
 
         Args:
@@ -627,7 +627,7 @@ def _process_as_thirdparty_attribute(node, wrap=False):
             except AttributeError:
                 pass
 
-            return get_import_name(obj.expr)
+            return get_end_name_of_node(obj.expr)
 
     # TODO : Couldn't I just if function == obj?
     def get_local_function_types(module, node):
@@ -644,7 +644,7 @@ def _process_as_thirdparty_attribute(node, wrap=False):
 
         '''
         from . import common_block
-        search_name = get_import_name(node)
+        search_name = get_end_name_of_node(node)
 
         # First, try to see if the object is defined in this module
         for function in module.nodes_of_class(astroid.FunctionDef):
@@ -683,7 +683,7 @@ def _process_as_thirdparty_attribute(node, wrap=False):
                  to import `node`.
 
         '''
-        search_name = get_import_name(node)
+        search_name = get_end_name_of_node(node)
         object_line_number = node.lineno
 
         for item in module.nodes_of_class((astroid.ImportFrom, astroid.Import)):
