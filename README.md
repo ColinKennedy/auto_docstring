@@ -6,13 +6,10 @@ styles.
 To use the auto-generator, just place your cursor in the function that you want
 to create documentation for and run the auto_docstring command.
 
-[![demo](https://asciinema.org/a/113463.png)](https://asciinema.org/a/113463?autoplay=1)
-
-[![asciicast](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
+[![demo](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
 
-Installation
-------------
+# Installation
 
 auto_docstring is an extension for UltiSnips, which is a Vim plugin that
 generates text-snippets. Visit [the UltiSnips GitHub page](https://github.com/SirVer/ultisnips) for its latest installation requirements and instructions.
@@ -25,22 +22,19 @@ $ pip install astroid
 
 Now add auto_docstring to your Vim configuration using a package manager.
 
-Vim-Plug
-++++++++
+## Vim-Plug
 
 ```vim
 Plug 'ColinKennedy/vim-auto_docstring'
 ```
 
-Vundle
-++++++
+## Vundle
 
 ```vim
 Plugin 'ColinKennedy/vim-auto_docstring'
 ```
 
-dein.vim
-++++++++
+## dein.vim
 
 ```vim
 call dein#add('ColinKennedy/vim-auto_docstring', {})
@@ -96,19 +90,18 @@ And that's it, you should be able to get started immediately.
 Of course, "snippet ad" can be named whatever you'd like. It's just a recommendation.
 
 
-Features
-========
+# Features
 
 This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
-[sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
+[![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
-[numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
+[![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
-[Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
+[![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
-[epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
+[![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
 
 - classmethod/staticmethod recognition
@@ -118,11 +111,9 @@ This tool is WIP but already has plenty of features
 - follows local functions and objects to get its types
 
 
-Config Settings
----------------
+## Config Settings
 
-Behavior Config Settings
-++++++++++++++++++++++++
+### Behavior Config Settings
 
 AUTO_DOCSTRING_STYLE
 
@@ -147,8 +138,7 @@ Add 'r' to the docstring tag if the docstring contains '\'
 Default: '1'
 
 
-Style Config Settings
-+++++++++++++++++++++
+### Style Config Settings
 
 AUTO_DOCSTRING_DELIMITER
 
@@ -189,4 +179,3 @@ source-file, sorted by line number. If "descending" then the sort is reversed.
 If "alphabetical" then line number is ignored and it is sorted by-name.
 
 Default: "ascending"
-
