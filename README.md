@@ -108,7 +108,7 @@ Google
 Epydoc
 [![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
-<script src="https://asciinema.org/a/14.js" id="asciicast-14" async></script>
+<script src="https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.js" id="asciicast-Jpebcqy20XDTRf6pZlFmkLrzu" async></script>
 
 - classmethod/staticmethod recognition
 - optional-arg parsing
