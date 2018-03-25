@@ -96,13 +96,13 @@ This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
 
-[![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p?t=1)
+[![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
-[![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6?t=1)
+[![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
-[![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd?t=1)
+[![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
-[![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu?t=1)
+[![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
 
 - classmethod/staticmethod recognition
 - optional-arg parsing
