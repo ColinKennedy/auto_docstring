@@ -84,17 +84,18 @@ def create_docstring(code, row, style='', wrap=False):
 
     if wrap:
         delimiter = environment.get_docstring_delimiter()
-        if environment.auto_raw_prefix() and _needs_prefix(generated_docstring):
-            prefix = 'r'
-        else:
-            prefix = ''
+        # if environment.auto_raw_prefix() and _needs_prefix(generated_docstring):
+        #     prefix = 'r'
+        # else:
+        #     prefix = ''
 
-        return prefix + delimiter + generated_docstring + delimiter
+        # return prefix + delimiter + generated_docstring + delimiter
+        return delimiter + generated_docstring + delimiter
 
     return generated_docstring
 
 
-def create_ultisnips_docstring(code, row, style=''):
+def create_ultisnips_docstring(code, row, style='', wrap=False):
     '''Create an UltiSnips-style docstring for the given `code`.
 
     Args:
@@ -112,7 +113,7 @@ def create_ultisnips_docstring(code, row, style=''):
         str: The auto-generated, UltiSnips docstring.
 
     '''
-    docstring = create_docstring(code, row, style=style)
+    docstring = create_docstring(code, row, style=style, wrap=wrap)
     return convert_to_ultisnips(docstring)
 
 

@@ -1,11 +1,11 @@
 - go back and double-check the docstrings and comments for all of the
   sphinx-related modules. They could have "Google-specifc" notes in them
   that are no longer relevant
+- Go through one-line summaries and remove variable names / function names
+  from the docstrings :(
 
 - support other documentation types (sphinx, numpy, scipy, epytext)
     - numpy
-      - Single-line summaries aren't single-lined
-      - They use "x or y of z" syntax
       - optional is written as "x: int, optional"
 
         When a parameter can only assume one of a fixed set of values, those values can be listed in braces, with the default appearing first:
@@ -24,46 +24,18 @@
 
 - create a new repo to use for the vim-plugin version
 
-- allow the user to start docstrings on the next line + indentation, not the current line
- - this should work even in other documentation types
-
-- Offer some kind of mechanism to allow default values to be displayed in the
-  actual default parameter(s)
-
-- Create a list of stdlib functions and objects to define the type of
-- Create a way to customize the way that ", optional)" is shown in google
-  style (and other styles)
-- Create another way to customize how default arg values are shown
-
 
 - Add 'r' automatically the generated docstring contains '\'
-- Go through one-line summaries and remove variable names / function names
-  from the docstrings :(
 
 - Change all _make_line calls to "_make_lines" so that classes can be
   more consistent
 - make a base-class for all blocks so that other styles don't have to inherit from
   google-style classes
 
+
 Roadmap
- - cross-typing (between args and returns, for example)
- - Follow module function(s)
-  - make sure that this works even with relative imports!
- - list/dict comprehensions
- - generators
- - logistical returns
  - attribute options
 
-
-
-
-- ard - replaces the docstring in the function
-- acd - only updates if args/raise statements are removed/added
-  - otherwise, keeps the info of the docstring intact
-- Make a function to create a specific docstring block type, instead of the
-  entire docstring
-  - make "acd"-esque variants for each, so that it can reuse parts of the block
-- make sure these commands will work in VISUAL mode, too
 
 - allow NoneType to be remapped to "None"
 

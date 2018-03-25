@@ -208,7 +208,7 @@ class TypeTestCase(common.CommonTestCase):
 
         expected_output = '{1:int!f}: {2!f}.'
 
-        self.compare(expected_output, code, file_path=source_file_path)
+        self.compare(expected_output, code)
 
 #     def test_relative_inner_import(self):
 #         pass

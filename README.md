@@ -6,10 +6,12 @@ Welcome to vim-auto_docstring, and interactive Python-docstring auto-generator.
 The tool supports sphinx-style docstrings as well as Google, numpy, and epydoc
 styles.
 
-To use the auto-generator, just place your cursor in the function that you want
-to create documentation for and run the auto_docstring command.
-
 [![demo](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd?autoplay=1&t=1)
+
+
+# How To Use
+To use the auto-generator, just place your cursor wherever you want to create
+the docstring and run the auto_docstring command.
 
 
 # Installation
@@ -60,22 +62,6 @@ def get_auto_docstring():
     docstring = docstring_builder.create_ultisnips_docstring(
         code, row=row, style='')
     return "'''" + docstring + "'''"
-
-
-def get_auto_docstring_block(block):
-    '''Generate a part of a docstring at the current row, in a Vim buffer.
-
-    Args:
-        block (str): The block to create. Example: 'Args'.
-
-    '''
-    (row, _) = vim.current.window.cursor
-    docstring = class_read.create_auto_docstring_block(
-        code='\n'.join(list(vim.current.buffer)), row=row,
-        language='python', style='google', block=block)
-    formatter = ultisnips_build.UltiSnipsTabstopFormatter()
-    return formatter.format(docstring)
-
 endglobal
 
 
@@ -91,11 +77,9 @@ Of course, you can rename "snippet ad" to be whatever you'd like.
 
 # Features
 
-This tool is WIP but already has plenty of features
+- Supports sphinx, numpy/scipy, Google, and epydoc (doxygen) docstring styles
 
-- Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
-
-TODO sphinx doesn't work. Why?
+TODO sphinx asciinema player isn't displaying... Why?
 
 Sphinx
 [![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.kng)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
@@ -115,8 +99,15 @@ Epydoc
 - nested-function support
 - follows local functions and objects to get its types
 
+- most features are overridable or highly-configurable
+
 
 ## Config Settings
+
+This repository is configurable using either environment variables or as
+Vim variables. By default, Vim variables are preferred over any environment
+variables. The environment variable option is a fallback, in case no vim
+variables exist.
 
 ### Behavior Config Settings
 
@@ -173,7 +164,7 @@ Character(s) to remove at the end of a raised exception's message. This
 setting does nothing when `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` is set to '0'.
 
 
-`AUTO_DOCSTING_TYPE_ORDER` Default: `ascending`
+`AUTO_DOCSTING_TYPE_ORDER` Default: `descending`
 
 Options: ("ascending", "descending", "alphabetical")
 
@@ -215,3 +206,93 @@ is used for its message.
 
 AUTHOR-NOTE: Show what this looks like
 
+
+## Roadmap
+
+The below list is the current set of planned features for auto_docstring.
+Each version has a set number of features to implement.
+
+To see the most recently implemented features, see the CHANGELOG
+
+
+### 0.1
+
+- Add dict-comprehension syntax support
+- Allow docstrings with default args to include its default-arg as part of
+  the docstring
+- Let the user customize how / where that default arg information is
+  displayed
+- Allow the user to start docstrings on the next line + indentation, not the current line
+
+
+### 0.2
+
+```python
+def foo():
+	return 8
+set((foo() for _ in range(10)))
+```
+should return a type of "set[int]"
+
+- Follow modules recursively to get the types of objects
+- Add support for local Python imports
+- Allow class docstrings (like an attributes block / args block)
+- Add type-inference for classmethods and instancemethods
+
+
+### 0.3
+- Add better support for standard library functions, classes, and objects
+- Find a way to display individal docstring blocks, rather than generating
+  an entire docstring all at once
+- Support later versions of Python (3.X)
+- R&D Type-hinting, for Python 3 (possibly add it as a goal for 0.4)
+- Support generator syntax with cast types. For example
+
+
+### 0.4
+- Add convenience snippets such as ...
+	- "ard" - Which replaces the docstring in the function
+	- "acd" - Which will re-use an exising docstring and only add/remove members
+	- These commands would work in VISUAL mode, too
+
+
+### 0.5
+
+- unclosed return detection
+i.e.
+
+```python
+def foo():
+	for item in range(bar):
+		if item:
+			return 'fizz'
+```
+
+Should be a return type of "str or NoneType" because there is a chance that the
+if condition will not be True.
+Whereas
+
+
+
+```python
+def foo():
+	for item in range(bar):
+		if item:
+			return 'fizz'
+	else:
+		return False
+```
+
+Should be a returned for "str or bool" because the for-loop is closed
+
+- Create a way to customize how ", optional):" tags are displayed
+- Implement shared cross-typing across blocks
+
+Example:
+```python
+def foo(item):
+	return item
+```
+
+Should allow the user to replace "item" and have it update in both the "Args"
+and "Returns" block at the same time, so they can save time writing variable types

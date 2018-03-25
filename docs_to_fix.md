@@ -1,3 +1,17 @@
+
+#####
+def get_required_tokens(self):
+    '''list[str]: Get the tokens for this Context that must be filled.'''
+    full_mapping_details = self.get_all_mapping_details()
+    required_tokens = []
+
+    for key, info in full_mapping_details.items():
+        if info.get('required', True) and key not in required_tokens:
+            required_tokens.append(key)
+
+    return required_tokens
+
+
 ####
 
 def foo():
