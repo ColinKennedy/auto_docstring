@@ -54,10 +54,10 @@ class CommonTestCase(unittest.TestCase):
         return code % '{curs}'
 
     def setUp(self):
-        self.env_copy = dict(os.environ)
         auto_docstring.deregister_all()
         self.files_folders = set()
         self.paths = list(sys.path)
+        os.environ.clear()
 
     def compare(self, expected_output, code, style='google', wrap=False):
         '''Format and test the given source `code` and `expected_output`.
@@ -122,7 +122,3 @@ class CommonTestCase(unittest.TestCase):
 
         for path in self.paths:
             sys.path.append(path)
-
-        os.environ.clear()
-        for key, value in six.iteritems(self.env_copy):
-            os.environ[key] = value

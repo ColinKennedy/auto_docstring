@@ -4,19 +4,39 @@
 '''A module for loading and storing user customization settings.'''
 
 # IMPORT STANDARD LIBRARIES
+import collections
 import os
 import re
 
 
 _STYLES = dict()
 _STYLE_BLOCK_ORDER_COMPILE = re.compile(r'(?P<name>\w+):(?P<blocks>[\w,]+):')
+_CONFIG = collections.defaultdict(list)
+
+
+def register_config_entry(name, predicate):
+    _CONFIG[name].insert(0, predicate)
+
+
+def get_config_entry(name, default=None):
+    for function in _CONFIG[name]:
+        try:
+            return function()
+        except Exception:
+            pass
+
+    return default
+
+
+def _auto_raw_prefix():
+    return os.environ['AUTO_DOCSTRING_RAW_PREFIX'] == '1'
 
 
 def auto_raw_prefix():
-    return os.getenv('AUTO_DOCSTRING_RAW_PREFIX', '1') == '1'
+    return get_config_entry('raw_prefix', default=True)
 
 
-def allow_type_follow():
+def _allow_type_follow():
     '''Check if it is OK to follow the type of a Call or Name object.
 
     Returns:
@@ -26,7 +46,11 @@ def allow_type_follow():
               it has found all its return types. Default is True.
 
     '''
-    return os.getenv('AUTO_DOCSTRING_TYPE_FOLLOW', '1') == '1'
+    return os.environ['AUTO_DOCSTRING_TYPE_FOLLOW'] == '1'
+
+
+def allow_type_follow():
+    return get_config_entry('type_follow', default=True)
 
 
 # TODO : Add this to __init__.py
@@ -96,30 +120,46 @@ def get_block_order(name):
     return get_default_style_blocks(name)
 
 
+def _get_container_prefix():
+    return os.environ['AUTO_DOCSTRING_CONTAINER_PREFIX']
+
+
 def get_container_prefix():
-    return os.getenv('AUTO_DOCSTRING_CONTAINER_PREFIX', '[')
+    return get_config_entry('container_prefix', default='[')
+
+
+def _get_container_suffix():
+    return os.environ['AUTO_DOCSTRING_CONTAINER_SUFFIX']
 
 
 def get_container_suffix():
-    return os.getenv('AUTO_DOCSTRING_CONTAINER_SUFFIX', ']')
+    return get_config_entry('container_suffix', default=']')
 
 
 # TODO : Change name to get_indent
-def get_default_indent():
+def _get_default_indent():
     '''The preferred indentation for the auto-generated docstrings.
 
     Returns:
         str: The indentation. Default: "    ".
 
     '''
-    return os.getenv('AUTO_DOCSTRING_INDENT', '    ')
+    return os.environ['AUTO_DOCSTRING_INDENT']
+
+
+def get_default_indent():
+    return get_config_entry('indent', default='    ')
+
+
+def _get_docstring_delimiter():
+    return os.environ['AUTO_DOCSTRING_DELIMITER']
 
 
 def get_docstring_delimiter():
-    return os.getenv('AUTO_DOCSTRING_DELIMITER', '"""')
+    return get_config_entry('delimiter', default='"""')
 
 
-def get_trailing_characters_to_drop():
+def _get_trailing_characters_to_drop():
     '''Get the character(s) to remove from exception messages.
 
     ```
@@ -148,15 +188,27 @@ def get_trailing_characters_to_drop():
         str: The characters to remove.
 
     '''
-    return os.getenv('AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS', '.')
+    return os.environ['AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS']
+
+
+def get_trailing_characters_to_drop():
+    return get_config_entry('trailing_characters', default='.')
+
+
+def _get_current_style():
+    return os.environ['AUTO_DOCSTRING_STYLE']
 
 
 def get_current_style():
-    return os.getenv('AUTO_DOCSTRING_STYLE', 'google')
+    return get_config_entry('style', default='google')
+
+
+def _get_option_separator():
+    return os.environ['AUTO_DOCSTRING_OPTION_SEPARATOR']
 
 
 def get_option_separator():
-    return os.getenv('AUTO_DOCSTRING_OPTION_SEPARATOR', ' or ')
+    return get_config_entry('option_separator', ' or ')
 
 
 # TODO : Finish this docstring
@@ -195,3 +247,13 @@ def drop_trailing_characters(text, characters=''):
     if text[character_length:] == characters:
         return text[:character_length]
     return text
+
+
+register_config_entry('container_prefix', predicate=_get_container_prefix)
+register_config_entry('container_suffix', predicate=_get_container_suffix)
+register_config_entry('delimiter', predicate=_get_docstring_delimiter)
+register_config_entry('indent', predicate=_get_default_indent)
+register_config_entry('option_separator', predicate=_get_option_separator)
+register_config_entry('raw_prefix', predicate=_auto_raw_prefix)
+register_config_entry('style', predicate=_get_current_style)
+register_config_entry('type_follow', predicate=_allow_type_follow)

@@ -23,6 +23,7 @@ from .config import environment
 from .defaults.registry import register
 from .defaults.registry import get_default
 from .defaults.registry import deregister_all
+from .config.environment import register_config_entry
 
 
 environment.register_code_style(name=epydoc.EpydocStyle.name, obj=epydoc.EpydocStyle)
@@ -50,4 +51,5 @@ __all__ = [
     'register',
     'get_default',
     'deregister_all',
+    'register_config_entry',
 ]
