@@ -252,10 +252,6 @@ To see the most recently implemented features, see the CHANGELOG
 ### 0.1
 
 - Add dict-comprehension syntax support
-- Allow docstrings with default args to include its default-arg as part of
-  the docstring
-- Let the user customize how / where that default arg information is
-  displayed
 - Allow the user to start docstrings on the next line + indentation, not the current line
 
 
@@ -272,6 +268,10 @@ should return a type of "set[int]"
 - Add support for local Python imports
 - Allow class docstrings (like an attributes block / args block)
 - Add type-inference for classmethods and instancemethods
+- Allow docstrings with default args to include its default-arg as part of
+  the docstring
+- Let the user customize how / where that default arg information is
+  displayed
 
 
 ### 1.0
