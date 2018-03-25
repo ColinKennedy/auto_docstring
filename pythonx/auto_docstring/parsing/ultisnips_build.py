@@ -190,6 +190,8 @@ class RecursiveParser(object):
         _curlys = pyparsing.nestedExpr('{', '}', content=_content)
 
         # 2. Since we made the expression nested a little while ago, lets unpack it
+        #    by getting the 0th index
+        #
         parsed_text = _curlys.parseString(text).asList()[0]
         result = function(parsed_text)
 

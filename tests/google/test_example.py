@@ -21,12 +21,16 @@ class AdvancedTestCase(common.CommonTestCase):
 
     '''A series of unittests for docstrings that required bugfixes.'''
 
-    def compare(self, expected_output, code):
+    def compare(self, expected_output, code, wrap=False):
         '''Create `code` docstring and test it against `expected_output`.
 
         Args:
             expected_output (str): The docstring that should be built.
             code (str): The code that is used to create a docstring.
+            wrap (:obj:`bool`, optional):
+                If True, add `"""` around the generated docstring.
+                If False, do not add any delimiter around the generated docstring.
+                Default is False.
 
         '''
         code = textwrap.dedent(code)

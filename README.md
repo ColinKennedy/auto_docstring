@@ -23,6 +23,7 @@ Once that is installed, install auto_docstring's dependencies, with [pip](https:
 
 ```bash
 $ pip install astroid
+$ pip install pyparsing
 ```
 
 Now add auto_docstring to your Vim configuration using a package manager.
