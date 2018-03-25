@@ -96,13 +96,19 @@ This tool is WIP but already has plenty of features
 
 - Supports sphinx, numpy/scipy, Google, and epydoc docstring styles
 
-[![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.png)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
+Sphinx
+[![sphinx](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p.kng)](https://asciinema.org/a/40b8QaBG949TFhIBxWk91Ub5p)
 
+Numpy
 [![numpy/scipy](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6.png)](https://asciinema.org/a/aOYKWOiD92Bz9XkixmhUOerd6)
 
+Google
 [![Google](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd.png)](https://asciinema.org/a/AeIPtOBsBPuEHsPvUZqDQXwDd)
 
+Epydoc
 [![epydoc](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu.png)](https://asciinema.org/a/Jpebcqy20XDTRf6pZlFmkLrzu)
+
+<script src="https://asciinema.org/a/14.js" id="asciicast-14" async></script>
 
 - classmethod/staticmethod recognition
 - optional-arg parsing
