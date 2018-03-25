@@ -106,46 +106,52 @@ Epydoc
 ## Config Settings
 
 This repository is configurable using either environment variables or as
-Vim variables. By default, Vim variables are preferred over any environment
-variables. The environment variable option is a fallback, in case no vim
-variables exist.
+Vim variables. Vim variable definitions are given higher priority than
+environment variables.
+
+To set a Vim variable, add a line like the one below to your `~/.vimrc` file:
+
+`let g:auto_docstring_foo = "value"`
+
+Where `auto_docstring_foo` is the name of variable to set.
+
 
 ### Behavior Config Settings
 
-env var: `AUTO_DOCSTRING_STYLE`
-vim var: `g:auto_docstring_style`
-Default: `google`
++------------------------------+--------------------------------+------------------------------+--------------------------------------------------+
+| Vim Variable                 | Environment Variable           | Default                      | Description                                      |
+|------------------------------|--------------------------------|------------------------------|--------------------------------------------------|
+| g:auto_docstring_style       | AUTO_DOCSTRING_STYLE           | "google"                     | Options: ("google", "sphinx", "numpy", "epydoc") |
+| g:auto_docstring_type_follow | AUTO_DOCSTRING_TYPE_FOLLOW     | "1"                          |                                                  |
+| g:auto_docstring_raw_prefix  | AUTO_DOCSTRING_AUTO_RAW_PREFIX | "1"                          |                                                  |
+| g:auto_docstring_block_order | AUTO_DOCSTRING_BLOCK_ORDER     | "args,raises,returns,yields" |                                                  |
++------------------------------+--------------------------------+------------------------------+--------------------------------------------------+
 
-Options: ("google", "sphinx", "numpy", "epydoc")
+
+`AUTO_DOCSTRING_STYLE`
 
 The style to use to render the auto-generated docstring.
 You can add your own styles and register them if you want (Seealso)
 TODO make the feature to let people register their own styles ...
 If you do make your own style, you can use it for this setting.
 
-env var: `AUTO_DOCSTRING_TYPE_FOLLOW`
-vim var: `g:auto_docstring_type_follow`
-Default: `1`
+`AUTO_DOCSTRING_TYPE_FOLLOW`
 
 If '1', this will search through callable objects to get the actual type
 If '0', it will just return the object/variable name, directly
 
-env var: `AUTO_DOCSTRING_AUTO_RAW_PREFIX`
-vim var: `g:auto_docstring_raw_prefix`
-Default: `1`
+`AUTO_DOCSTRING_AUTO_RAW_PREFIX`
 
 Add 'r' to the docstring tag if the docstring contains '\'
 
-env var: `AUTO_DOCSTRING_BLOCK_ORDER`
-vim var: `g:auto_docstring_block_order`
-Default: `args,raises,returns,yields`
+`AUTO_DOCSTRING_BLOCK_ORDER`
 
-The comma-separated list to use to display docstring blocks.
+The sequence which blocks will be displayed.
 You can specify block-order per-style, like this:
 
-`google:args,raises,returns,yields:sphinx:args,returns,raises`
+`google:args,raises,returns,yields:sphinx:args,returns,raises:`
 
-Or just define the list once and it will be applied for every style
+Or just define the list once and the block-order will be applied for every style
 
 `args,raises,returns,yields`
 
@@ -155,35 +161,32 @@ a function for that.
 
 ### Style Config Settings
 
-env var: `AUTO_DOCSTRING_DELIMITER`
-vim var: `g:auto_docstring_delimiter`
-Default: `"""`
++---------------------------------------------+-------------------------------------------+--------------+------------------------------------------------------+
+| Vim Variable                                | Environment Variable                      | Default      | Description                                          |
+|---------------------------------------------|-------------------------------------------|--------------|------------------------------------------------------|
+| g:auto_docstring_delimiter                  | AUTO_DOCSTRING_DELIMITER                  | '"""'        |                                                      |
+| g:auto_docstring_include_raise_message      | AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE      | "1"          |                                                      |
+| g:auto_docstring_remove_trailing_characters | AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS | "."          |                                                      |
+| g:auto_docsting_type_order                  | AUTO_DOCSTING_TYPE_ORDER                  | "descending" | Options: ("ascending", "descending", "alphabetical") |
++---------------------------------------------+-------------------------------------------+--------------+------------------------------------------------------+
+
+`AUTO_DOCSTRING_DELIMITER`
 
 The text which is used to start and end the docstring
 
-
-env var: `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE`
-vim var: `g:auto_docstring_`
-Default: `1`
+`AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE`
 
 If '1' and a string could be found a raised exception then add that to the
 auto-generated docstring.
 If '0', do not include the message, even if there is one
 
-
-env var: `AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS`
-vim var: `g:auto_docstring_remove_trailing_characters`
-Default: `.`
+`AUTO_DOCSTRING_REMOVE_TRAILING_CHARACTERS`
 
 Character(s) to remove at the end of a raised exception's message. This
 setting does nothing when `AUTO_DOCSTRING_INCLUDE_RAISE_MESSAGE` is set to '0'.
 
 
-env var: `AUTO_DOCSTING_TYPE_ORDER`
-vim var: `g:auto_docsting_type_order`
-Default: `descending`
-
-Options: ("ascending", "descending", "alphabetical")
+`AUTO_DOCSTING_TYPE_ORDER`
 
 If "ascending" then the returned types are listed by where they occur in the
 source-file, sorted by line number. If "descending" then the sort is reversed.
@@ -192,43 +195,45 @@ If "alphabetical" then line number is ignored and it is sorted by-name.
 
 ### Syntax Config Settings
 
-env var: `AUTO_DOCSTRING_THIRD_PARY_PREFIX`
-vim var: `g:auto_docstring_third_pary_prefix`
-Default: `<`
++----------------------------------------+--------------------------------------+---------+
+| Vim Variable                           | Environment Variable                 | Default |
+|----------------------------------------|--------------------------------------|---------|
+| g:auto_docstring_third_pary_prefix     | AUTO_DOCSTRING_THIRD_PARY_PREFIX     | "<"     |
+| g:auto_docstring_third_pary_suffix     | AUTO_DOCSTRING_THIRD_PARY_SUFFIX     | ">"     |
+| g:auto_docstring_container_prefix      | AUTO_DOCSTRING_CONTAINER_PREFIX      | "["     |
+| g:auto_docstring_container_suffix      | AUTO_DOCSTRING_CONTAINER_SUFFIX      | "]"     |
+| g:auto_docstring_option_separator      | AUTO_DOCSTRING_OPTION_SEPARATOR      | " or "  |
+| g:auto_docstring_description_separator | AUTO_DOCSTRING_DESCRIPTION_SEPARATOR | " "     |
++----------------------------------------+--------------------------------------+---------+
+
+`AUTO_DOCSTRING_THIRD_PARY_PREFIX`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the beginning to tell the user "this is
 undefined".
 
 
-env var: `AUTO_DOCSTRING_THIRD_PARY_SUFFIX`
-vim var: `g:auto_docstring_third_pary_suffix`
-Default: `>`
+`AUTO_DOCSTRING_THIRD_PARY_SUFFIX`
 
 If a docstring is generated and the type of an object cannot be inferred,
 this character will be placed at the end to tell the user "this is
 undefined".
 
 
-env var: `AUTO_DOCSTRING_CONTAINER_PREFIX`
-vim var: `g:auto_docstring_container_prefix`
-Default: `[`
+`AUTO_DOCSTRING_CONTAINER_PREFIX`
 
 TODO finish description
 The character or phrase that is used to
 
-env var: `AUTO_DOCSTRING_CONTAINER_SUFFIX`
-vim var: `g:auto_docstring_container_suffix`
-Default: `]`
+`AUTO_DOCSTRING_CONTAINER_SUFFIX`
 
-env var: `AUTO_DOCSTRING_OPTION_SEPARATOR`
-vim var: `g:auto_docstring_option_separator`
-Default: `" or "`
+TODO finish description
 
+`AUTO_DOCSTRING_OPTION_SEPARATOR`
 
-env var: `AUTO_DOCSTRING_DESCRIPTION_SEPARATOR`
-vim var: `g:auto_docstring_description_separator`
-Default: `' '`
+TODO description
+
+`AUTO_DOCSTRING_DESCRIPTION_SEPARATOR`
 
 The text that gets placed between an argument + its type and the tabstop that
 is used for its message.
