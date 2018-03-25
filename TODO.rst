@@ -35,6 +35,8 @@
   style (and other styles)
 - Create another way to customize how default arg values are shown
 
+
+- Add 'r' automatically the generated docstring contains '\'
 - Go through one-line summaries and remove variable names / function names
   from the docstrings :(
 
