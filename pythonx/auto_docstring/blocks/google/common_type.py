@@ -664,7 +664,9 @@ def _process_as_thirdparty_attribute(node, wrap=False):
     #     #     # raise ValueError(classobj)
     #     #     pass
 
-    # TODO : Maybe move "wrap" out and just add it wherever this is used?
+    # TODO : Maybe move "wrap" out of this parameter and just add it to parent
+    #        functions wherever it is used
+    #
     def get_import_path_from_ast(module, node, wrap=False):
         '''Find the dot "." import path, using the given `obj` AST node.
 
