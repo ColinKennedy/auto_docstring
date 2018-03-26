@@ -85,16 +85,22 @@ class Raises(common_block.CommonBlock):
 
         '''
         indent = environment.get_default_indent()
+        sep = environment.get_description_separator()
+
         if message:
-            return ['{indent}{raise_type}: {{{number}:{message}!f}}.'.format(
+            return ['{indent}{raise_type}:{sep}{{{number}:{message}!f}}.'.format(
                 indent=indent,
                 raise_type=raise_type,
+                sep=sep,
                 number=common.get_unique_number(),
                 message=message,
             )]
 
-        return ['{indent}{raise_type}: {{!f}}.'.format(
-            indent=indent, raise_type=raise_type)]
+        return ['{indent}{raise_type}:{sep}{{!f}}.'.format(
+                indent=indent,
+                raise_type=raise_type,
+                sep=sep,
+            )]
 
     # TODO : Move this to environment.py
     @staticmethod
