@@ -32,7 +32,7 @@ class Returns(mixin.SphinxBlockMixin, returns_block.Returns):
         return '{rtype_label} {{!f}}'.format(rtype_label=cls._type_label, arg=arg)
 
     @classmethod
-    def _build_indented_docstring_lines(cls, lines, indent=''):
+    def _build_indented_docstring_lines(cls, lines, indent='', multiline=False):
         items = []
         items_types = []
 

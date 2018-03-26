@@ -366,6 +366,22 @@ class StyleTestCase(ConfigCommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_description_separator_single(self):
+        code = \
+            '''
+            def foo():
+                {curs}
+                return 8
+            '''
+
+        expected_output = '{1:int!f}: {2!f}.'
+        self.compare(expected_output, code)
+
+        os.environ['AUTO_DOCSTRING_DESCRIPTION_SEPARATOR'] = '\n        '
+
+        expected_output = '{1:int!f}: {2!f}.'
+        self.compare(expected_output, code)
+
 
 class MarkupTestCase(ConfigCommonTestCase):
 #     def test_third_party_prefix(self):

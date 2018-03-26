@@ -14,6 +14,7 @@ import six
 # IMPORT LOCAL LIBRARIES
 from ..blocks.google import args_block
 from ..blocks.google import raises_block
+from ..blocks.google import common_block
 from ..blocks.google import yields_block
 from ..blocks.google import returns_block
 from ..config import environment
@@ -194,7 +195,7 @@ class GoogleStyle(BaseStyle):
     @staticmethod
     def _is_multiline(lines):
         '''bool: If the given lines needs extra spacing.'''
-        return len(lines) > 1
+        return common_block.is_multiline(lines)
 
     @classmethod
     def _get_header(cls, lines):

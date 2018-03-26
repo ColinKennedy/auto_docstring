@@ -168,8 +168,9 @@ class MultiTypeBlock(CommonBlock):
         return [type_info_as_str]
 
     @classmethod
-    def _build_indented_docstring_lines(cls, lines, indent=''):
-        return [cls._make_line(line, indent=indent) for line in lines]
+    def _build_indented_docstring_lines(cls, lines, indent='', multiline=False):
+        return [cls._make_line(line, indent=indent, multiline=multiline)
+                for line in lines]
 
     @classmethod
     def draw(cls, info):
@@ -194,19 +195,35 @@ class MultiTypeBlock(CommonBlock):
             return []
 
         starting_lines = []
+        all_lines = info.get('lines', [])
 
-        if info.get('lines'):
+        if all_lines:
             starting_lines = cls.get_starting_lines()
 
-        return starting_lines + cls._build_indented_docstring_lines(lines, info.get('indent', ''))
+        multiline = is_multiline(all_lines)
+
+        docstring_lines = cls._build_indented_docstring_lines(
+            lines,
+            info.get('indent', ''),
+            multiline=is_multiline(all_lines),
+        )
+        return starting_lines + docstring_lines
 
     @staticmethod
-    def _make_line(obj_type, indent):
+    def _make_line(obj_type, indent, multiline=False):
         '''Create the docstring line for the given input.
 
         Args:
-            indent (str): The amount of space to add to the docstring block.
-            obj_type (str): The type of the object. Example: "tuple[str]", "bool".
+            indent (str):
+                The amount of space to add to the docstring block.
+            obj_type (str):
+                The type of the object. Example: "tuple[str]", "bool".
+            multiline (`obj`, optional):
+                If True, get the user's preferred separator and place it between
+                the return type and the return description.
+                If False, force the separator to just be " " so that the return
+                statement will stay on a single line.
+                Default is False.
 
         Returns:
             str: The created docstring line.
@@ -215,10 +232,18 @@ class MultiTypeBlock(CommonBlock):
         if obj_type:
             # This ":" is needed for parsing by auto_docstring
             obj_type = ':' + obj_type
-        sep = environment.get_description_separator()
+
+        if not multiline:
+            sep = ' '
+        else:
+            sep = environment.get_description_separator()
 
         return '{indent}{{{obj_type}!f}}:{sep}{{!f}}.'.format(
             indent=indent,
             obj_type=obj_type,
             sep=sep,
         )
+
+
+def is_multiline(lines):
+    return len(lines) > 1
