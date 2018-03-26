@@ -32,14 +32,20 @@ class Args(common_block.CommonBlock):
 
         '''
         indent = environment.get_default_indent()
+        sep = environment.get_description_separator()
+
         if value:
-            return '{indent}{arg} ({{{id_}:{value}!f}}, optional): {{!f}}.'.format(
+            return '{indent}{arg} ({{{id_}:{value}!f}}, optional):{sep}{{!f}}.'.format(
                 indent=indent,
                 arg=arg,
                 id_=common.get_unique_number(),
-                value=value)
+                value=value,
+                sep=sep)
 
-        return '{indent}{arg} ({{!f}}): {{!f}}.'.format(indent=indent, arg=arg)
+        return '{indent}{arg} ({{!f}}):{sep}{{!f}}.'.format(
+            indent=indent,
+            sep=sep,
+            arg=arg)
 
     @classmethod
     def _build_args(cls, info):

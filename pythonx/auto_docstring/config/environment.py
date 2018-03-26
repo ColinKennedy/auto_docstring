@@ -203,6 +203,14 @@ def get_current_style():
     return get_config_entry('style', default='google')
 
 
+def _get_description_separator():
+    return os.environ['AUTO_DOCSTRING_DESCRIPTION_SEPARATOR']
+
+
+def get_description_separator():
+    return get_config_entry('description_separator', default=' ')
+
+
 def _get_option_separator():
     return os.environ['AUTO_DOCSTRING_OPTION_SEPARATOR']
 
@@ -257,3 +265,4 @@ register_config_entry('option_separator', predicate=_get_option_separator)
 register_config_entry('raw_prefix', predicate=_auto_raw_prefix)
 register_config_entry('style', predicate=_get_current_style)
 register_config_entry('type_follow', predicate=_allow_type_follow)
+register_config_entry('description_separator', predicate=_get_description_separator)

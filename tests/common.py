@@ -103,9 +103,9 @@ class CommonTestCase(unittest.TestCase):
         generated_docstring = docstring_builder.create_docstring(
             code, row=row, style=style, wrap=wrap)
 
-#         for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
-#             if char1 != char2:
-#                 raise ValueError(('asdfdf', index, char1, char2, generated_docstring[:index]))
+        # for index, (char1, char2) in enumerate(zip(expected_output, generated_docstring)):
+        #     if char1 != char2:
+        #         raise ValueError(('asdfdf', index, char1, char2, generated_docstring[:index]))
 
         self.assertEqual(expected_output, generated_docstring)
 

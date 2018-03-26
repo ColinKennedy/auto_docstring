@@ -212,8 +212,10 @@ class MultiTypeBlock(CommonBlock):
         if obj_type:
             # This ":" is needed for parsing by auto_docstring
             obj_type = ':' + obj_type
+        sep = environment.get_description_separator()
 
-        return '{indent}{{{obj_type}!f}}: {{!f}}.'.format(
+        return '{indent}{{{obj_type}!f}}:{sep}{{!f}}.'.format(
             indent=indent,
             obj_type=obj_type,
+            sep=sep,
         )
