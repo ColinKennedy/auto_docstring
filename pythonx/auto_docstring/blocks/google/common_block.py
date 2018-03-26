@@ -104,6 +104,9 @@ class CommonBlock(object):
 
         obj = visit.get_value(obj)
 
+        if common_type.DictComprehensionContainerType.is_valid(obj):
+            return common_type.DictComprehensionContainerType(obj)
+
         if common_type.ComprehensionContainerType.is_valid(obj):
             return common_type.ComprehensionContainerType(obj)
 

@@ -253,6 +253,19 @@ class ComprehensionTestCase(common.CommonTestCase):
 
         self.compare(expected_output, code)
 
+    def test_dict_comprehension(self):
+        code = \
+            '''
+            def foo():
+                %s
+                list_h = ['tt', 'afaf']
+                return {item: len(item) for item in list_h}
+            '''
+
+        expected_output = '{1:dict!f}: {2!f}.'
+
+        self.compare(expected_output, code)
+
 #     def test_generator_comp(self):
 #         code = \
 #             '''

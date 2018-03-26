@@ -283,6 +283,10 @@ class IterableType(Type):
                 self.items.append(ContainerType(subitem))
                 continue
 
+            if DictComprehensionContainerType.is_valid(subitem):
+                self.items.append(DictComprehensionContainerType(subitem))
+                continue
+
             if ComprehensionContainerType.is_valid(subitem):
                 self.items.append(ComprehensionContainerType(subitem))
                 continue
@@ -570,6 +574,18 @@ class ComprehensionContainerType(Type):
         container_type_name = get_type_name(container_type)
 
         return make_container_label(container_type_name, item_types)
+
+
+class DictComprehensionContainerType(Type):
+    def __init__(self, obj):
+        super(DictComprehensionContainerType, self).__init__(obj)
+
+    @staticmethod
+    def is_valid(node):
+        return isinstance(node, astroid.DictComp)
+
+    def as_str(self):
+        return 'dict'
 
 
 def _get_parents(node):
