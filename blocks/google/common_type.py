@@ -13,12 +13,10 @@ import inspect
 import astroid
 import six
 
-# IMPORT AUTO-DOCSTING LIBRARIES
-import auto_docstring
-
 # IMPORT LOCAL LIBRARIES
 from ...parsing import assign_search
 from ...config import environment
+from ...defaults import registry
 from ...parsing import visit
 from ...core import grouping
 from ...core import check
@@ -873,7 +871,7 @@ def _process_as_known_object(obj):
     import_path = get_local_attribute_path(path_obj)
 
     not_found = object()
-    default_function = auto_docstring.get_default(import_path, default=not_found)
+    default_function = registry.get_default(import_path, default=not_found)
 
     if default_function != not_found:
         return default_function(obj)
@@ -895,7 +893,7 @@ def _process_as_known_object(obj):
         return
 
     real_obj = getattr(module, obj_name)
-    default_function = auto_docstring.get_default(real_obj, not_found)
+    default_function = registry.get_default(real_obj, not_found)
 
     if default_function != not_found:
         return default_function(obj)

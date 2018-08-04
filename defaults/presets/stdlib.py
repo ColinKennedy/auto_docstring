@@ -6,10 +6,9 @@
 # IMPORT STANDARD LIBRARIES
 import os
 
-# IMPORT AUTO-DOCSTRING LIBRARIES
-import auto_docstring
-# TODO : Make this relative
-from auto_docstring.blocks.google import common_type
+# IMPORT LOCAL LIBRARIES
+from ...auto_docstring.blocks.google import common_type
+from .. import registry
 
 
 def get_getenv_return_types(obj):
@@ -38,7 +37,7 @@ def get_getenv_return_types(obj):
     return common_type.make_items_text(all_types)
 
 
-auto_docstring.register(os.getenv, returns=get_getenv_return_types)
-auto_docstring.register('str.format', returns='str')
-auto_docstring.register('str.join', returns='str')
-auto_docstring.register('textwrap.dedent', returns='str')
+registry.register(os.getenv, returns=get_getenv_return_types)
+registry.register('str.format', returns='str')
+registry.register('str.join', returns='str')
+registry.register('textwrap.dedent', returns='str')
