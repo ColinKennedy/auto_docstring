@@ -4,7 +4,11 @@
 '''A collection of classes and functions used to get Python return-types.'''
 
 # IMPORT STANDARD LIBRARIES
-import __builtin__
+try:
+    import builtins  # Python 3
+except ImportError:
+    import __builtin__ as builtins  # Python 2
+
 import collections
 import importlib
 import inspect
@@ -201,8 +205,8 @@ class SpecialType(Type):
         def is_builtin_type(obj):
             '''bool: If the given object is a built-in Python object.'''
             objects = []
-            for attr in dir(__builtin__):
-                attr = getattr(__builtin__, attr)
+            for attr in dir(builtins):
+                attr = getattr(builtins, attr)
                 objects.append(attr)
             objects = tuple((obj_ for obj_ in objects if inspect.isclass(obj_)))
             return obj in objects
